@@ -12,12 +12,12 @@ const SplashScreen = ({ navigation }: propsType): React.JSX.Element => {
   useEffect(() => {
     Animated.timing(scaleAnimation, {
       toValue: 1,
-      duration: 700,
+      duration: 600,
       easing: Easing.linear,
       useNativeDriver: true
     }).start(() => {
       setTimeout(() => {
-        navigation.navigate("Home")
+        navigation.navigate("Welcome")
       }, 100)
     })
   }, []);
@@ -31,7 +31,7 @@ const SplashScreen = ({ navigation }: propsType): React.JSX.Element => {
             transform: [{ scale: scaleAnimation }]
           },
         ]}
-        source={require("../../assets/APP-LOGO.png")}
+        source={require("../assets/APP-LOGO.png")}
       />
     </View>
   );
