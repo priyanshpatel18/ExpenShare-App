@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
@@ -12,13 +13,21 @@ const SplashScreen = ({ navigation }: propsType): React.JSX.Element => {
   useEffect(() => {
     Animated.timing(scaleAnimation, {
       toValue: 1,
-      duration: 600,
+      duration: 400,
       easing: Easing.linear,
       useNativeDriver: true
-    }).start(() => {
-      setTimeout(() => {
-        navigation.navigate("Welcome")
-      }, 100)
+    }).start(async () => {
+      if (await AsyncStorage.getItem("email")) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
+        return;
+      }
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Welcome' }],
+      });
     })
   }, []);
 

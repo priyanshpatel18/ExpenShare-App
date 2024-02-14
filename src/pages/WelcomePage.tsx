@@ -24,7 +24,7 @@ export default function WelcomePage({ navigation }: propsType): React.JSX.Elemen
           style={styles.registerButton}
           onPress={() => { navigation.navigate("Register") }}
         >
-          <GradientButton text='register' style={styles.registerText} />
+          <GradientButton text='register' />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.loginButton}
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     letterSpacing: 5
   },
   loginButton: {
-    backgroundColor: "#DDD",
+    backgroundColor: "#dfdfdf",
     borderRadius: 50,
     paddingHorizontal: 30,
     paddingVertical: 10,

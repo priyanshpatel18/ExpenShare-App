@@ -13,8 +13,8 @@ const GradientText = ({ text, style }: propsType): React.JSX.Element => {
     <MaskedView maskElement={<Text style={style}>{text}</Text>}>
       <LinearGradient
         colors={['#2faae3', '#c968ff', '#e680b1', '#fb9475']}
-        start={{ x: 1, y: 0 }}
-        end={{ x: 0, y: 0 }}>
+        start={{ x: 0, y: 1 }}
+        end={{ x: 1, y: 0 }}>
         <Text style={[style, { opacity: 0 }]}>{text}</Text>
       </LinearGradient>
     </MaskedView>
