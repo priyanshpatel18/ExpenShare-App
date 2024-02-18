@@ -27,7 +27,7 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
     store.setLoading(true)
     store.showToastWithGravityAndOffset("Sending Verification Mail..")
 
-    axios.post("https://expen-share-app-server.vercel.app/user/sendVerifyEmail", {
+    axios.post("/user/sendVerifyEmail", {
       email: email.toLowerCase(),
       userName: userName.toLowerCase(),
       password,

@@ -1,14 +1,10 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
+import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { userStore } from '../store/userStore';
 
 export default function Balance() {
-  const [totalBalance, setTotalBalance] = useState<string>("0.00");
-  const [income, setIncome] = useState<string>("0.00");
-  const [expense, setExpense] = useState<string>("0.00");
+  const store = userStore();
 
   return (
     <LinearGradient
@@ -19,7 +15,7 @@ export default function Balance() {
     >
       <View>
         <Text style={styles.balanceHeading}>Total Balance</Text>
-        <Text style={styles.mainBalance}>₹{totalBalance}</Text>
+        <Text style={styles.mainBalance}>₹{store.totalBalance > 999999 ? (store.totalBalance / 1000000).toFixed(2) + 'M' : store.totalBalance}</Text>
         <View style={styles.boxContainer}>
           <View style={styles.box}>
             <View style={styles.balanceIconContainer}>
@@ -28,9 +24,9 @@ export default function Balance() {
                 source={require("../assets/upArrow.png")}
               />
             </View>
-            <View>
+            <View style={{}}>
               <Text style={styles.boxText}>Income</Text>
-              <Text style={styles.boxText}>₹{income}</Text>
+              <Text style={styles.boxText}>₹{store.totalIncome > 999999 ? (store.totalIncome / 1000000).toFixed(2) + 'M' : store.totalIncome}</Text>
             </View>
           </View>
           <View style={styles.box}>
@@ -40,9 +36,9 @@ export default function Balance() {
                 source={require("../assets/downArrow.png")}
               />
             </View>
-            <View>
+            <View style={{}}>
               <Text style={styles.boxText}>Expense</Text>
-              <Text style={styles.boxText}>₹{expense}</Text>
+              <Text style={styles.boxText}>₹{store.totalExpense > 999999 ? (store.totalExpense / 1000000).toFixed(2) + 'M' : store.totalExpense}</Text>
             </View>
           </View>
         </View>
@@ -74,7 +70,7 @@ const styles = StyleSheet.create({
   boxContainer: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
     margin: 20
   },
   box: {

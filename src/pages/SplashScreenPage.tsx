@@ -17,9 +17,9 @@ const SplashScreen = ({ navigation }: propsType): React.JSX.Element => {
       easing: Easing.linear,
       useNativeDriver: true
     }).start(async () => {
-      if (await AsyncStorage.getItem("email")) {
-        // await AsyncStorage.removeItem("email");
-        // console.log(await AsyncStorage.getItem("email"));
+      if (await AsyncStorage.getItem("token")) {
+        // await AsyncStorage.removeItem("token");
+        // console.log(await AsyncStorage.getItem("token"));
         navigation.reset({
           index: 0,
           routes: [{ name: 'Home' }],

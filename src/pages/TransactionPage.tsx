@@ -6,12 +6,15 @@ import MenuBar from '../components/MenuBar';
 import Transaction from '../components/Transaction';
 import { userStore } from '../store/userStore';
 import TransactionDetails from '../components/TransactionDetails';
+import { getCategorySource as getExpenseCategorySource } from '../data/ExpenseCategories';
+import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCategories';
+import NoTransaction from '../components/NoTransaction';
 
 type PropsType = {
   navigation: NavigationProp<any>;
 };
 
-export interface Transaction {
+export interface TransactionType {
   transactionAmount: string;
   category: string;
   transactionTitle: string;
@@ -21,30 +24,31 @@ export interface Transaction {
 
 export default function TransactionPage({ navigation }: PropsType) {
   const [showIncome, setShowIncome] = useState(true);
-  const [transactions, setTransactions] = useState<Transaction[] | undefined>(undefined);
-  const [displayTransactions, setDisplayTransactions] = useState<Transaction[] | undefined>(undefined);
-
+  const [displayTransactions, setDisplayTransactions] = useState<TransactionType[] | undefined>(undefined);
+  const [showNoTransaction, setShowNoTransaction] = useState<boolean>(false);
   const store = userStore();
 
   useEffect(() => {
-    const fetchData = async () => {
-      store.fetchTransactions(setTransactions);
-    };
-
-    fetchData();
-  }, [transactions]);
-
-  useEffect(() => {
-    if (transactions) {
+    if (store.transactions) {
       if (showIncome) {
-        const incomeTransactions = transactions.filter(transaction => transaction.type === 'income');
+        const incomeTransactions = store.transactions.filter(transaction => transaction.type === 'income');
+        if (incomeTransactions.length === 0) {
+          setShowNoTransaction(true)
+          return;
+        }
+        setShowNoTransaction(false)
         setDisplayTransactions(incomeTransactions);
       } else {
-        const expenseTransactions = transactions.filter(transaction => transaction.type === 'expense');
+        const expenseTransactions = store.transactions.filter(transaction => transaction.type === 'expense');
+        if (expenseTransactions.length === 0) {
+          setShowNoTransaction(true)
+          return;
+        }
+        setShowNoTransaction(false)
         setDisplayTransactions(expenseTransactions);
       }
     }
-  }, [showIncome, transactions]);
+  }, [showIncome, store.transactions]);
 
   return (
     <View style={styles.container}>
@@ -84,22 +88,26 @@ export default function TransactionPage({ navigation }: PropsType) {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.transactions}>
-        {displayTransactions
-          ?.sort((a, b) => {
-            return new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime();
-          })
-          .map((transaction, index) => (
-            <View key={index}>
-              <TransactionDetails transaction={transaction} />
-              <Transaction
-                title={transaction.transactionTitle}
-                amount={transaction.transactionAmount}
-                imageUrl={require("../assets/food.png")}
-              />
-            </View>
-          ))}
-      </ScrollView>
+      {showNoTransaction ? <NoTransaction /> : (
+        <ScrollView style={styles.transactions}>
+          {displayTransactions
+            ?.sort((a, b) => {
+              return new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime();
+            })
+            .map((transaction, index) => {
+              return (<View key={index}>
+                <TransactionDetails transaction={transaction} />
+                <Transaction
+                  title={transaction.transactionTitle}
+                  amount={transaction.transactionAmount}
+                  imageUrl={transaction.type === "expense" ?
+                    getExpenseCategorySource(transaction.category) :
+                    getIncomeCategorySource(transaction.category)}
+                />
+              </View>)
+            })}
+        </ScrollView>
+      )}
 
       <MenuBar navigation={navigation} />
     </View >

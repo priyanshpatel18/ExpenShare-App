@@ -35,7 +35,13 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
 
   async function handleCreateExpense() {
     if (!amount.trim() || !title.trim()) {
-      store.showToastWithGravityAndOffset("Enter All Credentials");
+      store.showToastWithGravityAndOffset("Enter All Details");
+      return;
+    }
+
+    if (store.transactionType === "expense" && store.totalBalance - Number(amount) < 0) {
+      store.showToastWithGravityAndOffset("Insufficient Balance");
+      return;
     }
 
     store.setLoading(true)
@@ -84,8 +90,12 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
         store.setTransactionType("expense")
         if (showIncome) {
           store.showToastWithGravityAndOffset("Income Added Successfully");
+          store.setTotalBalance(store.totalBalance + Number(amount));
+          store.setTotalIncome(store.totalIncome + Number(amount));
         } else {
           store.showToastWithGravityAndOffset("Expense Added Successfully");
+          store.setTotalBalance(store.totalBalance - Number(amount));
+          store.setTotalExpense(store.totalExpense + Number(amount));
         }
         navigation.goBack();
       })
@@ -94,7 +104,8 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
         store.showToastWithGravityAndOffset(err.response.data.message)
       })
       .finally(() => {
-        store.setLoading(false)
+        store.fetchTransactions();
+        store.setLoading(false);
       })
   }
 

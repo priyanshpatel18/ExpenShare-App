@@ -6,6 +6,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import Balance from '../components/Balance';
 import MenuBar from '../components/MenuBar';
 import TransactionSection from '../components/TransactionSectionHome';
+import { userStore } from '../store/userStore';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -14,25 +15,31 @@ type propsType = {
 export default function HomePage({ navigation }: propsType): React.JSX.Element {
   const [profilePicture, setProfilePicture] = useState<string>();
   const [userName, setUserName] = useState<string>("");
+  const store = userStore()
 
   useEffect(() => {
     const fetchData = async () => {
-      const email = await AsyncStorage.getItem("email");
-      axios
-        .post("https://expen-share-app-server.vercel.app/user/getUser", { email })
+      store.setLoading(true)
+
+      const token = await AsyncStorage.getItem("token")
+      axios.post("/user/getUser", { token })
         .then((res) => {
-          const userData = res.data;
-          setProfilePicture(userData.profilePicture);
-          setUserName(userData.userName);
-          AsyncStorage.setItem("profilePicture", userData.profilePicture);
-          AsyncStorage.setItem("userName", userData.userName);
+          setProfilePicture(res.data.userObject.profilePicture);
+          setUserName(res.data.userObject.userName);
+          store.setTotalBalance(Number(res.data.userObject.totalBalance));
+          store.setTotalExpense(Number(res.data.userObject.totalExpense));
+          store.setTotalIncome(Number(res.data.userObject.totalIncome));
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
         })
+        .finally(() => {
+          store.setLoading(false)
+        })
     };
 
     fetchData();
+
   }, []);
 
   return (

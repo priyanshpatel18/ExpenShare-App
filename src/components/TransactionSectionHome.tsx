@@ -1,66 +1,72 @@
 import { NavigationProp } from '@react-navigation/native'
-import React from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { getCategorySource as getExpenseCategorySource } from '../data/ExpenseCategories'
+import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCategories'
+import { TransactionType } from '../pages/TransactionPage'
+import { userStore } from '../store/userStore'
 import Transaction from './Transaction'
+import NoTransaction from './NoTransaction'
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function TransactionSectionHome({ navigation }: propsType) {
+  const store = userStore();
+  const [displayTransactions, setDisplayTransactions] = useState<TransactionType[] | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      store.fetchTransactions();
+    }
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (store.transactions) {
+      const sortedTransactions = [...store.transactions].sort((a, b) => {
+        return new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime();
+      });
+
+      const lastFiveTransactions = sortedTransactions.slice(0, 5);
+
+      setDisplayTransactions(lastFiveTransactions);
+    }
+  }, [store.transactions]);
+
 
   return (
     <View style={styles.container}>
       <View style={styles.transactionContainer}>
         <Text style={styles.transactionHeading}>Transactions</Text>
         <Text
-          onPress={() => { navigation.navigate("Transaction"); }}
+          onPress={() => navigation.navigate("Transaction")}
           style={styles.transactionLink}
         >
           View All
         </Text>
       </View>
-      {/* <View style={styles.noTransaction}>
-        <Image
-          source={require("../assets/wallet.png")}
-          style={styles.emptyWallet}
-        />
-        <Text style={styles.noText}>
-          No Transactions Yet
-        </Text>
-      </View> */}
-      <ScrollView style={styles.transactions}>
-        <Transaction
-          title='food bill'
-          amount='50.00'
-          expense={true}
-          imageUrl={require("../assets/food.png")}
-        />
-        <Transaction
-          title='food bill'
-          amount='50.00'
-          expense={true}
-          imageUrl={require("../assets/food.png")}
-        />
-        <Transaction
-          title='food bill'
-          amount='50.00'
-          expense={true}
-          imageUrl={require("../assets/food.png")}
-        />
-        <Transaction
-          title='food bill'
-          amount='50.00'
-          expense={true}
-          imageUrl={require("../assets/food.png")}
-        />
-        <Transaction
-          title='food bill'
-          amount='50.00'
-          expense={true}
-          imageUrl={require("../assets/food.png")}
-        />
-      </ScrollView>
+
+      {displayTransactions?.length !== 0 ? (
+        <ScrollView style={styles.transactions}>
+          {displayTransactions?.map((transaction, index) => {
+            return (<View key={index}>
+              <Transaction
+                type={transaction.type}
+                title={transaction.transactionTitle}
+                amount={transaction.transactionAmount}
+                imageUrl={transaction.type === "expense" ?
+                  getExpenseCategorySource(transaction.category) :
+                  getIncomeCategorySource(transaction.category)}
+              />
+            </View>)
+          })}
+        </ScrollView>
+      ) : (
+        <NoTransaction />
+      )}
+
     </View>
   )
 }
@@ -86,20 +92,8 @@ const styles = StyleSheet.create({
     color: "#539AEA",
     fontFamily: "Montserrat-SemiBold"
   },
-  noTransaction: {
-    paddingTop: 50,
-    alignItems: "center"
-  },
-  emptyWallet: {
-    height: 100,
-    width: 100
-  },
-  noText: {
-    color: "#aaa",
-    fontFamily: "Montserrat-SemiBold",
-    fontSize: 22
-  },
   transactions: {
-    padding: 20,
+    paddingHorizontal: 20,
+    marginBottom: "25%"
   },
 })

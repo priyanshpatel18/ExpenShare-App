@@ -22,7 +22,7 @@ export default function VerifyOtpPage({ navigation }: propsType) {
     store.setLoading(true)
     const otpId = await AsyncStorage.getItem("otpId");
 
-    axios.post('https://expen-share-app-server.vercel.app/user/verifyOtp', { userOtp: otp, otpId })
+    axios.post('/user/verifyOtp', { userOtp: otp, otpId })
       .then((res) => {
         store.showToastWithGravityAndOffset("Create a new Password")
         navigation.navigate("ResetPassword")

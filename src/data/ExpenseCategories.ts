@@ -1,4 +1,4 @@
-const categoriesWithAssets = [
+const expenseAssets = [
   {
     name: "Air Tickets",
     source: require("../assets/categories/airTickets.png"),
@@ -79,4 +79,14 @@ const categoriesWithAssets = [
   { name: "water", source: require("../assets/categories/water.png") },
 ];
 
-export default categoriesWithAssets;
+export const getCategorySource = (name: string) => {
+  const uppercaseName = name.toUpperCase();
+
+  const category = expenseAssets.find(
+    category => category.name.toUpperCase() === uppercaseName,
+  );
+
+  return category ? category.source : null;
+};
+
+export default expenseAssets;

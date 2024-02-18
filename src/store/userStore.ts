@@ -8,9 +8,7 @@ import {
   launchImageLibrary,
 } from "react-native-image-picker";
 import { create } from "zustand";
-import { Transaction } from "../pages/TransactionPage";
-
-const userServer = "https://expen-share-app-server.vercel.app";
+import { TransactionType } from "../pages/TransactionPage";
 
 interface UserStoreState {
   loading: boolean;
@@ -25,11 +23,21 @@ interface UserStoreState {
   incomeTitle: string;
   setIncomeTitle: (title: string) => void;
 
+  totalBalance: number;
+  setTotalBalance: (totalBalance: number) => void;
+  totalIncome: number;
+  setTotalIncome: (totalIncome: number) => void;
+  totalExpense: number;
+  setTotalExpense: (totalExpense: number) => void;
+
   incomeIcon: any;
   setIncomeIcon: (icon: any) => void;
 
   transactionType: string;
   setTransactionType: (type: string) => void;
+
+  transactions: TransactionType[] | undefined;
+  setTransactions: (transactions: TransactionType[] | undefined) => void;
 
   showToastWithGravityAndOffset: (message: string) => void;
   pickImage: (
@@ -52,11 +60,7 @@ interface UserStoreState {
     navigation: NavigationProp<any>,
   ) => void;
 
-  fetchTransactions: (
-    setTransactions: React.Dispatch<
-      React.SetStateAction<undefined | Transaction[]>
-    >,
-  ) => void;
+  fetchTransactions: () => void;
 }
 
 export const userStore = create<UserStoreState>(set => ({
@@ -65,6 +69,13 @@ export const userStore = create<UserStoreState>(set => ({
 
   expenseTitle: "AIR TICKETS",
   setExpenseTitle: expenseTitle => set({ expenseTitle }),
+
+  totalBalance: 0,
+  setTotalBalance: totalBalance => set({ totalBalance }),
+  totalIncome: 0,
+  setTotalIncome: totalIncome => set({ totalIncome }),
+  totalExpense: 0,
+  setTotalExpense: totalExpense => set({ totalExpense }),
 
   expenseIcon: require("../assets/categories/airTickets.png"),
   setExpenseIcon: expenseIcon => set({ expenseIcon }),
@@ -78,13 +89,16 @@ export const userStore = create<UserStoreState>(set => ({
   transactionType: "expense",
   setTransactionType: transactionType => set({ transactionType }),
 
-  fetchTransactions: async setTransactions => {
-    const email = await AsyncStorage.getItem("email");
+  transactions: undefined,
+  setTransactions: transactions => set({ transactions }),
+
+  fetchTransactions: async () => {
+    const token = await AsyncStorage.getItem("token");
 
     axios
-      .post("http://192.168.114.48:5555/transaction/getAll", { email })
+      .post("/transaction/getAll", { token })
       .then(res => {
-        setTransactions(res.data.transactions);
+        set({ transactions: res.data.transactions });
       })
       .catch(err => {
         console.log(err);
@@ -136,9 +150,9 @@ export const userStore = create<UserStoreState>(set => ({
     };
 
     axios
-      .post(`${userServer}/user/login`, formData)
+      .post(`/user/login`, formData)
       .then(async res => {
-        await AsyncStorage.setItem("email", userNameOrEmail);
+        await AsyncStorage.setItem("token", res.data.token);
         navigation.reset({
           index: 0,
           routes: [{ name: "Home" }],
@@ -165,7 +179,7 @@ export const userStore = create<UserStoreState>(set => ({
     userStore.getState().showToastWithGravityAndOffset("Sending Mail...");
 
     axios
-      .post(`${userServer}/user/sendMail`, { email })
+      .post(`/user/sendMail`, { email })
       .then(async res => {
         userStore.getState().showToastWithGravityAndOffset(res.data.message);
         await AsyncStorage.setItem("otpId", res.data.otpId);
@@ -191,7 +205,7 @@ export const userStore = create<UserStoreState>(set => ({
     const otpId = await AsyncStorage.getItem("otpId");
 
     axios
-      .post(`${userServer}/user/verifyOtp`, { userOtp: otp, otpId })
+      .post("/user/verifyOtp", { userOtp: otp, otpId })
       .then(async () => {
         const formData = new FormData();
         const userDataId = await AsyncStorage.getItem("userDataId");
@@ -211,7 +225,7 @@ export const userStore = create<UserStoreState>(set => ({
           .getState()
           .showToastWithGravityAndOffset("Creating your account");
         axios
-          .post(`${userServer}/user/register`, formData, {
+          .post(`/user/register`, formData, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
@@ -287,7 +301,7 @@ export const userStore = create<UserStoreState>(set => ({
     };
 
     axios
-      .post(`${userServer}/user/resetPassword`, formData)
+      .post(`/user/resetPassword`, formData)
       .then(res => {
         userStore.getState().showToastWithGravityAndOffset(res.data.message);
         navigation.navigate("Login");

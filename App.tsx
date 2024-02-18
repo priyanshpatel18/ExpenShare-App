@@ -18,7 +18,8 @@ import WelcomePage from './src/pages/WelcomePage';
 import AddPage from './src/pages/AddPage';
 import CategoriesPage from './src/pages/CategoriesPage';
 
-axios.defaults.baseURL = "http://192.168.114.48:5555"
+axios.defaults.baseURL = "http://192.168.114.48:8080"
+// axios.defaults.baseURL = "https://expen-share-app-server.vercel.app"
 axios.defaults.withCredentials = true
 
 export default function App(): React.JSX.Element {

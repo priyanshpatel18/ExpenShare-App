@@ -4,13 +4,18 @@ import React from 'react'
 type propsType = {
   title: string;
   amount: string;
-  expense?: boolean;
+  type?: string;
   imageUrl: any;
 }
 
-export default function Transaction({ title, expense, amount, imageUrl }: propsType) {
+export default function Transaction({ title, type, amount, imageUrl }: propsType) {
   return (
-    <View style={styles.transaction}>
+    <View style={[
+      styles.transaction,
+      type === "expense" ? { backgroundColor: "rgb(255, 173, 173)" } :
+        type === "income" ? { backgroundColor: "rgb(170, 253, 166)" } :
+          { backgroundColor: "#CFCFCF" }
+    ]}>
       <View style={styles.categoryIconContainer}>
         <Image
           source={imageUrl}
@@ -22,9 +27,9 @@ export default function Transaction({ title, expense, amount, imageUrl }: propsT
       </Text>
 
       {
-        expense ? (
-          <Text style={[styles.amount, expense ? styles.expenseAmount : styles.incomeAmount]}>
-            {expense ? '-' : '+'}₹{amount}
+        type ? (
+          <Text style={[styles.amount, type === "expense" ? styles.expenseAmount : styles.incomeAmount]}>
+            {type === "expense" ? '-' : '+'}₹{Number(amount) > 999999 ? Number(amount) / 1000000 + 'M' : Number(amount)}
           </Text>
         ) : (
           <Text style={styles.amount}>
@@ -44,15 +49,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#dfdfdf",
+    backgroundColor: "#CFCFCF",
     paddingVertical: 20,
     paddingHorizontal: 15,
     borderRadius: 20,
-    marginBottom: 25
+    marginBottom: 15
   },
   categoryIconContainer: {
     padding: 20,
-    backgroundColor: "#FBC438",
+    backgroundColor: "#fff",
     height: 60,
     width: 60,
     justifyContent: "center",
@@ -61,8 +66,8 @@ const styles = StyleSheet.create({
     marginRight: 10
   },
   categoryIcon: {
-    height: 30,
-    width: 30
+    height: 35,
+    width: 35
   },
   transactionDescription: {
     flexShrink: 1,
@@ -73,13 +78,15 @@ const styles = StyleSheet.create({
     textTransform: "capitalize"
   },
   expenseAmount: {
-    color: "#ff3838"
+    color: "#f00",
+    fontFamily: "Montserrat-Bold"
   },
   incomeAmount: {
-    color: "#00b200"
+    color: "#00a200",
+    fontFamily: "Montserrat-Bold"
   },
   amount: {
-    fontSize: 18,
+    fontSize: 20,
     color: "#000",
     fontFamily: "Montserrat-Medium"
   }
