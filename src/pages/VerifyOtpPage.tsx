@@ -12,26 +12,27 @@ type propsType = {
 
 export default function VerifyOtpPage({ navigation }: propsType) {
   const [otp, setOtp] = useState('');
+  const store = userStore()
 
   const handleVerifyOtp = async () => {
     if (!otp.trim()) {
       return;
     }
 
-    userStore.setState({ loading: true })
+    store.setLoading(true)
     const otpId = await AsyncStorage.getItem("otpId");
 
-    axios.post('/user/verifyMail', { userOtp: otp, otpId })
+    axios.post('https://expen-share-app-server.vercel.app/user/verifyOtp', { userOtp: otp, otpId })
       .then((res) => {
-        userStore.getState().showToastWithGravityAndOffset(res.data.message)
+        store.showToastWithGravityAndOffset("Create a new Password")
         navigation.navigate("ResetPassword")
       })
       .catch((err) => {
         console.log(err);
-        userStore.getState().showToastWithGravityAndOffset(err.response.data.message)
+        store.showToastWithGravityAndOffset(err.response.data.message)
       })
       .finally(() => {
-        userStore.setState({ loading: false })
+        store.setLoading(false)
       })
   }
 
@@ -53,10 +54,10 @@ export default function VerifyOtpPage({ navigation }: propsType) {
         maxLength={6}
         placeholderTextColor="#999"
       />
-      {userStore.getState().loading ? (
+      {store.loading ? (
         <TouchableOpacity
           style={styles.verifyButton}
-          onPress={() => userStore.getState().showToastWithGravityAndOffset("Logging In..")}
+          onPress={() => store.showToastWithGravityAndOffset("Logging In..")}
         >
           <GradientButton text='verify' />
         </TouchableOpacity>

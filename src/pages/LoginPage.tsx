@@ -1,52 +1,19 @@
 import { NavigationProp } from '@react-navigation/native'
-import axios from 'axios'
 import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import GradientButton from '../components/GradientButton'
 import Input from '../components/TextInput'
 import { userStore } from '../store/userStore'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function LoginPage({ navigation }: propsType): React.JSX.Element {
+  const store = userStore();
+
   const [userNameOrEmail, setUserNameOrEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-
-  function handleLogin(): void {
-    if (!userNameOrEmail || !password) {
-      userStore.getState().showToastWithGravityAndOffset("Enter All Credentials")
-      return;
-    }
-
-    userStore.setState({ loading: true })
-    userStore.getState().showToastWithGravityAndOffset("Logging you in...")
-
-    const formData = {
-      userNameOrEmail,
-      password
-    }
-
-    axios
-      .post('/user/login', formData)
-      .then(async (res) => {
-        await AsyncStorage.setItem("email", userNameOrEmail)
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Home" }]
-        })
-        userStore.getState().showToastWithGravityAndOffset(res.data.message)
-      })
-      .catch((err) => {
-        console.log(err);
-        userStore.getState().showToastWithGravityAndOffset(err.response.data.message)
-      })
-      .finally(() => {
-        userStore.setState({ loading: false })
-      })
-  }
 
   return (
     <View style={styles.container}>
@@ -76,17 +43,17 @@ export default function LoginPage({ navigation }: propsType): React.JSX.Element 
           Forgot Password ?
         </Text>
 
-        {userStore.getState().loading ? (
+        {store.loading ? (
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => userStore.getState().showToastWithGravityAndOffset("Logging In..")}
+            onPress={() => store.showToastWithGravityAndOffset("Logging In..")}
           >
             <GradientButton text='login' />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => handleLogin()}
+            onPress={() => { store.handleLogin(userNameOrEmail, password, navigation) }}
           >
             <GradientButton text='login' />
           </TouchableOpacity>
@@ -118,7 +85,7 @@ const styles = StyleSheet.create({
     letterSpacing: 5
   },
   formContainer: {
-    width: "80%",
+    width: "85%",
   },
   loginButton: {
     borderRadius: 50,

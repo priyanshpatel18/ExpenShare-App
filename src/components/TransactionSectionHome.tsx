@@ -36,6 +36,30 @@ export default function TransactionSectionHome({ navigation }: propsType) {
           expense={true}
           imageUrl={require("../assets/food.png")}
         />
+        <Transaction
+          title='food bill'
+          amount='50.00'
+          expense={true}
+          imageUrl={require("../assets/food.png")}
+        />
+        <Transaction
+          title='food bill'
+          amount='50.00'
+          expense={true}
+          imageUrl={require("../assets/food.png")}
+        />
+        <Transaction
+          title='food bill'
+          amount='50.00'
+          expense={true}
+          imageUrl={require("../assets/food.png")}
+        />
+        <Transaction
+          title='food bill'
+          amount='50.00'
+          expense={true}
+          imageUrl={require("../assets/food.png")}
+        />
       </ScrollView>
     </View>
   )

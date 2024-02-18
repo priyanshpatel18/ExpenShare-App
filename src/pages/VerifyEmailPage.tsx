@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { userStore } from '../store/userStore';
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import GradientButton from '../components/GradientButton';
 
 type propsType = {
@@ -13,78 +11,7 @@ type propsType = {
 
 export default function VerifyEmailPage({ navigation }: propsType) {
   const [otp, setOtp] = useState<string>('');
-
-  async function handleVerifyEmail() {
-    userStore.setState({ loading: true });
-    userStore.getState().showToastWithGravityAndOffset("Verifying Email..");
-
-    if (!otp.trim()) {
-      return;
-    }
-    const otpId = await AsyncStorage.getItem("otpId");
-
-    axios
-      .post("/user/verifyEmail", { userOtp: otp, otpId })
-      .then(async res => {
-        const formData = new FormData();
-        formData.append("email", await AsyncStorage.getItem("email"));
-        formData.append("userName", await AsyncStorage.getItem("userName"));
-        formData.append("password", await AsyncStorage.getItem("password"));
-
-        const selectedImage = await AsyncStorage.getItem("selectedImage");
-        if (selectedImage) {
-          const extension = selectedImage.split(".").pop();
-
-          formData.append("profilePicture", {
-            uri: selectedImage,
-            name: `profilePicture.${extension}`,
-            type: `image/${extension}`,
-          });
-        }
-        userStore
-          .getState()
-          .showToastWithGravityAndOffset("Creating your account");
-        axios
-          .post("/user/register", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then(res => {
-            navigation.navigate("Home");
-            userStore
-              .getState()
-              .showToastWithGravityAndOffset(res.data.message);
-          })
-          .catch(err => {
-            if (
-              err.response &&
-              err.response.data &&
-              err.response.data.message
-            ) {
-              userStore
-                .getState()
-                .showToastWithGravityAndOffset(err.response.data.message);
-            } else {
-              console.error("Error:", err);
-            }
-          })
-          .finally(async () => {
-            await AsyncStorage.removeItem("otpId");
-            await AsyncStorage.removeItem("userName");
-            await AsyncStorage.removeItem("password");
-            await AsyncStorage.removeItem("profilePicture");
-          });
-      })
-      .catch(err => {
-        userStore
-          .getState()
-          .showToastWithGravityAndOffset(err.response.data.message);
-      })
-      .finally(async () => {
-        userStore.setState({ loading: false });
-      });
-  }
+  const store = userStore();
 
   return (
     <View style={styles.container}>
@@ -104,16 +31,15 @@ export default function VerifyEmailPage({ navigation }: propsType) {
         placeholderTextColor="#999"
         maxLength={6}
       />
-      {userStore.getState().loading ? (
+      {store.loading ? (
         <TouchableOpacity
           style={styles.button}
-          onPress={() => userStore.getState().showToastWithGravityAndOffset("Verifying Email...")}
+          onPress={() => store.showToastWithGravityAndOffset("Creating Account...")}
         >
           <GradientButton text='verify' />
         </TouchableOpacity>
       ) : (
-
-        <TouchableOpacity style={styles.button} onPress={() => handleVerifyEmail()}>
+        <TouchableOpacity style={styles.button} onPress={() => store.handleVerifyEmail(otp, navigation)}>
           <GradientButton text='verify' />
         </TouchableOpacity>
       )

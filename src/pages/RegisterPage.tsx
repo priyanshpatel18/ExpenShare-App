@@ -1,11 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import { ImageLibraryOptions, ImagePickerResponse, launchImageLibrary } from 'react-native-image-picker';
 import GradientButton from '../components/GradientButton';
 import Input from '../components/TextInput';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { userStore } from '../store/userStore';
 
 type propsType = {
@@ -17,31 +16,37 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
   const [userName, setUserName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const store = userStore()
 
   async function handleRegister() {
-    if (!email || !userName || !password) {
-      userStore.getState().showToastWithGravityAndOffset("Enter all Credentials")
+    if (!email.trim() || !userName.trim() || !password.trim()) {
+      store.showToastWithGravityAndOffset("Enter all Credentials")
       return
     }
-    userStore.setState({ loading: true });
-    userStore.getState().showToastWithGravityAndOffset("Sending Verification Mail..")
 
-    await AsyncStorage.setItem("email", email)
-    await AsyncStorage.setItem("userName", userName)
-    await AsyncStorage.setItem("password", password)
-    await AsyncStorage.setItem("selectedImage", String(selectedImage))
+    store.setLoading(true)
+    store.showToastWithGravityAndOffset("Sending Verification Mail..")
 
-    axios.post("/user/sendVerifyEmail", { email })
+    axios.post("https://expen-share-app-server.vercel.app/user/sendVerifyEmail", {
+      email: email.toLowerCase(),
+      userName: userName.toLowerCase(),
+      password,
+      selectedImage
+    })
       .then(async (res) => {
         await AsyncStorage.setItem("otpId", res.data.otpId);
+        await AsyncStorage.setItem("userDataId", res.data.userDataId);
         userStore.getState().showToastWithGravityAndOffset(res.data.message)
         navigation.navigate("VerifyEmail");
       })
       .catch((err) => {
         userStore.getState().showToastWithGravityAndOffset(err.response.data.message)
       })
-      .finally(() => {
-        userStore.setState({ loading: false })
+      .finally(async () => {
+        store.setLoading(false)
+        if (selectedImage) {
+          await AsyncStorage.setItem("selectedImage", selectedImage);
+        }
       })
   }
 
@@ -54,7 +59,7 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
       <Text style={styles.headingText}>register</Text>
       <View style={styles.formContainer}>
         <TouchableWithoutFeedback
-          onPress={() => userStore.getState().pickImage(setSelectedImage)}
+          onPress={() => store.pickImage(setSelectedImage)}
         >
           <View style={styles.imageContainer}>
             {selectedImage ? (
@@ -97,10 +102,10 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
           placeholder='Password'
           secureTextEntry={true}
         />
-        {userStore.getState().loading ? (
+        {store.loading ? (
           <TouchableOpacity
             style={styles.registerButton}
-            onPress={() => userStore.getState().showToastWithGravityAndOffset("Creating Account..")}
+            onPress={() => store.showToastWithGravityAndOffset("Creating Account..")}
           >
             <GradientButton text='register' />
           </TouchableOpacity>
@@ -139,7 +144,7 @@ const styles = StyleSheet.create({
     letterSpacing: 5
   },
   formContainer: {
-    width: "80%",
+    width: "85%",
   },
   inputContainer: {
     backgroundColor: "#dfdfdf",

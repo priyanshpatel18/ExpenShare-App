@@ -4,7 +4,7 @@ import React from 'react'
 type propsType = {
   title: string;
   amount: string;
-  expense: boolean;
+  expense?: boolean;
   imageUrl: any;
 }
 
@@ -21,16 +21,25 @@ export default function Transaction({ title, expense, amount, imageUrl }: propsT
         {title}
       </Text>
 
+      {
+        expense ? (
+          <Text style={[styles.amount, expense ? styles.expenseAmount : styles.incomeAmount]}>
+            {expense ? '-' : '+'}₹{amount}
+          </Text>
+        ) : (
+          <Text style={styles.amount}>
+            ₹{amount}
+          </Text>
+        )
+      }
 
-      <Text style={[styles.amount, expense ? styles.expenseAmount : styles.incomeAmount]}>
-        {expense ? '-' : '+'}₹{amount}
-      </Text>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   transaction: {
+    width: "100%",
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
@@ -70,7 +79,8 @@ const styles = StyleSheet.create({
     color: "#00b200"
   },
   amount: {
-    fontSize: 20,
+    fontSize: 18,
     color: "#000",
+    fontFamily: "Montserrat-Medium"
   }
 })

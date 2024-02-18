@@ -1,14 +1,15 @@
-import React from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-
-type propsType = {
-  totalBalance: string,
-  income: string,
-  expense: string,
-}
+import { userStore } from '../store/userStore';
 
 export default function Balance() {
+  const [totalBalance, setTotalBalance] = useState<string>("0.00");
+  const [income, setIncome] = useState<string>("0.00");
+  const [expense, setExpense] = useState<string>("0.00");
+
   return (
     <LinearGradient
       colors={['#2faae3', '#c968ff', '#e680b1', '#fb9475']}
@@ -18,7 +19,7 @@ export default function Balance() {
     >
       <View>
         <Text style={styles.balanceHeading}>Total Balance</Text>
-        <Text style={styles.mainBalance}>₹0.00</Text>
+        <Text style={styles.mainBalance}>₹{totalBalance}</Text>
         <View style={styles.boxContainer}>
           <View style={styles.box}>
             <View style={styles.balanceIconContainer}>
@@ -29,7 +30,7 @@ export default function Balance() {
             </View>
             <View>
               <Text style={styles.boxText}>Income</Text>
-              <Text style={styles.boxText}>₹0.00</Text>
+              <Text style={styles.boxText}>₹{income}</Text>
             </View>
           </View>
           <View style={styles.box}>
@@ -41,13 +42,12 @@ export default function Balance() {
             </View>
             <View>
               <Text style={styles.boxText}>Expense</Text>
-              <Text style={styles.boxText}>₹0.00</Text>
+              <Text style={styles.boxText}>₹{expense}</Text>
             </View>
           </View>
         </View>
       </View>
-    </LinearGradient >
-
+    </LinearGradient>
   )
 }
 

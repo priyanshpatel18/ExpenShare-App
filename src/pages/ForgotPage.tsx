@@ -1,11 +1,10 @@
 import { NavigationProp } from '@react-navigation/native';
-import axios from 'axios';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import GradientButton from '../components/GradientButton';
 import Input from '../components/TextInput';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { userStore } from '../store/userStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -13,28 +12,7 @@ type propsType = {
 
 export default function ForgotPage({ navigation }: propsType): React.JSX.Element {
   const [email, setEmail] = useState<string>("");
-
-  function handleSendMail() {
-    if (!email) {
-      userStore.getState().showToastWithGravityAndOffset("Enter the Email")
-      return;
-    }
-
-    userStore.getState().showToastWithGravityAndOffset("Sending Mail..")
-    axios.post("/user/sendMail", { email })
-      .then(async (res) => {
-        userStore.getState().showToastWithGravityAndOffset(res.data.message)
-        await AsyncStorage.setItem("otpId", res.data.otpId);
-        navigation.navigate("VerifyOtp")
-      })
-      .catch((err) => {
-        console.log(err);
-        userStore.getState().showToastWithGravityAndOffset(err.response.data.message)
-      })
-      .finally(() => {
-        userStore.setState({ loading: false })
-      })
-  }
+  const store = userStore()
 
   return (
     <View style={styles.container}>
@@ -51,17 +29,20 @@ export default function ForgotPage({ navigation }: propsType): React.JSX.Element
           placeholder='Email Address'
           secureTextEntry={false}
         />
-        {userStore.getState().loading ? (
+        {store.loading ? (
           <TouchableOpacity
             style={styles.sendMailButton}
-            onPress={() => userStore.getState().showToastWithGravityAndOffset("Sending Mail..")}
+            onPress={() => store.showToastWithGravityAndOffset("Sending Mail..")}
           >
             <GradientButton text='send mail' />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             style={styles.sendMailButton}
-            onPress={() => handleSendMail()}
+            onPress={async () => {
+              await AsyncStorage.setItem("resetEmail", email);
+              store.handleSendMail(email, navigation);
+            }}
           >
             <GradientButton text='send mail' />
           </TouchableOpacity>

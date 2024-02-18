@@ -12,20 +12,24 @@ type propsType = {
 }
 
 export default function HomePage({ navigation }: propsType): React.JSX.Element {
-  const [profilePicture, setProfilePicture] = useState<string>("");
+  const [profilePicture, setProfilePicture] = useState<string>();
   const [userName, setUserName] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const email = await AsyncStorage.getItem("email");
-        const response = await axios.post("/user/getUser", { email });
-        const userData = response.data;
-        setProfilePicture(userData.profilePicture);
-        setUserName(userData.userName);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
+      const email = await AsyncStorage.getItem("email");
+      axios
+        .post("https://expen-share-app-server.vercel.app/user/getUser", { email })
+        .then((res) => {
+          const userData = res.data;
+          setProfilePicture(userData.profilePicture);
+          setUserName(userData.userName);
+          AsyncStorage.setItem("profilePicture", userData.profilePicture);
+          AsyncStorage.setItem("userName", userData.userName);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+        })
     };
 
     fetchData();
