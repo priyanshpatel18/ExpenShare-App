@@ -33,6 +33,9 @@ export default function HomePage({ navigation }: propsType): React.JSX.Element {
         .finally(() => {
           store.setLoading(false)
         })
+
+      const storedMode = await AsyncStorage.getItem("mode");
+      store.setMode(storedMode || "light");
     };
 
     fetchData();
@@ -40,7 +43,7 @@ export default function HomePage({ navigation }: propsType): React.JSX.Element {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       <View style={styles.userContainer}>
         {
           store.userObject?.profilePicture ? (
@@ -85,7 +88,7 @@ const styles = StyleSheet.create({
     width: 100
   },
   userName: {
-    color: "#000",
+    color: Store.getState().mode === "light" ? "#000" : "#fff",
     fontSize: 20,
     fontFamily: "Montserrat-SemiBold"
   },
@@ -94,6 +97,6 @@ const styles = StyleSheet.create({
     width: 70,
     borderRadius: 50,
     borderWidth: 1,
-    borderColor: "#000"
+    borderColor: Store.getState().mode === "light" ? "#000" : "#fff"
   },
 })

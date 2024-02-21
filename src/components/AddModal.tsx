@@ -59,11 +59,15 @@ export default function AddModal({ setVisible }: propsType): React.JSX.Element {
             <TextInput
               value={amount}
               keyboardType='numeric'
-              onChangeText={(text: string) => setAmount(text)}
+              onChangeText={(text: string) => {
+                const sanitizedText = text.replace(/[^0-9.]/g, '').replace(/^(\d*\.\d*).*$/, '$1');
+                setAmount(sanitizedText);
+              }}
               placeholder='0.00'
               style={styles.input}
               maxLength={7}
             />
+
           </View>
         </View>
         <OptionsContainer

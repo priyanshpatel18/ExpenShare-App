@@ -19,8 +19,8 @@ import VerifyOtpPage from './src/pages/VerifyOtpPage';
 import WelcomePage from "./src/pages/WelcomePage";
 import ReportScreen from './src/pages/ReportPage';
 
-// axios.defaults.baseURL = "http://192.168.114.48:8080";
-axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
+axios.defaults.baseURL = "http://192.168.206.226:8080";
+// axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 axios.defaults.withCredentials = true;
 
 export default function App(): React.JSX.Element {

@@ -20,16 +20,19 @@ export interface TransactionType {
 export interface UserObject {
   email: string;
   userName: string;
-  profilePicture: string;
-  totalBalance: number;
-  totalIncome: number;
-  totalExpense: number;
+  profilePicture: string | undefined | null;
+  totalBalance: number | undefined;
+  totalIncome: number | undefined;
+  totalExpense: number | undefined;
 }
 
 interface StoreState {
   // Loading State
   loading: boolean;
   setLoading: (loading: boolean) => void;
+  // Theme
+  mode: string;
+  setMode: (mode: string) => void;
   // User Object
   userObject: UserObject | undefined;
   setUserObject: (userObject: UserObject | undefined) => void;
@@ -94,6 +97,9 @@ interface StoreState {
 export const Store = create<StoreState>(set => ({
   loading: false,
   setLoading: (loading: boolean) => set({ loading }),
+
+  mode: "light",
+  setMode: mode => set({ mode }),
 
   userObject: undefined,
   setUserObject: userObject => set({ userObject }),
@@ -265,7 +271,6 @@ export const Store = create<StoreState>(set => ({
             },
           })
           .then(async res => {
-            await AsyncStorage.setItem("email", res.data.email);
             navigation.reset({
               index: 0,
               routes: [{ name: "Home" }],
@@ -338,6 +343,7 @@ export const Store = create<StoreState>(set => ({
           navigation.navigate("Login");
           return;
         }
+        Store.getState().setIsAuthenticatedChange(false);
       })
       .catch(err => {
         console.log(err);

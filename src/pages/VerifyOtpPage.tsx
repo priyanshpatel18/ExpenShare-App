@@ -23,14 +23,13 @@ export default function VerifyOtpPage({ navigation }: propsType): React.JSX.Elem
     const otpId = await AsyncStorage.getItem("otpId");
 
     axios.post('/user/verifyOtp', { userOtp: otp, otpId })
-      .then(async (res) => {
-        if (!store.isAuthenticatedChange) {
+      .then(async () => {
+        if (store.isAuthenticatedChange === false) {
           navigation.navigate("ResetPassword")
           store.showToastWithGravityAndOffset("Create a new Password")
         } else {
           store.handleResetPassword(store.password, navigation);
           navigation.navigate("Account")
-          store.setIsAuthenticatedChange(false);
           store.password = "";
           await AsyncStorage.removeItem("resetEmail")
         }

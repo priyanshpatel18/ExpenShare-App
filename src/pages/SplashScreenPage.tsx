@@ -17,12 +17,15 @@ const SplashScreen = ({ navigation }: propsType): React.JSX.Element => {
       easing: Easing.linear,
       useNativeDriver: true
     }).start(async () => {
+      if (!await AsyncStorage.getItem("mode")) {
+        await AsyncStorage.setItem("mode", "light");
+      }
       if (await AsyncStorage.getItem("token")) {
         // await AsyncStorage.removeItem("token");
         // console.log(await AsyncStorage.getItem("token"));
         navigation.reset({
           index: 0,
-          routes: [{ name: 'Report' }],
+          routes: [{ name: 'Home' }],
         });
         return;
       }

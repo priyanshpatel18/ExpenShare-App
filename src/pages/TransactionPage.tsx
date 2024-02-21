@@ -9,6 +9,7 @@ import TransactionDetails from '../components/TransactionDetails';
 import { getCategorySource as getExpenseCategorySource } from '../data/ExpenseCategories';
 import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCategories';
 import { Store, TransactionType } from '../store/store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type PropsType = {
   navigation: NavigationProp<any>;
@@ -21,6 +22,12 @@ export default function TransactionPage({ navigation }: PropsType) {
   const store = Store();
 
   useEffect(() => {
+    const fun = async () => {
+      console.log(await AsyncStorage.getItem("mode"))
+    }
+
+    fun();
+
     if (store.transactions) {
       if (showIncome) {
         const incomeTransactions = store.transactions.filter(transaction => transaction.type === 'income');

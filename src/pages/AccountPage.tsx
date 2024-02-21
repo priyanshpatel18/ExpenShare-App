@@ -11,13 +11,13 @@ type propsType = {
 
 export default function AccountPage({ navigation }: propsType): React.JSX.Element {
   const store = Store();
-  const [textInput, setTextInput] = useState<string | undefined>(store.userObject?.userName);
-  const [profilePicture, setProfilePicture] = useState<string | undefined | null>(store.userObject?.profilePicture)
+  const [textInput, setTextInput] = useState<string>(String(store.userObject?.userName));
+  const [profilePicture, setProfilePicture] = useState<string | undefined | null>(String(store.userObject?.profilePicture))
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
 
   async function handleSave() {
-    if (profilePicture?.trim() === store.userObject?.profilePicture && textInput?.trim() === store.userObject?.userName) {
+    if (textInput.trim() === store.userObject?.userName && profilePicture === store.userObject.profilePicture) {
       store.showToastWithGravityAndOffset("No Changes");
       navigation.goBack();
       return;
@@ -36,13 +36,27 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
         type: `image/${extension}`
       })
     }
+    Store.getState().showToastWithGravityAndOffset("Updating...")
+
     store.setLoading(true)
-    axios.post("/user/update", formData)
+    axios.post("/user/update", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
       .then((res) => {
-        store.showToastWithGravityAndOffset(res.data.message);
+        store.setUserObject({
+          userName: textInput,
+          email: store.userObject?.email || '',
+          profilePicture: res.data.profileUrl || String(store.userObject?.profilePicture),
+          totalBalance: store.userObject?.totalBalance,
+          totalIncome: store.userObject?.totalIncome,
+          totalExpense: store.userObject?.totalExpense
+        });
+        Store.getState().showToastWithGravityAndOffset(res.data.message);
       })
       .catch((err) => {
-        store.showToastWithGravityAndOffset(err.response.data.message)
+        Store.getState().showToastWithGravityAndOffset(err.response.data.message)
       })
       .finally(() => {
         store.setLoading(false);
@@ -56,8 +70,26 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
       return;
     }
 
-    if (newPassword !== confirmPassword) {
-      store.showToastWithGravityAndOffset("Passwords don't match");
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      let message = "";
+
+      if (!/(?=.*[a-z])/.test(newPassword)) {
+        message = "Password should contain at least one lowercase";
+      } else if (!/(?=.*[A-Z])/.test(newPassword)) {
+        message = "Password should contain at least one uppercase";
+      } else if (!/(?=.*\d)/.test(newPassword)) {
+        message = "Password should contain at least one number";
+      } else if (!/(?=.*[@$!%*?&])/.test(newPassword)) {
+        message = "Password should contain at least one special character";
+      } else if (newPassword.length < 6) {
+        message = "Password should be minimum 8 characters";
+      } else if (newPassword !== confirmPassword) {
+        message = "Passwords don't match";
+      }
+
+      store.showToastWithGravityAndOffset(message);
       return;
     }
 
@@ -81,12 +113,21 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
           </TouchableOpacity>
           <Text style={styles.headingText}>Account</Text>
         </View>
-        <TouchableOpacity onPress={handleSave}>
-          <Image
-            style={styles.headingButton}
-            source={require("../assets/doneButton.png")}
-          />
-        </TouchableOpacity>
+        {store.loading ?
+          <TouchableOpacity onPress={() => Store.getState().showToastWithGravityAndOffset("Updating...")}>
+            <Image
+              style={styles.headingButton}
+              source={require("../assets/doneButton.png")}
+            />
+          </TouchableOpacity>
+          :
+          <TouchableOpacity onPress={handleSave}>
+            <Image
+              style={styles.headingButton}
+              source={require("../assets/doneButton.png")}
+            />
+          </TouchableOpacity>
+        }
       </View>
       <View style={styles.detailContainer}>
         <TouchableWithoutFeedback onPress={() => store.pickImage(setProfilePicture)}>

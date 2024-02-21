@@ -15,7 +15,7 @@ export default function Balance(): React.JSX.Element {
     >
       <View>
         <Text style={styles.balanceHeading}>Total Balance</Text>
-        <Text style={styles.mainBalance}>₹{store.totalBalance > 999999 ? (store.totalBalance / 1000000).toFixed(2) + 'M' : store.totalBalance}</Text>
+        <Text style={styles.mainBalance}>₹{Math.round(store.totalBalance) > 999999 ? (store.totalBalance / 1000000).toFixed(2) + 'M' : Math.round(store.totalBalance)}</Text>
         <View style={styles.boxContainer}>
           <View style={styles.box}>
             <View style={styles.balanceIconContainer}>
@@ -26,7 +26,7 @@ export default function Balance(): React.JSX.Element {
             </View>
             <View style={{}}>
               <Text style={styles.boxText}>Income</Text>
-              <Text style={styles.boxText}>₹{store.totalIncome > 999999 ? (store.totalIncome / 1000000).toFixed(2) + 'M' : store.totalIncome}</Text>
+              <Text style={styles.boxText}>₹{Math.round(store.totalIncome) > 999999 ? (Math.round(store.totalIncome) / 1000000).toFixed(2) + 'M' : Math.round(store.totalIncome)}</Text>
             </View>
           </View>
           <View style={styles.box}>
@@ -38,7 +38,7 @@ export default function Balance(): React.JSX.Element {
             </View>
             <View style={{}}>
               <Text style={styles.boxText}>Expense</Text>
-              <Text style={styles.boxText}>₹{store.totalExpense > 999999 ? (store.totalExpense / 1000000).toFixed(2) + 'M' : store.totalExpense}</Text>
+              <Text style={styles.boxText}>₹{Math.round(store.totalExpense) > 999999 ? (Math.round(store.totalExpense) / 1000000).toFixed(2) + 'M' : Math.round(store.totalExpense)}</Text>
             </View>
           </View>
         </View>

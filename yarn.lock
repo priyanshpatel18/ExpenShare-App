@@ -1932,7 +1932,7 @@
   dependencies:
     nanoid "^3.1.23"
 
-"@shopify/react-native-skia@^0.1.239", "@shopify/react-native-skia@>=0.1.190":
+"@shopify/react-native-skia@>=0.1.190":
   version "0.1.239"
   resolved "https://registry.npmjs.org/@shopify/react-native-skia/-/react-native-skia-0.1.239.tgz"
   integrity sha512-TEZkb67JqLUyGbeKuDJQni33bJilXlh5minPEV+KjqTgaP1Etq8WAEXlBCfDR6eFpqzlPXgv94MlnTDwDwdFFQ==
@@ -3854,11 +3854,6 @@ get-symbol-description@^1.0.0:
     es-errors "^1.3.0"
     get-intrinsic "^1.2.4"
 
-gifted-charts-core@^0.0.21:
-  version "0.0.21"
-  resolved "https://registry.npmjs.org/gifted-charts-core/-/gifted-charts-core-0.0.21.tgz"
-  integrity sha512-5eFamhAbvlcodvQHs5Wp/MImZiSYLWNie9aQiprZ2w7H3A5KcCtqnW/+eb58ml2Hc7MjzIUXhszGVDMmJcsXDg==
-
 glob-parent@^5.1.2:
   version "5.1.2"
   resolved "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz"
@@ -4119,9 +4114,9 @@ invariant@^2.2.4:
     loose-envify "^1.0.0"
 
 ip@^1.1.5:
-  version "1.1.8"
-  resolved "https://registry.npmjs.org/ip/-/ip-1.1.8.tgz"
-  integrity sha512-PuExPYUiu6qMBQb4l06ecm6T6ujzhmh+MeJcW9wa89PoAz5pvd4zPgN5WJV104mb6S2T1AwNIAaB70JNrLQWhg==
+  version "1.1.9"
+  resolved "https://registry.npmjs.org/ip/-/ip-1.1.9.tgz"
+  integrity sha512-cyRxvOEpNHNtchU3Ln9KC/auJgup87llfQpQ+t5ghoC/UhL16SWzbueiCsdTnWmqAWl7LadfuwhlqmtOaqMHdQ==
 
 is-array-buffer@^3.0.2, is-array-buffer@^3.0.4:
   version "3.0.4"
@@ -5897,7 +5892,7 @@ react-native-file-viewer@^2.1.5:
   resolved "https://registry.npmjs.org/react-native-file-viewer/-/react-native-file-viewer-2.1.5.tgz"
   integrity sha512-MGC6sx9jsqHdefhVQ6o0akdsPGpkXgiIbpygb2Sg4g4bh7v6K1cardLV1NwGB9A6u1yICOSDT/MOC//9Ez6EUg==
 
-react-native-gesture-handler@^2.15.0, react-native-gesture-handler@>=2.0.0:
+react-native-gesture-handler@>=2.0.0:
   version "2.15.0"
   resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.15.0.tgz"
   integrity sha512-cmMGW8k86o/xgVTBZZOPohvR5re4Vh65PUxH4HbBBJAYTog4aN4wTVTUlnoky01HuSN8/X4h3tI/K3XLPoDnsg==
@@ -5907,13 +5902,6 @@ react-native-gesture-handler@^2.15.0, react-native-gesture-handler@>=2.0.0:
     invariant "^2.2.4"
     lodash "^4.17.21"
     prop-types "^15.7.2"
-
-react-native-gifted-charts@^1.4.7:
-  version "1.4.7"
-  resolved "https://registry.npmjs.org/react-native-gifted-charts/-/react-native-gifted-charts-1.4.7.tgz"
-  integrity sha512-KifKvVTXedtju7WLNKE+amY1LjS7DNUpj/YOa+9kzB0kgMEl2XyW592SyZi07S5iKs8tYvvZy2tkNg452PRH4w==
-  dependencies:
-    gifted-charts-core "^0.0.21"
 
 react-native-html-to-pdf@^0.12.0:
   version "0.12.0"
@@ -5925,12 +5913,12 @@ react-native-image-picker@^7.1.0:
   resolved "https://registry.npmjs.org/react-native-image-picker/-/react-native-image-picker-7.1.0.tgz"
   integrity sha512-An0hn2mwqjGAA2mbsXdHRTyoMMklGPT9stIjE2zvkegU7CdoFhowqvVHfnELJNZnfAiSQuIaeY//z0r1R0lsgw==
 
-react-native-linear-gradient@*, react-native-linear-gradient@^2.8.3:
+react-native-linear-gradient@^2.8.3:
   version "2.8.3"
   resolved "https://registry.npmjs.org/react-native-linear-gradient/-/react-native-linear-gradient-2.8.3.tgz"
   integrity sha512-KflAXZcEg54PXkLyflaSZQ3PJp4uC4whM7nT/Uot9m0e/qxFV3p6uor1983D1YOBJbJN7rrWdqIjq0T42jOJyA==
 
-react-native-reanimated@^3.7.1, react-native-reanimated@>=2.0.0, react-native-reanimated@>=3.0.0:
+react-native-reanimated@>=2.0.0, react-native-reanimated@>=3.0.0:
   version "3.7.1"
   resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-3.7.1.tgz"
   integrity sha512-bapCxhnS58+GZynQmA/f5U8vRlmhXlI/WhYg0dqnNAGXHNIc+38ahRWcG8iK8e0R2v9M8Ky2ZWObEC6bmweofg==
@@ -5953,7 +5941,7 @@ react-native-screens@^3.29.0, "react-native-screens@>= 3.0.0":
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
-react-native-svg@*:
+react-native-svg@^14.1.0:
   version "14.1.0"
   resolved "https://registry.npmjs.org/react-native-svg/-/react-native-svg-14.1.0.tgz"
   integrity sha512-HeseElmEk+AXGwFZl3h56s0LtYD9HyGdrpg8yd9QM26X+d7kjETrRQ9vCjtxuT5dCZEIQ5uggU1dQhzasnsCWA==

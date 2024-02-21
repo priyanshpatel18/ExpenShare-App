@@ -1,12 +1,52 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { NavigationProp } from '@react-navigation/native';
+import React from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import DonutChart from '../components/DonutChart';
+import MainChart from '../components/MainChart';
 
-export default function ReportPage() {
+type propsType = {
+  navigation: NavigationProp<any>
+}
+
+export default function ReportPage({ navigation }: propsType) {
+  const percentages = [100, 80, 60, 40, 20, 10];
+  const colors = ['#38D39F', '#FF4757', "#FFDD59", "#12CBC4", "#FA8231", "#1E90FF"];
+
   return (
-    <View>
-      <Text>ReportPage</Text>
+    <View style={styles.container}>
+      <View style={styles.headingContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image
+            style={styles.headingButton}
+            source={require("../assets/backButton.png")}
+          />
+        </TouchableOpacity>
+        <Text style={styles.headingText}>Report</Text>
+      </View>
+      <MainChart percentages={percentages} colors={colors} />
+      <DonutChart />
     </View>
   )
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    backgroundColor: "#fff",
+    flex: 1,
+  },
+  headingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 30
+  },
+  headingButton: {
+    height: 40,
+    width: 40,
+  },
+  headingText: {
+    color: "#000",
+    fontSize: 30,
+    fontFamily: "Montserrat-SemiBold",
+  },
+})

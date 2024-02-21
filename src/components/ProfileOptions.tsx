@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import FileViewer from "react-native-file-viewer"
@@ -80,17 +80,6 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
           <Text style={styles.buttonText}>Report</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity>
-        <View style={styles.button}>
-          <View style={[styles.iconContainer, { backgroundColor: "#ffba9c" }]}>
-            <Image
-              style={styles.buttonIcon}
-              source={require("../assets/settings.png")}
-            />
-          </View>
-          <Text style={styles.buttonText}>dark mode</Text>
-        </View>
-      </TouchableOpacity>
       <TouchableOpacity onPress={handleLogout}>
         <View style={styles.button}>
           <View style={[styles.iconContainer, { backgroundColor: "#ffbebe" }]}>
@@ -114,7 +103,7 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
         </View>
       </Modal>
 
-    </View>
+    </View >
   )
 }
 

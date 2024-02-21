@@ -24,6 +24,27 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
       return
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/;
+
+    if (!passwordRegex.test(password)) {
+      let message = "";
+
+      if (!/(?=.*[a-z])/.test(password)) {
+        message = "Password should contain at least one lowercase";
+      } else if (!/(?=.*[A-Z])/.test(password)) {
+        message = "Password should contain at least one uppercase";
+      } else if (!/(?=.*\d)/.test(password)) {
+        message = "Password should contain at least one number";
+      } else if (!/(?=.*[@$!%*?&])/.test(password)) {
+        message = "Password should contain at least one special character";
+      } else if (password.length < 6) {
+        message = "Password should be minimum 6 characters";
+      }
+
+      store.showToastWithGravityAndOffset(message);
+      return;
+    }
+
     store.setLoading(true)
     store.showToastWithGravityAndOffset("Sending Verification Mail..")
 
