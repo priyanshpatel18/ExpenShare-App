@@ -1,19 +1,18 @@
 import { NavigationProp } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getCategorySource as getExpenseCategorySource } from '../data/ExpenseCategories'
 import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCategories'
-import { TransactionType } from '../pages/TransactionPage'
-import { userStore } from '../store/userStore'
-import Transaction from './Transaction'
+import { Store, TransactionType } from '../store/store'
 import NoTransaction from './NoTransaction'
+import Transaction from './Transaction'
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
-export default function TransactionSectionHome({ navigation }: propsType) {
-  const store = userStore();
+export default function TransactionSectionHome({ navigation }: propsType): React.JSX.Element {
+  const store = Store();
   const [displayTransactions, setDisplayTransactions] = useState<TransactionType[] | undefined>(undefined);
 
   useEffect(() => {

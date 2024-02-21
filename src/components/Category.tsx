@@ -1,17 +1,17 @@
 import { NavigationProp } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { userStore } from '../store/userStore';
+import { Store } from '../store/store';
 
 
 type propsType = {
   categoryIcon: any;
   categoryText: string;
-  navigation: NavigationProp<any>
+  setShowCategories: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function Category({ categoryIcon, categoryText, navigation }: propsType) {
-  const store = userStore();
+export default function Category({ categoryIcon, categoryText, setShowCategories }: propsType): React.JSX.Element {
+  const store = Store();
 
   function handleCategorySelect() {
     if (store.transactionType === "income") {
@@ -22,7 +22,7 @@ export default function Category({ categoryIcon, categoryText, navigation }: pro
       store.setExpenseIcon(categoryIcon)
       store.setExpenseTitle(categoryText.toUpperCase())
     }
-    navigation.goBack();
+    setShowCategories(false);
   }
 
   return (

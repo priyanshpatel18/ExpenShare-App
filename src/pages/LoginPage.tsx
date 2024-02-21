@@ -3,14 +3,14 @@ import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import GradientButton from '../components/GradientButton'
 import Input from '../components/TextInput'
-import { userStore } from '../store/userStore'
+import { Store } from '../store/store'
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function LoginPage({ navigation }: propsType): React.JSX.Element {
-  const store = userStore();
+  const store = Store();
 
   const [userNameOrEmail, setUserNameOrEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");

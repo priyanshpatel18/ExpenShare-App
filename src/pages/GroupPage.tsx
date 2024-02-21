@@ -7,7 +7,7 @@ type propsType = {
   navigation: NavigationProp<any>
 }
 
-export default function GroupPage({ navigation }: propsType) {
+export default function GroupPage({ navigation }: propsType): React.JSX.Element {
   return (
     <View style={styles.container}>
       <Text>GroupPage</Text>

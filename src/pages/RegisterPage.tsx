@@ -5,18 +5,18 @@ import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import GradientButton from '../components/GradientButton';
 import Input from '../components/TextInput';
-import { userStore } from '../store/userStore';
+import { Store } from '../store/store';
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function RegisterPage({ navigation }: propsType): React.JSX.Element {
-  const [selectedImage, setSelectedImage] = useState<string | undefined | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | undefined | null>();
   const [userName, setUserName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const store = userStore()
+  const store = Store()
 
   async function handleRegister() {
     if (!email.trim() || !userName.trim() || !password.trim()) {
@@ -36,11 +36,11 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
       .then(async (res) => {
         await AsyncStorage.setItem("otpId", res.data.otpId);
         await AsyncStorage.setItem("userDataId", res.data.userDataId);
-        userStore.getState().showToastWithGravityAndOffset(res.data.message)
+        Store.getState().showToastWithGravityAndOffset(res.data.message)
         navigation.navigate("VerifyEmail");
       })
       .catch((err) => {
-        userStore.getState().showToastWithGravityAndOffset(err.response.data.message)
+        Store.getState().showToastWithGravityAndOffset(err.response.data.message)
       })
       .finally(async () => {
         store.setLoading(false)
@@ -70,7 +70,7 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
             ) : (
               <Image
                 style={styles.profileImage}
-                source={require("../assets/profile.png")}
+                source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
               />
             )}
             <View style={styles.addIconContainer}>
@@ -99,8 +99,8 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
           value={password}
           setValue={setPassword}
           keyboardType='default'
-          placeholder='Password'
           secureTextEntry={true}
+          placeholder='Password'
         />
         {store.loading ? (
           <TouchableOpacity

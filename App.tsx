@@ -3,24 +3,25 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import axios from 'axios';
 import React from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
+// File Imports
+import AccountPage from './src/pages/AccountPage';
 import ForgotPage from './src/pages/ForgotPage';
 import GroupPage from './src/pages/GroupPage';
 import HomePage from './src/pages/HomePage';
 import LoginPage from './src/pages/LoginPage';
+import UserPage from './src/pages/ProfilePage';
 import RegisterPage from './src/pages/RegisterPage';
 import ResetPasswordPage from './src/pages/ResetPasswordPage';
 import SplashScreen from './src/pages/SplashScreenPage';
 import TransactionPage from './src/pages/TransactionPage';
-import UserPage from './src/pages/UserPage';
 import VerifyEmailPage from './src/pages/VerifyEmailPage';
 import VerifyOtpPage from './src/pages/VerifyOtpPage';
-import WelcomePage from './src/pages/WelcomePage';
-import AddPage from './src/pages/AddPage';
-import CategoriesPage from './src/pages/CategoriesPage';
+import WelcomePage from "./src/pages/WelcomePage";
+import ReportScreen from './src/pages/ReportPage';
 
-axios.defaults.baseURL = "http://192.168.114.48:8080"
-// axios.defaults.baseURL = "https://expen-share-app-server.vercel.app"
-axios.defaults.withCredentials = true
+// axios.defaults.baseURL = "http://192.168.114.48:8080";
+axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
+axios.defaults.withCredentials = true;
 
 export default function App(): React.JSX.Element {
   const Stack = createNativeStackNavigator();
@@ -44,8 +45,8 @@ export default function App(): React.JSX.Element {
           <Stack.Screen name="Transaction" component={TransactionPage} />
           <Stack.Screen name="Group" component={GroupPage} />
           <Stack.Screen name="User" component={UserPage} />
-          <Stack.Screen name="AddTransaction" component={AddPage} options={{ animation: "slide_from_bottom" }} />
-          <Stack.Screen name="Categories" component={CategoriesPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
+          <Stack.Screen name="Account" component={AccountPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
+          <Stack.Screen name="Report" component={ReportScreen} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

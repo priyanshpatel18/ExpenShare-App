@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
+import { Image, StyleSheet, Text, View } from 'react-native'
 
-export default function NoTransaction() {
+export default function NoTransaction(): React.JSX.Element {
   return (
     <View style={styles.noTransaction}>
       <Image

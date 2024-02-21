@@ -22,7 +22,7 @@ const SplashScreen = ({ navigation }: propsType): React.JSX.Element => {
         // console.log(await AsyncStorage.getItem("token"));
         navigation.reset({
           index: 0,
-          routes: [{ name: 'Home' }],
+          routes: [{ name: 'Report' }],
         });
         return;
       }

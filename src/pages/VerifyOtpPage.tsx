@@ -3,16 +3,16 @@ import { NavigationProp } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { userStore } from '../store/userStore';
 import GradientButton from '../components/GradientButton';
+import { Store } from '../store/store';
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
-export default function VerifyOtpPage({ navigation }: propsType) {
+export default function VerifyOtpPage({ navigation }: propsType): React.JSX.Element {
   const [otp, setOtp] = useState('');
-  const store = userStore()
+  const store = Store()
 
   const handleVerifyOtp = async () => {
     if (!otp.trim()) {
@@ -23,9 +23,17 @@ export default function VerifyOtpPage({ navigation }: propsType) {
     const otpId = await AsyncStorage.getItem("otpId");
 
     axios.post('/user/verifyOtp', { userOtp: otp, otpId })
-      .then((res) => {
-        store.showToastWithGravityAndOffset("Create a new Password")
-        navigation.navigate("ResetPassword")
+      .then(async (res) => {
+        if (!store.isAuthenticatedChange) {
+          navigation.navigate("ResetPassword")
+          store.showToastWithGravityAndOffset("Create a new Password")
+        } else {
+          store.handleResetPassword(store.password, navigation);
+          navigation.navigate("Account")
+          store.setIsAuthenticatedChange(false);
+          store.password = "";
+          await AsyncStorage.removeItem("resetEmail")
+        }
       })
       .catch((err) => {
         console.log(err);

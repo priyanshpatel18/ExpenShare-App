@@ -8,7 +8,7 @@ type propsType = {
   imageUrl: any;
 }
 
-export default function Transaction({ title, type, amount, imageUrl }: propsType) {
+export default function Transaction({ title, type, amount, imageUrl }: propsType): React.JSX.Element {
   return (
     <View style={[
       styles.transaction,

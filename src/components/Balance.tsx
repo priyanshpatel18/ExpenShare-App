@@ -1,10 +1,10 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { userStore } from '../store/userStore';
+import { Store } from '../store/store';
 
-export default function Balance() {
-  const store = userStore();
+export default function Balance(): React.JSX.Element {
+  const store = Store();
 
   return (
     <LinearGradient

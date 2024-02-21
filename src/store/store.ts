@@ -8,64 +8,95 @@ import {
   launchImageLibrary,
 } from "react-native-image-picker";
 import { create } from "zustand";
-import { TransactionType } from "../pages/TransactionPage";
 
-interface UserStoreState {
+export interface TransactionType {
+  transactionAmount: string;
+  category: string;
+  transactionTitle: string;
+  transactionDate: string;
+  type: string;
+}
+
+export interface UserObject {
+  email: string;
+  userName: string;
+  profilePicture: string;
+  totalBalance: number;
+  totalIncome: number;
+  totalExpense: number;
+}
+
+interface StoreState {
+  // Loading State
   loading: boolean;
   setLoading: (loading: boolean) => void;
-
+  // User Object
+  userObject: UserObject | undefined;
+  setUserObject: (userObject: UserObject | undefined) => void;
+  // Default Expense Category Name
   expenseTitle: string;
   setExpenseTitle: (title: string) => void;
-
+  // Default Expense Category Icon
   expenseIcon: any;
   setExpenseIcon: (icon: any) => void;
-
+  // Default Income Category Icon
   incomeTitle: string;
   setIncomeTitle: (title: string) => void;
-
+  // Default Income Category Icon
+  incomeIcon: any;
+  setIncomeIcon: (icon: any) => void;
+  //Total Values
   totalBalance: number;
   setTotalBalance: (totalBalance: number) => void;
   totalIncome: number;
   setTotalIncome: (totalIncome: number) => void;
   totalExpense: number;
   setTotalExpense: (totalExpense: number) => void;
+  // Change Pass Flag
+  isAuthenticatedChange: boolean;
+  setIsAuthenticatedChange: (isAuthenticatedChange: boolean) => void;
+  // New Password
+  password: string;
+  setPassword: (password: string) => void;
 
-  incomeIcon: any;
-  setIncomeIcon: (icon: any) => void;
-
+  // Transaction Type
   transactionType: string;
   setTransactionType: (type: string) => void;
-
+  // Transactions
   transactions: TransactionType[] | undefined;
   setTransactions: (transactions: TransactionType[] | undefined) => void;
-
+  // Snackbar
   showToastWithGravityAndOffset: (message: string) => void;
+  // Pick Image
   pickImage: (
-    setImage: React.Dispatch<React.SetStateAction<string | null | undefined>>,
+    setImage: React.Dispatch<React.SetStateAction<string | undefined | null>>,
   ) => void;
-
+  // Handle Login
   handleLogin: (
     userNameOrEmail: string,
     password: string,
     navigation: NavigationProp<any>,
   ) => void;
-
+  // Handle Send Mail
   handleSendMail: (email: string, navigation: NavigationProp<any>) => void;
 
   handleVerifyEmail: (otp: string, navigation: NavigationProp<any>) => void;
 
   handleResetPassword: (
     password: string,
-    confirmPassword: string,
     navigation: NavigationProp<any>,
+    confirmPassword?: string,
   ) => void;
 
   fetchTransactions: () => void;
 }
 
-export const userStore = create<UserStoreState>(set => ({
+export const Store = create<StoreState>(set => ({
   loading: false,
   setLoading: (loading: boolean) => set({ loading }),
+
+  userObject: undefined,
+  setUserObject: userObject => set({ userObject }),
 
   expenseTitle: "AIR TICKETS",
   setExpenseTitle: expenseTitle => set({ expenseTitle }),
@@ -76,6 +107,13 @@ export const userStore = create<UserStoreState>(set => ({
   setTotalIncome: totalIncome => set({ totalIncome }),
   totalExpense: 0,
   setTotalExpense: totalExpense => set({ totalExpense }),
+
+  isAuthenticatedChange: false,
+  setIsAuthenticatedChange: (isAuthenticatedChange: boolean) =>
+    set({ isAuthenticatedChange }),
+
+  password: "",
+  setPassword: (password: string) => set({ password }),
 
   expenseIcon: require("../assets/categories/airTickets.png"),
   setExpenseIcon: expenseIcon => set({ expenseIcon }),
@@ -136,9 +174,7 @@ export const userStore = create<UserStoreState>(set => ({
 
   handleLogin: (userNameOrEmail, password, navigation) => {
     if (!userNameOrEmail.trim() || !password.trim()) {
-      userStore
-        .getState()
-        .showToastWithGravityAndOffset("Enter All Credentials");
+      Store.getState().showToastWithGravityAndOffset("Enter All Credentials");
       return;
     }
 
@@ -157,13 +193,13 @@ export const userStore = create<UserStoreState>(set => ({
           index: 0,
           routes: [{ name: "Home" }],
         });
-        userStore.getState().showToastWithGravityAndOffset(res.data.message);
+        Store.getState().showToastWithGravityAndOffset(res.data.message);
       })
       .catch(err => {
         console.log(err);
-        userStore
-          .getState()
-          .showToastWithGravityAndOffset(err.response.data.message);
+        Store.getState().showToastWithGravityAndOffset(
+          err.response.data.message,
+        );
       })
       .finally(() => {
         set({ loading: false });
@@ -172,24 +208,24 @@ export const userStore = create<UserStoreState>(set => ({
 
   handleSendMail: (email, navigation) => {
     if (!email.trim()) {
-      userStore.getState().showToastWithGravityAndOffset("Enter the Email");
+      Store.getState().showToastWithGravityAndOffset("Enter the Email");
     }
 
     set({ loading: true });
-    userStore.getState().showToastWithGravityAndOffset("Sending Mail...");
+    Store.getState().showToastWithGravityAndOffset("Sending Mail...");
 
     axios
       .post(`/user/sendMail`, { email })
       .then(async res => {
-        userStore.getState().showToastWithGravityAndOffset(res.data.message);
+        Store.getState().showToastWithGravityAndOffset(res.data.message);
         await AsyncStorage.setItem("otpId", res.data.otpId);
         navigation.navigate("VerifyOtp");
       })
       .catch(err => {
         console.log(err);
-        userStore
-          .getState()
-          .showToastWithGravityAndOffset(err.response.data.message);
+        Store.getState().showToastWithGravityAndOffset(
+          err.response.data.message,
+        );
       })
       .finally(() => {
         set({ loading: false });
@@ -221,9 +257,7 @@ export const userStore = create<UserStoreState>(set => ({
           });
         }
 
-        userStore
-          .getState()
-          .showToastWithGravityAndOffset("Creating your account");
+        Store.getState().showToastWithGravityAndOffset("Creating your account");
         axios
           .post(`/user/register`, formData, {
             headers: {
@@ -236,9 +270,7 @@ export const userStore = create<UserStoreState>(set => ({
               index: 0,
               routes: [{ name: "Home" }],
             });
-            userStore
-              .getState()
-              .showToastWithGravityAndOffset(res.data.message);
+            Store.getState().showToastWithGravityAndOffset(res.data.message);
           })
           .catch(err => {
             if (
@@ -246,9 +278,9 @@ export const userStore = create<UserStoreState>(set => ({
               err.response.data &&
               err.response.data.message
             ) {
-              userStore
-                .getState()
-                .showToastWithGravityAndOffset(err.response.data.message);
+              Store.getState().showToastWithGravityAndOffset(
+                err.response.data.message,
+              );
             } else {
               console.error("Error:", err);
             }
@@ -260,9 +292,9 @@ export const userStore = create<UserStoreState>(set => ({
       })
       .catch(err => {
         if (err.response && err.response.data && err.response.data.message) {
-          userStore
-            .getState()
-            .showToastWithGravityAndOffset(err.response.data.message);
+          Store.getState().showToastWithGravityAndOffset(
+            err.response.data.message,
+          );
         } else {
           console.error("Error:", err);
         }
@@ -272,28 +304,26 @@ export const userStore = create<UserStoreState>(set => ({
       });
   },
 
-  handleResetPassword: async (password, confirmPassword, navigation) => {
-    if (
-      !password ||
-      !password.trim() ||
-      !confirmPassword ||
-      !confirmPassword.trim()
-    ) {
-      userStore
-        .getState()
-        .showToastWithGravityAndOffset("Enter All Credentials");
-      return;
-    }
+  handleResetPassword: async (password, navigation, confirmPassword?) => {
+    if (!Store.getState().isAuthenticatedChange) {
+      if (
+        !password ||
+        !password.trim() ||
+        !confirmPassword ||
+        !confirmPassword.trim()
+      ) {
+        Store.getState().showToastWithGravityAndOffset("Enter All Credentials");
+        return;
+      }
 
-    if (password !== confirmPassword) {
-      userStore
-        .getState()
-        .showToastWithGravityAndOffset("Passwords must match");
-      return;
+      if (password !== confirmPassword) {
+        Store.getState().showToastWithGravityAndOffset("Passwords must match");
+        return;
+      }
     }
 
     set({ loading: true });
-    userStore.getState().showToastWithGravityAndOffset("Resetting");
+    Store.getState().showToastWithGravityAndOffset("Resetting");
 
     const formData = {
       password: password,
@@ -302,15 +332,18 @@ export const userStore = create<UserStoreState>(set => ({
 
     axios
       .post(`/user/resetPassword`, formData)
-      .then(res => {
-        userStore.getState().showToastWithGravityAndOffset(res.data.message);
-        navigation.navigate("Login");
+      .then(async res => {
+        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        if (!Store.getState().isAuthenticatedChange) {
+          navigation.navigate("Login");
+          return;
+        }
       })
       .catch(err => {
         console.log(err);
-        userStore
-          .getState()
-          .showToastWithGravityAndOffset(err.response?.data.message);
+        Store.getState().showToastWithGravityAndOffset(
+          err.response?.data.message,
+        );
       })
       .finally(async () => {
         set({ loading: false });

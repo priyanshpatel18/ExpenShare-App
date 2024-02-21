@@ -1,7 +1,7 @@
 import { NavigationProp } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { userStore } from '../store/userStore';
+import { Store } from '../store/store';
 
 import GradientButton from '../components/GradientButton';
 
@@ -9,9 +9,9 @@ type propsType = {
   navigation: NavigationProp<any>
 }
 
-export default function VerifyEmailPage({ navigation }: propsType) {
+export default function VerifyEmailPage({ navigation }: propsType): React.JSX.Element {
   const [otp, setOtp] = useState<string>('');
-  const store = userStore();
+  const store = Store();
 
   return (
     <View style={styles.container}>

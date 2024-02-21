@@ -1,19 +1,19 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
-import { NavigationProp } from '@react-navigation/native'
+import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import { userStore } from '../store/userStore'
+import { Store } from '../store/store'
 import GradientButton from './GradientButton'
-import axios from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 type propsType = {
   amount: string,
   showIncome: boolean,
-  navigation: NavigationProp<any>
+  setVisible: React.Dispatch<React.SetStateAction<boolean>>
+  setShowCategories: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function OptionsContainer({ amount, showIncome, navigation }: propsType) {
+export default function OptionsContainer({ amount, showIncome, setVisible, setShowCategories }: propsType): React.JSX.Element {
   const [currentDate, setCurrentDate] = useState<string>('');
   const [currentTime, setCurrentTime] = useState<string>('');
 
@@ -27,7 +27,7 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
   const [mode, setMode] = useState<'date' | 'time' | null>(null);
   const [time, setTime] = useState(new Date());
   const [date, setDate] = useState(new Date());
-  const store = userStore();
+  const store = Store();
 
   // Request Inputs
   const [title, setTitle] = useState<string>("");
@@ -48,7 +48,7 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
     const formData = new FormData()
 
     formData.append("incomeFlag", store.transactionType);
-    formData.append("email", await AsyncStorage.getItem("email"))
+    formData.append("token", await AsyncStorage.getItem("token"))
     formData.append("amount", amount)
     if (store.transactionType === "income") {
       formData.append("category", store.incomeTitle.toUpperCase())
@@ -71,7 +71,6 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
     formData.append("transactionDate", isoDate);
 
     if (invoiceImage) {
-      console.log(invoiceImage);
       const extension = invoiceImage.split(".").pop();
       formData.append("invoice", {
         uri: invoiceImage,
@@ -97,7 +96,7 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
           store.setTotalBalance(store.totalBalance - Number(amount));
           store.setTotalExpense(store.totalExpense + Number(amount));
         }
-        navigation.goBack();
+        setVisible(false)
       })
       .catch((err) => {
         console.error(err.response.data.message);
@@ -153,7 +152,7 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
         <View>
           <View style={styles.option}>
             <Text style={styles.labelText}>Select a Category</Text>
-            <TouchableOpacity style={styles.categoryContainer} onPress={() => navigation.navigate("Categories")}>
+            <TouchableOpacity style={styles.categoryContainer} onPress={() => setShowCategories(true)}>
               <View style={styles.categoryIconContainer}>
                 <Image
                   source={store.transactionType === "expense" ? store.expenseIcon : store.incomeIcon}
@@ -198,7 +197,7 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
             {invoiceImage &&
               <>
                 <Text style={styles.viewImage} onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>View Image</Text>
-                <Modal visible={isInvoiceVisible} transparent={true} onRequestClose={() => setIsInvoiceVisible(!isInvoiceVisible)}>
+                <Modal visible={isInvoiceVisible} transparent={true} onRequestClose={() => setIsInvoiceVisible(!isInvoiceVisible)} animationType="slide">
                   <View style={[styles.modalContainer, { backgroundColor: "rgba(0, 0, 0, 0.5)" }]}>
                     <TouchableWithoutFeedback onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
                       <Image source={{ uri: invoiceImage }} style={styles.modalImage} />
@@ -240,9 +239,17 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
           </View>
         </View>
       </ScrollView >
-      <TouchableOpacity style={styles.continueButton} onPress={handleCreateExpense}>
-        <GradientButton text='continue' />
-      </TouchableOpacity>
+      {store.loading ?
+        <TouchableOpacity style={styles.continueButton}
+          onPress={() => Store.getState().showToastWithGravityAndOffset("Adding...")}
+        >
+          <GradientButton text='continue' />
+        </TouchableOpacity>
+        :
+        <TouchableOpacity style={styles.continueButton} onPress={handleCreateExpense}>
+          <GradientButton text='continue' />
+        </TouchableOpacity>
+      }
       {/* Modals */}
       <Modal
         visible={modalVisible}

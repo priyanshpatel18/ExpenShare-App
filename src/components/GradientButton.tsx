@@ -6,7 +6,7 @@ type propsType = {
   text: string
 }
 
-export default function GradientButton({ text }: propsType): React.JSX.Element {
+export default function ({ text }: propsType): React.JSX.Element {
   return (
     <LinearGradient
       colors={['#2faae3', '#c968ff', '#e680b1', '#fb9475']}

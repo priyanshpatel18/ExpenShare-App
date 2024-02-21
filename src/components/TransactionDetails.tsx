@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import { Transaction } from '../pages/TransactionPage';
+import { TransactionType } from '../store/store';
 
-type PropsType = {
-  transaction: Transaction;
+type propsType = {
+  transaction: TransactionType;
 };
 
-export default function TransactionDetails({ transaction }: PropsType) {
+export default function TransactionDetails({ transaction }: propsType): React.JSX.Element {
   const date = new Date(transaction.transactionDate);
 
   // Format the date

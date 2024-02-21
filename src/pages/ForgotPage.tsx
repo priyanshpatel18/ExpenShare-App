@@ -1,10 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import GradientButton from '../components/GradientButton';
 import Input from '../components/TextInput';
-import { userStore } from '../store/userStore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Store } from '../store/store';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -12,7 +12,7 @@ type propsType = {
 
 export default function ForgotPage({ navigation }: propsType): React.JSX.Element {
   const [email, setEmail] = useState<string>("");
-  const store = userStore()
+  const store = Store()
 
   return (
     <View style={styles.container}>

@@ -1,8 +1,8 @@
+import { NavigationProp } from '@react-navigation/native'
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import GradientText from '../components/GradientText'
 import GradientButton from '../components/GradientButton'
-import { NavigationProp } from '@react-navigation/native'
+import GradientText from '../components/GradientText'
 
 type propsType = {
   navigation: NavigationProp<any>;

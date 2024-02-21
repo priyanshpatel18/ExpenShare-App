@@ -3,30 +3,22 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import MenuBar from '../components/MenuBar';
+import NoTransaction from '../components/NoTransaction';
 import Transaction from '../components/Transaction';
-import { userStore } from '../store/userStore';
 import TransactionDetails from '../components/TransactionDetails';
 import { getCategorySource as getExpenseCategorySource } from '../data/ExpenseCategories';
 import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCategories';
-import NoTransaction from '../components/NoTransaction';
+import { Store, TransactionType } from '../store/store';
 
 type PropsType = {
   navigation: NavigationProp<any>;
 };
 
-export interface TransactionType {
-  transactionAmount: string;
-  category: string;
-  transactionTitle: string;
-  transactionDate: string;
-  type: string;
-}
-
 export default function TransactionPage({ navigation }: PropsType) {
   const [showIncome, setShowIncome] = useState(true);
   const [displayTransactions, setDisplayTransactions] = useState<TransactionType[] | undefined>(undefined);
   const [showNoTransaction, setShowNoTransaction] = useState<boolean>(false);
-  const store = userStore();
+  const store = Store();
 
   useEffect(() => {
     if (store.transactions) {
