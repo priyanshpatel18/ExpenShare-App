@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   switchButtonText: {
-    color: "#000",
+    color: "#222",
     fontSize: 20,
     textTransform: "uppercase",
     fontFamily: "Montserrat-SemiBold",

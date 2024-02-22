@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headingText: {
-    color: "#000",
+    color: "#222",
     fontSize: 30,
     fontWeight: "bold",
     textTransform: "uppercase",
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   mainInstruction: {
     textAlign: "center",
     fontSize: 18,
-    color: "#000",
+    color: "#222",
     paddingVertical: 5,
     width: "80%"
   },
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     marginVertical: 30,
-    color: "#000",
+    color: "#222",
     fontSize: 30,
     letterSpacing: 5,
     textAlign: "center"

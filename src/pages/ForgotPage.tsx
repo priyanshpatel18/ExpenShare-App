@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     padding: 10
   },
   headingText: {
-    color: "#000",
+    color: "#222",
     fontSize: 24,
     fontWeight: "bold",
     textTransform: "uppercase",

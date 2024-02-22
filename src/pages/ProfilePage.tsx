@@ -69,17 +69,17 @@ const styles = StyleSheet.create({
     width: 80,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: "#000"
+    borderColor: "#222"
   },
   userName: {
-    color: "#000",
+    color: "#222",
     fontSize: 22,
     fontFamily: "Montserrat-SemiBold",
     marginVertical: 10,
     textAlign: "center"
   },
   userNameInput: {
-    color: "#000",
+    color: "#222",
     fontSize: 22,
     fontFamily: "Montserrat-SemiBold",
     marginVertical: 10,

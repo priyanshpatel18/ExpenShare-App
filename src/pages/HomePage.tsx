@@ -2,11 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useEffect } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Modal, StyleSheet, Text, View } from 'react-native';
 import Balance from '../components/Balance';
 import MenuBar from '../components/MenuBar';
 import TransactionSection from '../components/TransactionHome';
 import { Store } from '../store/store';
+import Loading from '../components/Loading';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -15,66 +16,43 @@ type propsType = {
 export default function HomePage({ navigation }: propsType): React.JSX.Element {
   const store = Store()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      store.setLoading(true)
-
-      const token = await AsyncStorage.getItem("token")
-      axios.post("/user/getUser", { token })
-        .then((res) => {
-          store.setUserObject(res.data.userObject);
-          store.setTotalBalance(Number(res.data.userObject.totalBalance));
-          store.setTotalExpense(Number(res.data.userObject.totalExpense));
-          store.setTotalIncome(Number(res.data.userObject.totalIncome));
-        })
-        .catch((err) => {
-          console.error("Error fetching data:", err);
-        })
-        .finally(() => {
-          store.setLoading(false)
-        })
-
-      const storedMode = await AsyncStorage.getItem("mode");
-      store.setMode(storedMode || "light");
-    };
-
-    fetchData();
-
-  }, []);
-
   return (
-    <View style={[styles.container]}>
-      <View style={styles.userContainer}>
-        {
-          store.userObject?.profilePicture ? (
-            <Image
-              style={styles.userProfileImage}
-              source={{ uri: store.userObject.profilePicture }}
-            />
-          ) : (
-            <Image
-              style={styles.userProfileImage}
-              source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
-            />
-          )
-        }
-        <View>
-          <Text style={styles.userName}>Welcome,</Text>
-          <Text style={styles.userName}>{store.userObject?.userName}</Text>
+    <>
+      {store.loading ? <Loading /> : (
+        <View style={[styles.container]}>
+          <View style={styles.userContainer}>
+            {
+              store.userObject?.profilePicture ? (
+                <Image
+                  style={styles.userProfileImage}
+                  source={{ uri: store.userObject.profilePicture }}
+                />
+              ) : (
+                <Image
+                  style={styles.userProfileImage}
+                  source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+                />
+              )
+            }
+            <View>
+              <Text style={styles.userName}>Welcome,</Text>
+              <Text style={styles.userName}>{store.userObject?.userName}</Text>
+            </View>
+          </View>
+          <Balance />
+          <TransactionSection navigation={navigation} />
+          <MenuBar navigation={navigation} />
         </View>
-      </View>
-      <Balance />
-      <TransactionSection navigation={navigation} />
-      <MenuBar navigation={navigation} />
-    </View>
+      )}
+    </>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     height: "100%",
-    flex: 1,
-    backgroundColor: "#fff"
+    width: "100%",
+    backgroundColor: "#fff",
   },
   userContainer: {
     display: "flex",
@@ -88,7 +66,7 @@ const styles = StyleSheet.create({
     width: 100
   },
   userName: {
-    color: Store.getState().mode === "light" ? "#000" : "#fff",
+    color: Store.getState().mode === "light" ? "#222" : "#fff",
     fontSize: 20,
     fontFamily: "Montserrat-SemiBold"
   },
@@ -97,6 +75,6 @@ const styles = StyleSheet.create({
     width: 70,
     borderRadius: 50,
     borderWidth: 1,
-    borderColor: Store.getState().mode === "light" ? "#000" : "#fff"
+    borderColor: Store.getState().mode === "light" ? "#222" : "#fff"
   },
 })

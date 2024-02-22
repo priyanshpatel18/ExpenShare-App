@@ -9,11 +9,13 @@ type propsType = {
 }
 
 export default function Transaction({ title, type, amount, imageUrl }: propsType): React.JSX.Element {
+
+
   return (
     <View style={[
       styles.transaction,
-      type === "expense" ? { backgroundColor: "rgb(255, 173, 173)" } :
-        type === "income" ? { backgroundColor: "rgb(170, 253, 166)" } :
+      type === "expense" ? { backgroundColor: "#FDD" } :
+        type === "income" ? { backgroundColor: "#DFD" } :
           { backgroundColor: "#CFCFCF" }
     ]}>
       <View style={styles.categoryIconContainer}>
@@ -33,7 +35,7 @@ export default function Transaction({ title, type, amount, imageUrl }: propsType
           </Text>
         ) : (
           <Text style={styles.amount}>
-            ₹{amount}
+            ₹{Number(amount) > 999999 ? Number(amount) / 1000000 + 'M' : Number(amount)}
           </Text>
         )
       }
@@ -71,7 +73,7 @@ const styles = StyleSheet.create({
   },
   transactionDescription: {
     flexShrink: 1,
-    color: "#000",
+    color: "#222",
     fontFamily: "Montserrat-SemiBold",
     fontSize: 25,
     maxWidth: '60%',
@@ -87,7 +89,7 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontSize: 20,
-    color: "#000",
+    color: "#222",
     fontFamily: "Montserrat-Medium"
   }
 })

@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   mainHeading: {
     textAlign: "center",
-    color: "#000",
+    color: "#222",
     fontSize: 30,
     paddingVertical: 5,
     width: "80%"

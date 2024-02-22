@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   details: {
-    color: '#000',
+    color: '#222',
     fontSize: 16,
     fontFamily: 'Montserrat-SemiBold',
   },

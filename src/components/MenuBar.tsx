@@ -1,7 +1,6 @@
 import { NavigationProp, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { Image, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-import { Store } from '../store/store';
 import AddModal from './AddModal';
 
 type propsType = {
@@ -10,7 +9,6 @@ type propsType = {
 
 export default function MenuBar({ navigation }: propsType): React.JSX.Element {
   const route = useRoute();
-  const store = Store();
   const [visible, setVisible] = useState(false);
 
   return (
@@ -31,8 +29,6 @@ export default function MenuBar({ navigation }: propsType): React.JSX.Element {
           </TouchableWithoutFeedback>
         </View>
         <TouchableWithoutFeedback onPress={() => {
-          // navigation.navigate("AddTransaction")
-          // store.setTransactionType("expense")
           setVisible(true)
         }}>
           <Image
@@ -55,7 +51,7 @@ export default function MenuBar({ navigation }: propsType): React.JSX.Element {
           </TouchableWithoutFeedback>
         </View>
       </View>
-      {visible && <AddModal navigation={navigation} setVisible={setVisible} />}
+      {visible && <AddModal setVisible={setVisible} />}
 
     </View >
   );

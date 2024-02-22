@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 30,
-    color: "#000",
+    color: "#222",
     textAlign: "center",
     fontFamily: "Montserrat-SemiBold",
     textTransform: "capitalize"

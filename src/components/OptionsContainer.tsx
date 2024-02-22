@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
 import axios from 'axios'
+import { MotiImage, MotiView } from 'moti'
 import React, { useEffect, useState } from 'react'
-import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { Store } from '../store/store'
 import GradientButton from './GradientButton'
 
@@ -197,12 +198,27 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
             {invoiceImage &&
               <>
                 <Text style={styles.viewImage} onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>View Image</Text>
-                <Modal visible={isInvoiceVisible} transparent={true} onRequestClose={() => setIsInvoiceVisible(!isInvoiceVisible)} animationType="slide">
-                  <View style={[styles.modalContainer, { backgroundColor: "rgba(0, 0, 0, 0.5)" }]}>
-                    <TouchableWithoutFeedback onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
-                      <Image source={{ uri: invoiceImage }} style={styles.modalImage} />
-                    </TouchableWithoutFeedback>
-                  </View>
+                <Modal visible={isInvoiceVisible} transparent={true}>
+                  {isInvoiceVisible &&
+                    <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)} style={styles.modalContainer}>
+                      <MotiView
+                        from={{
+                          opacity: 0,
+                          scale: 0.5,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          scale: 1,
+                        }}
+                        transition={{
+                          type: 'timing',
+                        }}
+                        style={styles.shape}
+                      >
+                        <Image source={{ uri: invoiceImage }} style={styles.modalImage} />
+                      </MotiView>
+                    </Pressable>
+                  }
                 </Modal>
               </>
             }
@@ -255,9 +271,9 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
         visible={modalVisible}
         transparent={true}
       >
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View style={styles.modalContainer}>
-            {mode && (
+        <Pressable onPress={() => setModalVisible(false)}>
+          {mode && (
+            <MotiView>
               <DateTimePicker
                 testID='dateAndTimePicker'
                 value={mode === "time" ? time : date}
@@ -266,9 +282,9 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
                 onChange={mode === "time" ? handleTimeSelect : handleDateSelect}
                 maximumDate={maxDate}
               />
-            )}
-          </View>
-        </TouchableWithoutFeedback>
+            </MotiView>
+          )}
+        </Pressable>
       </Modal>
     </View>
   )
@@ -320,14 +336,14 @@ const styles = StyleSheet.create({
     width: 25,
   },
   categoryText: {
-    color: "#000",
+    color: "#222",
     fontSize: 20,
     textTransform: "capitalize",
     fontFamily: "Montserrat-SemiBold",
   },
   titleInput: {
     fontSize: 22,
-    color: "#000",
+    color: "#222",
     padding: 0,
     fontFamily: "Montserrat-SemiBold",
   },
@@ -338,7 +354,7 @@ const styles = StyleSheet.create({
   },
   notesInput: {
     fontSize: 22,
-    color: "#000",
+    color: "#222",
     padding: 0,
     width: "85%",
     fontFamily: "Montserrat-SemiBold",
@@ -351,16 +367,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     alignSelf: "flex-end",
     color: "#539AEA"
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  modalImage: {
-    width: '80%',
-    height: '100%',
-    resizeMode: 'contain',
   },
   dateAndTimeContainer: {
     display: "flex",
@@ -385,7 +391,7 @@ const styles = StyleSheet.create({
     width: 30
   },
   dateAndTimeText: {
-    color: "#000",
+    color: "#222",
     fontSize: 18,
     fontFamily: "Montserrat-Medium",
   },
@@ -393,5 +399,27 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     overflow: "hidden",
     marginTop: 20
+  },
+  modalContainer: {
+    display: "flex",
+    height: "100%",
+    width: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  shape: {
+    justifyContent: 'center',
+    alignItems: "center",
+    borderRadius: 10,
+    marginRight: 10,
+    resizeMode: 'contain',
+    height: "100%",
+    width: "100%"
+  },
+  modalImage: {
+    width: '80%',
+    height: '100%',
+    resizeMode: 'contain',
   },
 })

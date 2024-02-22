@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { Store } from '../store/store'
 import axios from 'axios'
+import Loading from '../components/Loading'
+import RNFS from "react-native-fs"
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -22,6 +24,17 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
       navigation.goBack();
       return;
     }
+
+    if (profilePicture) {
+      const fileInfo = await RNFS.stat(profilePicture);
+      const fileSizeInBytes = fileInfo.size;
+      const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
+      if (fileSizeInMegabytes > 3) {
+        store.showToastWithGravityAndOffset("File Size must be less than 3MB")
+        return;
+      }
+    }
+
     const formData = new FormData();
 
     formData.append("token", await AsyncStorage.getItem("token"));
@@ -102,101 +115,106 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headingContainer}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 30 }}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image
-              style={styles.headingButton}
-              source={require("../assets/backButton.png")}
-            />
-          </TouchableOpacity>
-          <Text style={styles.headingText}>Account</Text>
-        </View>
-        {store.loading ?
-          <TouchableOpacity onPress={() => Store.getState().showToastWithGravityAndOffset("Updating...")}>
-            <Image
-              style={styles.headingButton}
-              source={require("../assets/doneButton.png")}
-            />
-          </TouchableOpacity>
-          :
-          <TouchableOpacity onPress={handleSave}>
-            <Image
-              style={styles.headingButton}
-              source={require("../assets/doneButton.png")}
-            />
-          </TouchableOpacity>
-        }
-      </View>
-      <View style={styles.detailContainer}>
-        <TouchableWithoutFeedback onPress={() => store.pickImage(setProfilePicture)}>
-          <View>
-            {profilePicture ?
-              <Image
-                style={styles.profilePicture}
-                source={{ uri: profilePicture }}
+    <>
+      {store.loading ? <Loading />
+        : (
+          <View style={styles.container}>
+            <View style={styles.headingContainer}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Image
+                  style={styles.headingButton}
+                  source={require("../assets/backButton.png")}
+                />
+              </TouchableOpacity>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 30 }}>
+                <Text style={styles.headingText}>Account</Text>
+              </View>
+              {store.loading ?
+                <TouchableOpacity onPress={() => Store.getState().showToastWithGravityAndOffset("Updating...")}>
+                  <Image
+                    style={styles.headingButton}
+                    source={require("../assets/doneButton.png")}
+                  />
+                </TouchableOpacity>
+                :
+                <TouchableOpacity onPress={handleSave}>
+                  <Image
+                    style={styles.headingButton}
+                    source={require("../assets/doneButton.png")}
+                  />
+                </TouchableOpacity>
+              }
+            </View>
+            <View style={styles.detailContainer}>
+              <TouchableWithoutFeedback onPress={() => store.pickImage(setProfilePicture)}>
+                <View>
+                  {profilePicture ?
+                    <Image
+                      style={styles.profilePicture}
+                      source={{ uri: profilePicture }}
+                    />
+                    :
+                    <Image
+                      style={styles.profilePicture}
+                      source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+                    />
+                  }
+                  <Image
+                    style={styles.addIcon}
+                    source={require("../assets/addIcon.png")}
+                  />
+                </View>
+              </TouchableWithoutFeedback>
+              <View>
+                <Text style={styles.subHeading}>Username</Text>
+                <TextInput
+                  value={textInput}
+                  style={[styles.propertyValue, { padding: 0 }]}
+                  onChangeText={(text: string) => setTextInput(text)}
+                  placeholderTextColor="#111"
+                />
+              </View>
+            </View>
+            <View>
+              <Text style={styles.subHeading}>email</Text>
+              <Text style={styles.propertyValue}>{store.userObject?.email}</Text>
+            </View>
+            <View style={styles.passwordContainer}>
+              <Text style={[styles.subHeading, { marginTop: 20, fontSize: 22 }]}>password change</Text>
+              <Text style={styles.infoText}>Leave Passwords Empty, when you don't want to change it</Text>
+              <TextInput
+                value={newPassword}
+                onChangeText={(password: string) => setNewPassword(password)}
+                style={[styles.propertyValue, styles.passwordInput]}
+                placeholder='Password'
+                placeholderTextColor="#888"
+                keyboardType='default'
+                secureTextEntry={true}
               />
-              :
-              <Image
-                style={styles.profilePicture}
-                source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+              <TextInput
+                value={confirmPassword}
+                onChangeText={(password: string) => setConfirmPassword(password)}
+                style={[styles.passwordInput, styles.propertyValue]}
+                placeholder='Confirm Password'
+                placeholderTextColor="#888"
+                keyboardType='default'
+                secureTextEntry={true}
               />
-            }
-            <Image
-              style={styles.addIcon}
-              source={require("../assets/addIcon.png")}
-            />
+              {store.loading ?
+                <TouchableOpacity style={styles.changeButton} onPress={() => store.showToastWithGravityAndOffset("Sending Mail...")}>
+                  <Text style={styles.changeText}>Change Password</Text>
+                </TouchableOpacity> :
+                <TouchableOpacity style={styles.changeButton} onPress={handleChange}>
+                  <Text style={styles.changeText}>Change Password</Text>
+                </TouchableOpacity>
+              }
+            </View>
+            <TouchableOpacity style={[styles.changeButton, { backgroundColor: "#ff4545" }]}>
+              <Text style={styles.changeText}>Delete your account</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableWithoutFeedback>
-        <View>
-          <Text style={styles.subHeading}>Username</Text>
-          <TextInput
-            value={textInput}
-            style={[styles.propertyValue, { padding: 0 }]}
-            onChangeText={(text: string) => setTextInput(text)}
-            placeholderTextColor="#111"
-          />
-        </View>
-      </View>
-      <View>
-        <Text style={styles.subHeading}>email</Text>
-        <Text style={styles.propertyValue}>{store.userObject?.email}</Text>
-      </View>
-      <View style={styles.passwordContainer}>
-        <Text style={[styles.subHeading, { marginTop: 20, fontSize: 22 }]}>password change</Text>
-        <Text style={styles.infoText}>Leave Passwords Empty, when you don't want to change it</Text>
-        <TextInput
-          value={newPassword}
-          onChangeText={(password: string) => setNewPassword(password)}
-          style={[styles.propertyValue, styles.passwordInput]}
-          placeholder='Password'
-          placeholderTextColor="#888"
-          keyboardType='default'
-          secureTextEntry={true}
-        />
-        <TextInput
-          value={confirmPassword}
-          onChangeText={(password: string) => setConfirmPassword(password)}
-          style={[styles.passwordInput, styles.propertyValue]}
-          placeholder='Confirm Password'
-          placeholderTextColor="#888"
-          keyboardType='default'
-          secureTextEntry={true}
-        />
-        {store.loading ?
-          <TouchableOpacity style={styles.changeButton} onPress={() => store.showToastWithGravityAndOffset("Sending Mail...")}>
-            <Text style={styles.changeText}>Change Password</Text>
-          </TouchableOpacity> :
-          <TouchableOpacity style={styles.changeButton} onPress={handleChange}>
-            <Text style={styles.changeText}>Change Password</Text>
-          </TouchableOpacity>
-        }
-      </View>
-      <TouchableOpacity style={[styles.changeButton, { backgroundColor: "#ff4545" }]}>
-        <Text style={styles.changeText}>Delete your account</Text>
-      </TouchableOpacity>
-    </View>
+        )}
+    </>
   )
 }
 
@@ -216,7 +234,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headingText: {
-    color: "#000",
+    color: "#222",
     fontSize: 30,
     fontFamily: "Montserrat-SemiBold",
   },
@@ -231,7 +249,7 @@ const styles = StyleSheet.create({
     width: 80,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: "#000"
+    borderColor: "#222"
   },
   addIcon: {
     backgroundColor: "#f00",

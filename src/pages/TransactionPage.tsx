@@ -10,6 +10,7 @@ import { getCategorySource as getExpenseCategorySource } from '../data/ExpenseCa
 import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCategories';
 import { Store, TransactionType } from '../store/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MotiView } from 'moti';
 
 type PropsType = {
   navigation: NavigationProp<any>;
@@ -22,12 +23,6 @@ export default function TransactionPage({ navigation }: PropsType) {
   const store = Store();
 
   useEffect(() => {
-    const fun = async () => {
-      console.log(await AsyncStorage.getItem("mode"))
-    }
-
-    fun();
-
     if (store.transactions) {
       if (showIncome) {
         const incomeTransactions = store.transactions.filter(transaction => transaction.type === 'income');
@@ -86,7 +81,6 @@ export default function TransactionPage({ navigation }: PropsType) {
           )}
         </TouchableOpacity>
       </View>
-
       {showNoTransaction ? <NoTransaction /> : (
         <ScrollView style={styles.transactions}>
           {displayTransactions
@@ -94,20 +88,28 @@ export default function TransactionPage({ navigation }: PropsType) {
               return new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime();
             })
             .map((transaction, index) => {
-              return (<View key={index}>
-                <TransactionDetails transaction={transaction} />
-                <Transaction
-                  title={transaction.transactionTitle}
-                  amount={transaction.transactionAmount}
-                  imageUrl={transaction.type === "expense" ?
-                    getExpenseCategorySource(transaction.category) :
-                    getIncomeCategorySource(transaction.category)}
-                />
-              </View>)
+              return (
+                <MotiView key={index}
+                  from={{
+                    opacity: 0
+                  }}
+                  animate={{
+                    opacity: 1
+                  }}
+                >
+                  <TransactionDetails transaction={transaction} />
+                  <Transaction
+                    title={transaction.transactionTitle}
+                    amount={transaction.transactionAmount}
+                    imageUrl={transaction.type === "expense" ?
+                      getExpenseCategorySource(transaction.category) :
+                      getIncomeCategorySource(transaction.category)}
+                  />
+                </MotiView>
+              )
             })}
         </ScrollView>
       )}
-
       <MenuBar navigation={navigation} />
     </View >
   );
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
   },
   headingText: {
     fontFamily: "Montserrat-SemiBold",
-    color: '#000',
+    color: '#222',
     fontSize: 25,
     fontWeight: 'bold',
     textTransform: 'uppercase',
@@ -147,7 +149,7 @@ const styles = StyleSheet.create({
   },
 
   switchButtonText: {
-    color: "#000",
+    color: "#222",
     fontSize: 22,
     textTransform: "uppercase",
     fontFamily: "Montserrat-SemiBold"
@@ -167,7 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   details: {
-    color: "#000",
+    color: "#222",
     fontSize: 16,
     fontFamily: "Montserrat-SemiBold"
   },

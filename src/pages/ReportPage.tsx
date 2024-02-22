@@ -1,8 +1,10 @@
 import { NavigationProp } from '@react-navigation/native';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useReducer } from 'react';
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DonutChart from '../components/DonutChart';
 import MainChart from '../components/MainChart';
+import { MotiView } from 'moti';
+import Loading from '../components/Loading';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -14,19 +16,19 @@ export default function ReportPage({ navigation }: propsType) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headingContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image
-            style={styles.headingButton}
-            source={require("../assets/backButton.png")}
-          />
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Image
+          style={styles.headingButton}
+          source={require("../assets/backButton.png")}
+        />
+      </TouchableOpacity>
+      <View style={styles.headingContainer} >
         <Text style={styles.headingText}>Report</Text>
-      </View>
+      </View >
       <MainChart percentages={percentages} colors={colors} />
       <DonutChart />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -38,15 +40,20 @@ const styles = StyleSheet.create({
   headingContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 30
   },
   headingButton: {
     height: 40,
     width: 40,
+    position: "absolute",
+    top: 0,
+    left: 0
   },
   headingText: {
-    color: "#000",
+    color: "#222",
     fontSize: 30,
     fontFamily: "Montserrat-SemiBold",
   },
 })
+

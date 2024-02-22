@@ -6,6 +6,7 @@ import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCate
 import { Store, TransactionType } from '../store/store'
 import NoTransaction from './NoTransaction'
 import Transaction from './Transaction'
+import { MotiView } from 'moti'
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -50,23 +51,41 @@ export default function TransactionSectionHome({ navigation }: propsType): React
       {displayTransactions?.length !== 0 ? (
         <ScrollView style={styles.transactions}>
           {displayTransactions?.map((transaction, index) => {
-            return (<View key={index}>
-              <Transaction
-                type={transaction.type}
-                title={transaction.transactionTitle}
-                amount={transaction.transactionAmount}
-                imageUrl={transaction.type === "expense" ?
-                  getExpenseCategorySource(transaction.category) :
-                  getIncomeCategorySource(transaction.category)}
-              />
-            </View>)
+            return (
+              <MotiView key={index}
+                from={{
+                  opacity: 0,
+                  bottom: (index + 1) * -300
+                }}
+                animate={{
+                  opacity: 1,
+                  bottom: 0
+                }}
+                transition={{
+                  type: "timing",
+                  duration: 700
+                }}
+              >
+                <View>
+                  <Transaction
+                    type={transaction.type}
+                    title={transaction.transactionTitle}
+                    amount={transaction.transactionAmount}
+                    imageUrl={transaction.type === "expense" ?
+                      getExpenseCategorySource(transaction.category) :
+                      getIncomeCategorySource(transaction.category)}
+                  />
+                </View>
+
+              </MotiView>
+            )
           })}
         </ScrollView>
       ) : (
         <NoTransaction />
-      )}
-
-    </View>
+      )
+      }
+    </View >
   )
 }
 
@@ -80,10 +99,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginVertical: 15
+    marginVertical: 15,
   },
   transactionHeading: {
-    color: "#000",
+    color: "#222",
     fontSize: 18,
     fontFamily: "Montserrat-Bold"
   },
@@ -93,6 +112,6 @@ const styles = StyleSheet.create({
   },
   transactions: {
     paddingHorizontal: 20,
-    marginBottom: "25%"
+    marginBottom: "25%",
   },
 })

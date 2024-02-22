@@ -202,7 +202,6 @@ export const Store = create<StoreState>(set => ({
         Store.getState().showToastWithGravityAndOffset(res.data.message);
       })
       .catch(err => {
-        console.log(err);
         Store.getState().showToastWithGravityAndOffset(
           err.response.data.message,
         );

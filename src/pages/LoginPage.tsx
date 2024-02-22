@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headingText: {
-    color: "#000",
+    color: "#222",
     fontSize: 30,
     fontWeight: "bold",
     textTransform: "uppercase",

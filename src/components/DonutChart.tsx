@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   title: {
-    color: "#000",
+    color: "#222",
     fontSize: 20,
     width: "70%",
     textAlign: "center"

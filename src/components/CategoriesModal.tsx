@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
     padding: 10,
     fontSize: 16,
-    color: "#000",
+    color: "#222",
     borderRadius: 10,
     flex: 1
   },
