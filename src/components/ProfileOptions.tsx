@@ -1,12 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
-import { Button, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import FileViewer from "react-native-file-viewer";
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import FileViewer from "react-native-file-viewer"
 
-import { Store } from '../store/store';
 import { MotiView } from 'moti';
+import { Store } from '../store/store';
 
 type propsType = {
   navigation: NavigationProp<any>

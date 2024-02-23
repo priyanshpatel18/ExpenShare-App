@@ -29,7 +29,7 @@ export default function SearchUser({ userName, profilePicture }: propsType) {
             :
             <Image
               style={styles.userProfile}
-              source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+              source={require("../assets/defaultUser.png")}
             />
         }
         <Text style={styles.userName}>{userName}</Text>

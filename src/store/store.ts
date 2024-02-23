@@ -10,11 +10,14 @@ import {
 import { create } from "zustand";
 
 export interface TransactionType {
+  _id: string;
   transactionAmount: string;
   category: string;
   transactionTitle: string;
   transactionDate: string;
   type: string;
+  notes: string;
+  invoiceUrl: string;
 }
 
 export interface UserObject {
@@ -24,6 +27,12 @@ export interface UserObject {
   totalBalance: number | undefined;
   totalIncome: number | undefined;
   totalExpense: number | undefined;
+}
+
+interface GroupDocument extends Document {
+  groupName: string;
+  groupProfile?: string;
+  members: string[];
 }
 
 interface StoreState {
@@ -96,6 +105,15 @@ interface StoreState {
   handleRegister: (navigation: NavigationProp<any>) => void;
   // Get User
   handleGetUser: (navigation: NavigationProp<any>) => void;
+  // Group State
+  groups: GroupDocument[] | [];
+  setGroups: (groups: GroupDocument[]) => void;
+  // Create Group
+  handleCreateGroup: (
+    title: string,
+    selectedImage: string | undefined | null,
+    setOpenAddGroup: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => void;
 }
 
 export const Store = create<StoreState>(set => ({
@@ -189,6 +207,7 @@ export const Store = create<StoreState>(set => ({
     }
 
     set({ loading: true });
+    Store.getState().showToastWithGravityAndOffset("Logging in...");
 
     const formData = {
       userNameOrEmail: String(userNameOrEmail.toLowerCase()),
@@ -199,6 +218,8 @@ export const Store = create<StoreState>(set => ({
       .post(`/user/login`, formData)
       .then(async res => {
         await AsyncStorage.setItem("token", res.data.token);
+        const token = res.data.token;
+        Store.getState().handleGetUser(token);
         navigation.reset({
           index: 0,
           routes: [{ name: "Home" }],
@@ -393,5 +414,64 @@ export const Store = create<StoreState>(set => ({
       });
   },
 
-  handleCreateExpense: () => {},
+  groups: [],
+  setGroups: (groups: GroupDocument[]) => set({ groups }),
+
+  handleCreateGroup: async (title, selectedImage, setOpenAddGroup) => {
+    if (!title.trim()) {
+      Store.getState().showToastWithGravityAndOffset("Title is required");
+      return;
+    }
+
+    set({ loading: true });
+    Store.getState().showToastWithGravityAndOffset("Creating...");
+
+    const formData = new FormData();
+
+    const token = await AsyncStorage.getItem("token");
+
+    formData.append("groupName", title);
+    formData.append("token", token);
+
+    if (selectedImage) {
+      const extension = selectedImage.split(".").pop();
+      formData.append("groupProfile", {
+        uri: selectedImage,
+        name: `profilePicture.${extension}`,
+        type: `image/${extension}`,
+      });
+    }
+
+    axios
+      .post("/group/create", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(res => {
+        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        // Add Group to store
+        const newGroup = {
+          groupName: title,
+          groupProfile: selectedImage ? selectedImage : undefined,
+          members: [],
+          groupExpense: [],
+          totalExpense: 0,
+        };
+        Store.getState().setGroups([...Store.getState().groups, newGroup]);
+        setOpenAddGroup(false);
+      })
+      .catch(err => {
+        if (axios.isAxiosError(err)) {
+          Store.getState().showToastWithGravityAndOffset(
+            err.response?.data.message,
+          );
+        } else {
+          console.error(err);
+        }
+      })
+      .finally(() => {
+        set({ loading: false });
+      });
+  },
 }));

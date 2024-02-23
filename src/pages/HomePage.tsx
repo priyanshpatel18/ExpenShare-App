@@ -42,7 +42,7 @@ export default function HomePage({ navigation }: propsType): React.JSX.Element {
                 ) : (
                   <Image
                     style={styles.userProfileImage}
-                    source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+                    source={require("../assets/defaultUser.png")}
                   />
                 )
               }
@@ -64,17 +64,24 @@ export default function HomePage({ navigation }: propsType): React.JSX.Element {
                       type: 'timing',
                     }}
                   >
-                    <Image
-                      source={{ uri: store.userObject?.profilePicture || "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
-                      style={styles.modalImage}
-                    />
+                    {store.userObject?.profilePicture ?
+                      <Image
+                        source={{ uri: store.userObject?.profilePicture }}
+                        style={styles.modalImage}
+                      />
+                      :
+                      <Image
+                        source={require("../assets/defaultUser.png")}
+                        style={styles.modalImage}
+                      />
+                    }
                   </MotiView>
                 </Pressable>
               </Modal>
             }
             <View>
               <Text style={styles.userName}>Welcome,</Text>
-              <Text style={styles.userName}>{store.userObject?.userName}</Text>
+              <Text style={styles.userName}>{store.userObject?.userName.toLowerCase()}</Text>
             </View>
           </MotiView>
           <Balance />

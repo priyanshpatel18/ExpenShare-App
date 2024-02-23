@@ -4,6 +4,7 @@ import OptionsContainer from '../components/OptionsContainer';
 import { Store } from '../store/store';
 import CategoriesModal from './CategoriesModal';
 import { MotiView } from 'moti';
+import Loading from './Loading';
 
 type propsType = {
   setVisible: React.Dispatch<React.SetStateAction<boolean>>
@@ -15,8 +16,9 @@ export default function AddModal({ setVisible }: propsType): React.JSX.Element {
   const store = Store();
   const [showCategories, setShowCategories] = useState<boolean>(false);
 
+
   return (
-    <Modal transparent={false} animationType='slide' >
+    store.loading ? <Loading /> : <Modal transparent={false} animationType='slide' >
       <MotiView
         style={styles.container}
         from={{
@@ -170,12 +172,12 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   rupeeText: {
-    fontSize: 60,
+    fontSize: 55,
     fontFamily: "Montserrat-Bold",
     color: "#fff"
   },
   input: {
-    fontSize: 60,
+    fontSize: 55,
     fontFamily: "Montserrat-Bold",
     color: "#fff",
     width: "100%"

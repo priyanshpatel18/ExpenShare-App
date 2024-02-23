@@ -1,21 +1,26 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
-import { Image } from 'moti';
 
 type propsType = {
-  groupPhoto: string;
+  groupPhoto?: string;
   groupName: string;
   totalMembers: number;
-
 }
 
 export default function Group({ groupPhoto, groupName, totalMembers }: propsType) {
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: groupPhoto }}
-        style={styles.groupPhoto}
-      />
+      {groupPhoto ? (
+        <Image
+          source={{ uri: groupPhoto }}
+          style={styles.groupPhoto}
+        />
+      ) : (
+        <Image
+          source={require("../assets/defaultGroup.png")}
+          style={styles.defaultGroupPhoto}
+        />
+      )}
       <Text style={styles.groupTitle} numberOfLines={1} ellipsizeMode="tail">{groupName}</Text>
       <View style={styles.groupContainer}>
         <Text style={styles.members}>members</Text>
@@ -45,7 +50,10 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    resizeMode: "contain"
+  },
+  defaultGroupPhoto: {
+    width: 70,
+    height: 70,
   },
   groupTitle: {
     color: "#222",

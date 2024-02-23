@@ -45,6 +45,11 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
       return;
     }
 
+    if (title.length > 15) {
+      store.showToastWithGravityAndOffset("Title must be short");
+      return;
+    }
+
     store.setLoading(true)
     const formData = new FormData()
 
@@ -100,8 +105,11 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
         setVisible(false)
       })
       .catch((err) => {
-        console.error(err.response.data.message);
-        store.showToastWithGravityAndOffset(err.response.data.message)
+        if (axios.isAxiosError(err)) {
+          store.showToastWithGravityAndOffset(err.response?.data.message)
+        } else {
+          console.log(err);
+        }
       })
       .finally(() => {
         store.fetchTransactions();
@@ -197,10 +205,10 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
             </View>
             {invoiceImage &&
               <>
-                <Text style={styles.viewImage} onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>View Image</Text>
+                <Text style={styles.viewImage} onPress={() => setIsInvoiceVisible(true)}>View Image</Text>
                 <Modal visible={isInvoiceVisible} transparent={true}>
                   {isInvoiceVisible &&
-                    <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)} style={styles.modalContainer}>
+                    <Pressable onPress={() => setIsInvoiceVisible(false)} style={styles.modalContainer}>
                       <MotiView
                         from={{
                           opacity: 0,
@@ -271,20 +279,18 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
         visible={modalVisible}
         transparent={true}
       >
-        <Pressable onPress={() => setModalVisible(false)}>
+        <TouchableOpacity>
           {mode && (
-            <MotiView>
-              <DateTimePicker
-                testID='dateAndTimePicker'
-                value={mode === "time" ? time : date}
-                mode={mode}
-                display="spinner"
-                onChange={mode === "time" ? handleTimeSelect : handleDateSelect}
-                maximumDate={maxDate}
-              />
-            </MotiView>
+            <DateTimePicker
+              testID='dateAndTimePicker'
+              value={mode === "time" ? time : date}
+              mode={mode}
+              display="default"
+              onChange={mode === "time" ? handleTimeSelect : handleDateSelect}
+              maximumDate={maxDate}
+            />
           )}
-        </Pressable>
+        </TouchableOpacity>
       </Modal>
     </View>
   )

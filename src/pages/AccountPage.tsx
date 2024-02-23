@@ -25,8 +25,18 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
       return;
     }
 
-    if (profilePicture) {
-      const fileInfo = await RNFS.stat(profilePicture);
+    if (textInput !== store.userObject?.userName && /\s/.test(textInput)) {
+      store.showToastWithGravityAndOffset("Username cannot contain spaces");
+      return;
+    }
+
+    if (textInput !== store.userObject?.userName && textInput.length !== 15) {
+      store.showToastWithGravityAndOffset("Username must be 15 characters long");
+      return;
+    }
+
+    if (profilePicture !== store.userObject?.profilePicture) {
+      const fileInfo = await RNFS.stat(String(profilePicture));
       const fileSizeInBytes = fileInfo.size;
       const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
       if (fileSizeInMegabytes > 3) {
@@ -39,7 +49,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
 
     formData.append("token", await AsyncStorage.getItem("token"));
     if (textInput !== store.userObject?.userName) {
-      formData.append("userName", textInput);
+      formData.append("userName", textInput.toLowerCase());
     }
     if (profilePicture !== store.userObject?.profilePicture) {
       const extension = profilePicture?.split(".").pop();
@@ -49,6 +59,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
         type: `image/${extension}`
       })
     }
+
     Store.getState().showToastWithGravityAndOffset("Updating...")
 
     store.setLoading(true)
@@ -156,7 +167,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
                     :
                     <Image
                       style={styles.profilePicture}
-                      source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+                      source={require("../assets/defaultUser.png")}
                     />
                   }
                   <Image
@@ -240,9 +251,10 @@ const styles = StyleSheet.create({
   },
   detailContainer: {
     flexDirection: "row",
-    gap: 50,
+    gap: 30,
     paddingVertical: 25,
     paddingHorizontal: 20,
+    alignItems: "center"
   },
   profilePicture: {
     height: 80,

@@ -10,50 +10,10 @@ type propsType = {
   setOpenAddGroup: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-interface AllUserObject {
-  userName: string,
-  email: string,
-  profilePicture: string
-}
-
 export default function AddGroup({ setOpenAddGroup }: propsType) {
   const store = Store();
   const [title, setTitle] = useState<string>("");
-  const [emailOrUserName, setEmailOrUserName] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<string | undefined | null>();
-  const [originalUsers, setOriginalUsers] = useState<AllUserObject[] | undefined>(undefined);
-  const [filteredUsers, setFilteredUsers] = useState<AllUserObject[] | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      store.setLoading(true);
-
-      const token: string | null = await AsyncStorage.getItem("token");
-      axios
-        .post("/user/getAllUsers", { token })
-        .then((res) => {
-          setOriginalUsers(res.data.users);
-          setFilteredUsers(res.data.users);
-        })
-        .catch((err) => {
-          store.showToastWithGravityAndOffset(err.response.data.message)
-        })
-        .finally(() => {
-          store.setLoading(false);
-        })
-    }
-
-    fetchData();
-  }, [])
-
-  function handleChange(text: string) {
-    setEmailOrUserName(text);
-
-    const filtered = originalUsers?.filter(user => {
-      return user.userName.toLowerCase().includes(text.toLowerCase());
-    })
-    setFilteredUsers(filtered);
-  }
 
   return (
     <View style={styles.container}>
@@ -83,7 +43,7 @@ export default function AddGroup({ setOpenAddGroup }: propsType) {
             ) : (
               <Image
                 style={styles.defaultProfile}
-                source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1708605034/diversity_aohzw1.png" }}
+                source={require("../assets/defaultGroup.png")}
               />
             )}
             <View style={styles.addIconContainer}>
@@ -102,35 +62,14 @@ export default function AddGroup({ setOpenAddGroup }: propsType) {
             style={styles.titleInput}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.labelText}>Group Members</Text>
-          <TextInput
-            value={emailOrUserName}
-            placeholder='Search Members'
-            placeholderTextColor="#aaa"
-            cursorColor="#aaa"
-            onChangeText={(text: string) => handleChange(text)}
-            style={styles.titleInput}
-            keyboardType="default"
-            autoCapitalize="none"
-          />
-        </View>
-        {emailOrUserName && filteredUsers && filteredUsers.length > 0 &&
-          <ScrollView style={styles.totalUsers}>
-            {filteredUsers.map((user, index) => (
-              <View key={index}>
-                <SearchUser userName={user.userName} profilePicture={user.profilePicture} />
-                {filteredUsers.length > 1 && <View style={styles.separator} />}
-              </View>
-            ))}
-          </ScrollView>
-        }
         {store.loading ?
           <TouchableOpacity style={styles.createButton}>
             <GradientButton text='create' />
           </TouchableOpacity>
           :
-          <TouchableOpacity style={styles.createButton}>
+          <TouchableOpacity style={styles.createButton}
+            onPress={() => store.handleCreateGroup(title, selectedImage, setOpenAddGroup)}
+          >
             <GradientButton text='create' />
           </TouchableOpacity>
         }

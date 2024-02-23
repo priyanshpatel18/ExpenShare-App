@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableHighlight, TouchableOpacity } from 'react-native'
 import React from 'react'
 
 type propsType = {
@@ -45,7 +45,6 @@ export default function Transaction({ title, type, amount, imageUrl }: propsType
           </Text>
         )
       }
-
     </View>
   )
 }
@@ -66,23 +65,23 @@ const styles = StyleSheet.create({
   categoryIconContainer: {
     padding: 20,
     backgroundColor: "#fff",
-    height: 55,
-    width: 55,
+    height: 50,
+    width: 50,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
     marginRight: 10
   },
   categoryIcon: {
-    height: 30,
-    width: 30
+    height: 25,
+    width: 25
   },
   transactionDescription: {
     flexShrink: 1,
     color: "#222",
     fontFamily: "Montserrat-SemiBold",
     fontSize: 22,
-    maxWidth: '75%',
+    maxWidth: '80%',
     textTransform: "capitalize"
   },
   expenseAmount: {

@@ -19,8 +19,9 @@ import VerifyOtpPage from './src/pages/VerifyOtpPage';
 import WelcomePage from "./src/pages/WelcomePage";
 import ReportScreen from './src/pages/ReportPage';
 import Loading from './src/components/Loading';
+import TransactionDetailsPage from './src/pages/TransactionDetailsPage';
 
-axios.defaults.baseURL = "http://192.168.188.249:8080";
+axios.defaults.baseURL = "http://192.168.206.226:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 axios.defaults.withCredentials = true;
 
@@ -49,6 +50,7 @@ export default function App(): React.JSX.Element {
           <Stack.Screen name="User" component={UserPage} />
           <Stack.Screen name="Account" component={AccountPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
           <Stack.Screen name="Report" component={ReportScreen} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
+          <Stack.Screen name="TransactionDetails" component={TransactionDetailsPage} options={{ animation: "slide_from_bottom", animationDuration: 1000 }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

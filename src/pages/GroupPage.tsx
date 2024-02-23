@@ -1,12 +1,11 @@
 import { NavigationProp } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import MenuBar from '../components/MenuBar'
-import GradientButton from '../components/GradientButton'
-import { Store } from '../store/store'
-import Group from '../components/Group'
-import GradientText from '../components/GradientText'
 import AddGroup from '../components/AddGroup'
+import GradientText from '../components/GradientText'
+import Group from '../components/Group'
+import MenuBar from '../components/MenuBar'
+import { Store } from '../store/store'
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -15,7 +14,6 @@ type propsType = {
 export default function GroupPage({ navigation }: propsType): React.JSX.Element {
   const store = Store();
   const [openAddGroup, setOpenAddGroup] = useState(false);
-  const [showGroup, setShowGroup] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -27,15 +25,26 @@ export default function GroupPage({ navigation }: propsType): React.JSX.Element 
           style={styles.buttonText}
         />
       </TouchableOpacity>
-      <ScrollView style={styles.groupList}>
-        <TouchableOpacity>
-          <Group
-            groupPhoto="https://c4.wallpaperflare.com/wallpaper/683/602/386/1x1-dark-fire-gray-wallpaper-preview.jpg"
-            groupName='Tech Wizards'
-            totalMembers={10}
-          />
-        </TouchableOpacity>
-      </ScrollView>
+      {store.groups.length > 0 &&
+        <ScrollView style={styles.groupList}>
+          {store.groups.map((group, index) => (
+            <TouchableOpacity key={index}>
+              {group.groupProfile ? (
+                <Group
+                  groupPhoto={group.groupProfile}
+                  groupName={group.groupName}
+                  totalMembers={group.members.length}
+                />
+              ) : (
+                <Group
+                  groupName={group.groupName}
+                  totalMembers={group.members.length}
+                />
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      }
       <MenuBar navigation={navigation} />
 
       <Modal visible={openAddGroup} animationType='slide'>
@@ -71,7 +80,7 @@ const styles = StyleSheet.create({
     borderWidth: 2
   },
   buttonText: {
-    fontSize: 30,
+    fontSize: 22,
     fontFamily: "Montserrat-Bold",
     textTransform: "uppercase"
   },

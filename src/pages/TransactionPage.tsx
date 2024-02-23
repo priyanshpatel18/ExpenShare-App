@@ -1,4 +1,4 @@
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { MotiView } from 'moti';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -15,11 +15,17 @@ type PropsType = {
   navigation: NavigationProp<any>;
 };
 
+interface TransactionDetailsRouteParams {
+  transaction: TransactionType;
+}
+
 export default function TransactionPage({ navigation }: PropsType) {
   const [showIncome, setShowIncome] = useState(true);
   const [displayTransactions, setDisplayTransactions] = useState<TransactionType[] | undefined>(undefined);
   const [showNoTransaction, setShowNoTransaction] = useState<boolean>(false);
   const store = Store();
+
+  const redirect = useNavigation();
 
   useEffect(() => {
     if (store.transactions) {
@@ -90,7 +96,7 @@ export default function TransactionPage({ navigation }: PropsType) {
                 <MotiView
                   key={index}
                   from={{
-                    top: -1000 * (index + 1),
+                    top: -400 * (index + 0.7),
                     zIndex: -9999
                   }}
                   animate={{
@@ -100,10 +106,15 @@ export default function TransactionPage({ navigation }: PropsType) {
                   transition={{
                     type: "timing",
                     duration: 700,
-                    delay: index * 140
+                    delay: index * 50
                   }}
                 >
-                  <View key={index}>
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() =>
+                      navigation.navigate("TransactionDetails", { transaction, imageUrl: getIncomeCategorySource(transaction.category) })
+                    }
+                  >
                     <TransactionDetails transaction={transaction} />
                     <Transaction
                       title={transaction.transactionTitle}
@@ -112,7 +123,7 @@ export default function TransactionPage({ navigation }: PropsType) {
                         getIncomeCategorySource(transaction.category)
                       }
                     />
-                  </View>
+                  </TouchableOpacity>
                 </MotiView>
               ))
             : displayTransactions
@@ -122,7 +133,7 @@ export default function TransactionPage({ navigation }: PropsType) {
                 <MotiView
                   key={index}
                   from={{
-                    top: -1000 * (index + 1),
+                    top: -400 * (index + 1),
                     zIndex: -9999
                   }}
                   animate={{
@@ -132,10 +143,15 @@ export default function TransactionPage({ navigation }: PropsType) {
                   transition={{
                     type: "timing",
                     duration: 700,
-                    delay: index * 140
+                    delay: index * 50
                   }}
                 >
-                  <View key={index}>
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() =>
+                      navigation.navigate("TransactionDetails", { transaction, imageUrl: getExpenseCategorySource(transaction.category) })
+                    }
+                  >
                     <TransactionDetails transaction={transaction} />
                     <Transaction
                       title={transaction.transactionTitle}
@@ -144,7 +160,7 @@ export default function TransactionPage({ navigation }: PropsType) {
                         getExpenseCategorySource(transaction.category)
                       }
                     />
-                  </View>
+                  </TouchableOpacity>
                 </MotiView>
               ))}
         </ScrollView>

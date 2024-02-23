@@ -14,7 +14,6 @@ export default function UserPage({ navigation }: propsType): React.JSX.Element {
 
   return (
     <View style={styles.container}>
-      <Text>UserPage</Text>
       <View style={styles.userInfoContainer}>
         <View style={styles.details}>
           <View>
@@ -26,7 +25,7 @@ export default function UserPage({ navigation }: propsType): React.JSX.Element {
               :
               <Image
                 style={styles.profilePicture}
-                source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+                source={require("../assets/defaultUser.png")}
               />
             }
           </View>
@@ -50,13 +49,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   userInfoContainer: {
-    paddingHorizontal: 20,
+    padding: 20,
     position: "relative",
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20
+    marginBottom: 20,
   },
   details: {
     display: "flex",
@@ -76,7 +75,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "Montserrat-SemiBold",
     marginVertical: 10,
-    textAlign: "center"
+    textAlign: "center",
+    textTransform: "lowercase"
   },
   userNameInput: {
     color: "#222",

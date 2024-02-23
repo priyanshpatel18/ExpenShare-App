@@ -24,6 +24,26 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
       return
     }
 
+    if (/\s/.test(email)) {
+      store.showToastWithGravityAndOffset("Email cannot contain spaces");
+      return;
+    }
+
+    if (/\s/.test(userName)) {
+      store.showToastWithGravityAndOffset("Username cannot contain spaces");
+      return;
+    }
+
+    if (userName.length !== 15) {
+      store.showToastWithGravityAndOffset("Username must be 15 characters long");
+      return;
+    }
+
+    if (!/^\S*$/.test(password)) {
+      store.showToastWithGravityAndOffset("Password cannot contain spaces");
+      return;
+    }
+
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/;
 
     if (!passwordRegex.test(password)) {
@@ -91,7 +111,7 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
             ) : (
               <Image
                 style={styles.profileImage}
-                source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+                source={require("../assets/defaultUser.png")}
               />
             )}
             <View style={styles.addIconContainer}>
