@@ -63,7 +63,7 @@ export default function TransactionSectionHome({ navigation }: propsType): React
                 }}
                 transition={{
                   type: "timing",
-                  duration: 500
+                  duration: 1300
                 }}
               >
                 <View>
