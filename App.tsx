@@ -20,7 +20,7 @@ import WelcomePage from "./src/pages/WelcomePage";
 import ReportScreen from './src/pages/ReportPage';
 import Loading from './src/components/Loading';
 
-axios.defaults.baseURL = "http://192.168.206.226:8080";
+axios.defaults.baseURL = "http://192.168.188.249:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 axios.defaults.withCredentials = true;
 

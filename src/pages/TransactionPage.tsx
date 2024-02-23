@@ -1,4 +1,5 @@
 import { NavigationProp } from '@react-navigation/native';
+import { MotiView } from 'moti';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -9,8 +10,6 @@ import TransactionDetails from '../components/TransactionDetails';
 import { getCategorySource as getExpenseCategorySource } from '../data/ExpenseCategories';
 import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCategories';
 import { Store, TransactionType } from '../store/store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MotiView } from 'moti';
 
 type PropsType = {
   navigation: NavigationProp<any>;
@@ -83,32 +82,73 @@ export default function TransactionPage({ navigation }: PropsType) {
       </View>
       {showNoTransaction ? <NoTransaction /> : (
         <ScrollView style={styles.transactions}>
-          {displayTransactions
-            ?.sort((a, b) => {
-              return new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime();
-            })
-            .map((transaction, index) => {
-              return (
-                <MotiView key={index}
+          {showIncome
+            ? displayTransactions
+              ?.filter(transaction => transaction.type === 'income')
+              .sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime())
+              .map((transaction, index) => (
+                <MotiView
+                  key={index}
                   from={{
-                    opacity: 0
+                    top: -1000 * (index + 1),
+                    zIndex: -9999
                   }}
                   animate={{
-                    opacity: 1
+                    top: 0,
+                    zIndex: 0
+                  }}
+                  transition={{
+                    type: "timing",
+                    duration: 700,
+                    delay: index * 140
                   }}
                 >
-                  <TransactionDetails transaction={transaction} />
-                  <Transaction
-                    title={transaction.transactionTitle}
-                    amount={transaction.transactionAmount}
-                    imageUrl={transaction.type === "expense" ?
-                      getExpenseCategorySource(transaction.category) :
-                      getIncomeCategorySource(transaction.category)}
-                  />
+                  <View key={index}>
+                    <TransactionDetails transaction={transaction} />
+                    <Transaction
+                      title={transaction.transactionTitle}
+                      amount={transaction.transactionAmount}
+                      imageUrl={
+                        getIncomeCategorySource(transaction.category)
+                      }
+                    />
+                  </View>
                 </MotiView>
-              )
-            })}
+              ))
+            : displayTransactions
+              ?.filter(transaction => transaction.type === 'expense')
+              .sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime())
+              .map((transaction, index) => (
+                <MotiView
+                  key={index}
+                  from={{
+                    top: -1000 * (index + 1),
+                    zIndex: -9999
+                  }}
+                  animate={{
+                    top: 0,
+                    zIndex: 0
+                  }}
+                  transition={{
+                    type: "timing",
+                    duration: 700,
+                    delay: index * 140
+                  }}
+                >
+                  <View key={index}>
+                    <TransactionDetails transaction={transaction} />
+                    <Transaction
+                      title={transaction.transactionTitle}
+                      amount={transaction.transactionAmount}
+                      imageUrl={
+                        getExpenseCategorySource(transaction.category)
+                      }
+                    />
+                  </View>
+                </MotiView>
+              ))}
         </ScrollView>
+
       )}
       <MenuBar navigation={navigation} />
     </View >

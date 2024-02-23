@@ -80,18 +80,22 @@ interface StoreState {
     password: string,
     navigation: NavigationProp<any>,
   ) => void;
-  // Handle Send Mail
+  // Handle Send Mail for OTP Verification (Password Reset)
   handleSendMail: (email: string, navigation: NavigationProp<any>) => void;
-
+  // Send OTP Verification for Email Verification
   handleVerifyEmail: (otp: string, navigation: NavigationProp<any>) => void;
-
+  // Reset Passeord
   handleResetPassword: (
     password: string,
     navigation: NavigationProp<any>,
     confirmPassword?: string,
   ) => void;
-
+  // Fetch Transactions
   fetchTransactions: () => void;
+  // Register
+  handleRegister: (navigation: NavigationProp<any>) => void;
+  // Get User
+  handleGetUser: (navigation: NavigationProp<any>) => void;
 }
 
 export const Store = create<StoreState>(set => ({
@@ -248,51 +252,7 @@ export const Store = create<StoreState>(set => ({
     axios
       .post("/user/verifyOtp", { userOtp: otp, otpId })
       .then(async () => {
-        const formData = new FormData();
-        const userDataId = await AsyncStorage.getItem("userDataId");
-        const selectedImage = await AsyncStorage.getItem("selectedImage");
-        formData.append("userDataId", userDataId);
-
-        if (selectedImage) {
-          const extension = selectedImage.split(".").pop();
-          formData.append("profilePicture", {
-            uri: selectedImage,
-            name: `profilePicture.${extension}`,
-            type: `image/${extension}`,
-          });
-        }
-
-        Store.getState().showToastWithGravityAndOffset("Creating your account");
-        axios
-          .post(`/user/register`, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then(async res => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "Home" }],
-            });
-            Store.getState().showToastWithGravityAndOffset(res.data.message);
-          })
-          .catch(err => {
-            if (
-              err.response &&
-              err.response.data &&
-              err.response.data.message
-            ) {
-              Store.getState().showToastWithGravityAndOffset(
-                err.response.data.message,
-              );
-            } else {
-              console.error("Error:", err);
-            }
-          })
-          .finally(async () => {
-            await AsyncStorage.removeItem("userDataId");
-            await AsyncStorage.removeItem("otpId");
-          });
+        Store.getState().handleRegister(navigation);
       })
       .catch(err => {
         if (err.response && err.response.data && err.response.data.message) {
@@ -306,6 +266,84 @@ export const Store = create<StoreState>(set => ({
       .finally(async () => {
         set({ loading: false });
       });
+  },
+
+  handleRegister: async navigation => {
+    const formData = new FormData();
+    const userDataId = await AsyncStorage.getItem("userDataId");
+    const selectedImage = await AsyncStorage.getItem("selectedImage");
+    formData.append("userDataId", userDataId);
+
+    if (selectedImage) {
+      const extension = selectedImage.split(".").pop();
+      formData.append("profilePicture", {
+        uri: selectedImage,
+        name: `profilePicture.${extension}`,
+        type: `image/${extension}`,
+      });
+    }
+
+    Store.getState().showToastWithGravityAndOffset("Creating your account");
+
+    axios
+      .post(`/user/register`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(async res => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        });
+        await AsyncStorage.setItem("token", res.data.token);
+
+        Store.getState().handleGetUser(navigation);
+        Store.getState().showToastWithGravityAndOffset(res.data.message);
+      })
+      .catch(err => {
+        if (axios.isAxiosError(err)) {
+          Store.getState().showToastWithGravityAndOffset(
+            err.response?.data.message,
+          );
+        } else {
+          console.error("Error:", err);
+        }
+      })
+      .finally(async () => {
+        await AsyncStorage.removeItem("userDataId");
+        await AsyncStorage.removeItem("otpId");
+      });
+  },
+
+  handleGetUser: async navigation => {
+    set({ loading: true });
+
+    try {
+      const [userDataResponse, _] = await Promise.all([
+        axios.post("/user/getUser", {
+          token: await AsyncStorage.getItem("token"),
+        }),
+        Store.getState().fetchTransactions(),
+      ]);
+      const userData = userDataResponse.data.userObject;
+
+      set({ userObject: userData });
+      set({ totalBalance: Number(userData.totalBalance) });
+      set({ totalIncome: Number(userData.totalIncome) });
+      set({ totalExpense: Number(userData.totalExpense) });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        navigation.navigate("Welcome");
+        Store.getState().showToastWithGravityAndOffset(
+          error.response?.data.message,
+        );
+      } else {
+        console.error("Error fetching data:", error);
+      }
+    } finally {
+      set({ loading: false });
+    }
   },
 
   handleResetPassword: async (password, navigation, confirmPassword?) => {

@@ -11,17 +11,35 @@ export default function Balance(): React.JSX.Element {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const inputRef = useRef<TextInput>(null)
 
+  function formatAmount(amount: number): string {
+    const formattedAmount =
+      Number(amount) > 100000 ?
+        Number(amount) < 999999 ? `${(Number(amount) / 1000).toFixed(2)}K`
+          : `${(Number(amount) / 1000000).toFixed(2)}M`
+        : String(amount);
+
+    return formattedAmount;
+  }
+
   const animation = (toValue: number) => {
     return Animated.timing(animatedValue, {
       toValue,
-      duration: 1200,
+      duration: 700,
       useNativeDriver: true,
-      delay: 800
+      delay: 0
     }).start();
   }
 
   useEffect(() => {
-    const balance: number = Number(Math.round(store.totalBalance) > 999999 ? (Math.round(store.totalBalance) / 1000000).toFixed(2) : Math.round(store.totalBalance))
+    const amount = store.totalBalance;
+    let balance = amount;
+
+    if (amount > 100000 && amount < 999999) {
+      balance = amount / 1000;
+    }
+    if (amount > 999999) {
+      balance /= 1000000
+    }
 
     animation(balance);
 
@@ -56,7 +74,11 @@ export default function Balance(): React.JSX.Element {
             defaultValue='0'
             style={styles.mainBalance}
           />
-          {store.totalBalance > 999999 &&
+          {store.totalBalance > 100000 && store.totalBalance < 999999 ? (
+            <Text style={styles.mainBalance}>K</Text>
+          ) :
+            store.totalBalance > 999999
+            &&
             <Text style={styles.mainBalance}>M</Text>
           }
         </View>
@@ -70,7 +92,7 @@ export default function Balance(): React.JSX.Element {
             </View>
             <View style={{}}>
               <Text style={styles.boxText}>Income</Text>
-              <Text style={styles.boxText}>₹{Math.round(store.totalIncome) > 999999 ? (Math.round(store.totalIncome) / 1000000).toFixed(2) + 'M' : Math.round(store.totalIncome)}</Text>
+              <Text style={styles.boxText}>₹{formatAmount(store.totalIncome)}</Text>
             </View>
           </View>
           <View style={styles.box}>
@@ -82,12 +104,12 @@ export default function Balance(): React.JSX.Element {
             </View>
             <View style={{}}>
               <Text style={styles.boxText}>Expense</Text>
-              <Text style={styles.boxText}>₹{Math.round(store.totalExpense) > 999999 ? (Math.round(store.totalExpense) / 1000000).toFixed(2) + 'M' : Math.round(store.totalExpense)}</Text>
+              <Text style={styles.boxText}>₹{formatAmount(store.totalExpense)}</Text>
             </View>
           </View>
         </View>
       </View>
-    </LinearGradient>
+    </LinearGradient >
   )
 }
 

@@ -15,7 +15,8 @@ export default function SearchUser({ userName, profilePicture }: propsType) {
   }
 
   return (
-    <View
+    <TouchableOpacity
+      onPress={handleSelect}
       style={styles.searchResult}
     >
       <View style={{ flexDirection: "row", gap: 20, alignItems: "center" }}>
@@ -38,11 +39,10 @@ export default function SearchUser({ userName, profilePicture }: propsType) {
         fillColor='#00BA00'
         iconStyle={{ borderColor: "#0f0" }}
         innerIconStyle={{ borderWidth: 2 }}
-        onPress={handleSelect}
         disableBuiltInState
         isChecked={isSelected}
       />
-    </View>
+    </TouchableOpacity>
   );
 }
 

@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
 import axios from 'axios'
-import { MotiImage, MotiView } from 'moti'
+import { MotiView } from 'moti'
 import React, { useEffect, useState } from 'react'
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { Store } from '../store/store'

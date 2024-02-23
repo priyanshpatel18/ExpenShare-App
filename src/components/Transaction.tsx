@@ -9,7 +9,11 @@ type propsType = {
 }
 
 export default function Transaction({ title, type, amount, imageUrl }: propsType): React.JSX.Element {
-
+  const transactionAmount =
+    Number(amount) > 100000 ?
+      Number(amount) < 999999 ? `${Math.round(Number(amount) / 1000)}K`
+        : `${Math.round(Number(amount) / 1000000)}M`
+      : Number(amount);
 
   return (
     <View style={[
@@ -18,24 +22,26 @@ export default function Transaction({ title, type, amount, imageUrl }: propsType
         type === "income" ? { backgroundColor: "#DFD" } :
           { backgroundColor: "#CFCFCF" }
     ]}>
-      <View style={styles.categoryIconContainer}>
-        <Image
-          source={imageUrl}
-          style={styles.categoryIcon}
-        />
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View style={styles.categoryIconContainer}>
+          <Image
+            source={imageUrl}
+            style={styles.categoryIcon}
+          />
+        </View>
+        <Text style={styles.transactionDescription} numberOfLines={1} ellipsizeMode="tail">
+          {title}
+        </Text>
       </View>
-      <Text style={styles.transactionDescription} numberOfLines={1} ellipsizeMode="tail">
-        {title}
-      </Text>
 
       {
         type ? (
           <Text style={[styles.amount, type === "expense" ? styles.expenseAmount : styles.incomeAmount]}>
-            {type === "expense" ? '-' : '+'}₹{Number(amount) > 999999 ? Number(amount) / 1000000 + 'M' : Number(amount)}
+            {type === "expense" ? '-' : '+'}₹{transactionAmount}
           </Text>
         ) : (
           <Text style={styles.amount}>
-            ₹{Number(amount) > 999999 ? Number(amount) / 1000000 + 'M' : Number(amount)}
+            ₹{transactionAmount}
           </Text>
         )
       }
@@ -52,7 +58,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#CFCFCF",
-    paddingVertical: 20,
+    paddingVertical: 15,
     paddingHorizontal: 15,
     borderRadius: 20,
     marginBottom: 15
@@ -60,23 +66,23 @@ const styles = StyleSheet.create({
   categoryIconContainer: {
     padding: 20,
     backgroundColor: "#fff",
-    height: 60,
-    width: 60,
+    height: 55,
+    width: 55,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
     marginRight: 10
   },
   categoryIcon: {
-    height: 35,
-    width: 35
+    height: 30,
+    width: 30
   },
   transactionDescription: {
     flexShrink: 1,
     color: "#222",
     fontFamily: "Montserrat-SemiBold",
-    fontSize: 25,
-    maxWidth: '60%',
+    fontSize: 22,
+    maxWidth: '75%',
     textTransform: "capitalize"
   },
   expenseAmount: {
@@ -88,7 +94,7 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat-Bold"
   },
   amount: {
-    fontSize: 20,
+    fontSize: 18,
     color: "#222",
     fontFamily: "Montserrat-Medium"
   }

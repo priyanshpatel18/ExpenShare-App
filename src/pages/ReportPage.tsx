@@ -1,16 +1,16 @@
 import { NavigationProp } from '@react-navigation/native';
-import React, { useReducer } from 'react';
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DonutChart from '../components/DonutChart';
 import MainChart from '../components/MainChart';
-import { MotiView } from 'moti';
-import Loading from '../components/Loading';
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function ReportPage({ navigation }: propsType) {
+  
+
   const percentages = [100, 80, 60, 40, 20, 10];
   const colors = ['#38D39F', '#FF4757', "#FFDD59", "#12CBC4", "#FA8231", "#1E90FF"];
 

@@ -28,7 +28,6 @@ export default function GroupPage({ navigation }: propsType): React.JSX.Element 
         />
       </TouchableOpacity>
       <ScrollView style={styles.groupList}>
-
         <TouchableOpacity>
           <Group
             groupPhoto="https://c4.wallpaperflare.com/wallpaper/683/602/386/1x1-dark-fire-gray-wallpaper-preview.jpg"
@@ -36,16 +35,12 @@ export default function GroupPage({ navigation }: propsType): React.JSX.Element 
             totalMembers={10}
           />
         </TouchableOpacity>
-
       </ScrollView>
       <MenuBar navigation={navigation} />
 
       <Modal visible={openAddGroup} animationType='slide'>
         <AddGroup setOpenAddGroup={setOpenAddGroup} />
       </Modal>
-
-
-
     </View>
   )
 }
@@ -72,7 +67,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     backgroundColor: "#eee",
     padding: 15,
-    borderColor: "#ccc",
+    borderColor: "#aaa",
     borderWidth: 2
   },
   buttonText: {

@@ -4,6 +4,7 @@ import { Store } from '../store/store';
 import SearchUser from './SearchUser';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import GradientButton from './GradientButton';
 
 type propsType = {
   setOpenAddGroup: React.Dispatch<React.SetStateAction<boolean>>
@@ -124,8 +125,17 @@ export default function AddGroup({ setOpenAddGroup }: propsType) {
             ))}
           </ScrollView>
         }
+        {store.loading ?
+          <TouchableOpacity style={styles.createButton}>
+            <GradientButton text='create' />
+          </TouchableOpacity>
+          :
+          <TouchableOpacity style={styles.createButton}>
+            <GradientButton text='create' />
+          </TouchableOpacity>
+        }
       </View>
-    </View >
+    </View>
   )
 }
 
@@ -219,5 +229,10 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 2,
     backgroundColor: "#CCC"
+  },
+  createButton: {
+    overflow: "hidden",
+    borderRadius: 50,
+    marginVertical: 20
   }
 })

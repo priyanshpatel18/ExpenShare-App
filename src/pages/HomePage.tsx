@@ -1,13 +1,12 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
-import axios from 'axios';
-import React, { useEffect } from 'react';
-import { Image, Modal, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Balance from '../components/Balance';
+import Loading from '../components/Loading';
 import MenuBar from '../components/MenuBar';
 import TransactionSection from '../components/TransactionHome';
 import { Store } from '../store/store';
-import Loading from '../components/Loading';
+import { MotiView } from 'moti';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -15,30 +14,69 @@ type propsType = {
 
 export default function HomePage({ navigation }: propsType): React.JSX.Element {
   const store = Store()
+  const [profileClicked, setProfileClicked] = useState<boolean>(false);
 
   return (
     <>
       {store.loading ? <Loading /> : (
         <View style={[styles.container]}>
-          <View style={styles.userContainer}>
-            {
-              store.userObject?.profilePicture ? (
-                <Image
-                  style={styles.userProfileImage}
-                  source={{ uri: store.userObject.profilePicture }}
-                />
-              ) : (
-                <Image
-                  style={styles.userProfileImage}
-                  source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
-                />
-              )
+          <MotiView
+            from={{
+              opacity: 0.1,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            transition={{
+              type: "timing"
+            }}
+            style={styles.userContainer}
+          >
+            <Pressable onPress={() => setProfileClicked(!profileClicked)}>
+              {
+                store.userObject?.profilePicture ? (
+                  <Image
+                    style={styles.userProfileImage}
+                    source={{ uri: store.userObject.profilePicture }}
+                  />
+                ) : (
+                  <Image
+                    style={styles.userProfileImage}
+                    source={{ uri: "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+                  />
+                )
+              }
+            </Pressable>
+            {profileClicked &&
+              <Modal visible={profileClicked} transparent={true}>
+                <Pressable onPress={() => setProfileClicked(!profileClicked)} style={styles.modalContainer}>
+                  <MotiView
+                    style={styles.shape}
+                    from={{
+                      opacity: 0,
+                      scale: 0.5,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                    }}
+                    transition={{
+                      type: 'timing',
+                    }}
+                  >
+                    <Image
+                      source={{ uri: store.userObject?.profilePicture || "https://res.cloudinary.com/dsl326wbi/image/upload/v1707911640/profile_m7bx7w.png" }}
+                      style={styles.modalImage}
+                    />
+                  </MotiView>
+                </Pressable>
+              </Modal>
             }
             <View>
               <Text style={styles.userName}>Welcome,</Text>
               <Text style={styles.userName}>{store.userObject?.userName}</Text>
             </View>
-          </View>
+          </MotiView>
           <Balance />
           <TransactionSection navigation={navigation} />
           <MenuBar navigation={navigation} />
@@ -66,7 +104,7 @@ const styles = StyleSheet.create({
     width: 100
   },
   userName: {
-    color: Store.getState().mode === "light" ? "#222" : "#fff",
+    color: "#222",
     fontSize: 20,
     fontFamily: "Montserrat-SemiBold"
   },
@@ -75,6 +113,28 @@ const styles = StyleSheet.create({
     width: 70,
     borderRadius: 50,
     borderWidth: 1,
-    borderColor: Store.getState().mode === "light" ? "#222" : "#fff"
+    borderColor: "#222"
+  },
+  modalContainer: {
+    display: "flex",
+    height: "100%",
+    width: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  shape: {
+    justifyContent: 'center',
+    alignItems: "center",
+    borderRadius: 10,
+    marginRight: 10,
+    resizeMode: 'contain',
+    height: "100%",
+    width: "100%"
+  },
+  modalImage: {
+    width: '60%',
+    height: '60%',
+    resizeMode: 'contain',
   },
 })

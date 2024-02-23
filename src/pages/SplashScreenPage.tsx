@@ -22,32 +22,9 @@ const SplashScreen = ({ navigation }: propsType): React.JSX.Element => {
     }).start(async () => {
       if (await AsyncStorage.getItem("token")) {
         // await AsyncStorage.removeItem("token");
-        console.log(await AsyncStorage.getItem("token"));
-        
-        async function fetchData() {
+        // console.log(await AsyncStorage.getItem("token"));
 
-          store.setLoading(true);
-          try {
-            const [userDataResponse, _] = await Promise.all([
-              axios.post("/user/getUser", { token: await AsyncStorage.getItem("token") }),
-              store.fetchTransactions()
-            ]);
-            const userData = userDataResponse.data.userObject;
-
-            store.setUserObject(userData);
-            store.setTotalBalance(Number(userData.totalBalance));
-            store.setTotalExpense(Number(userData.totalExpense));
-            store.setTotalIncome(Number(userData.totalIncome));
-          } catch (error) {
-            console.error("Error fetching data:", error);
-          }
-          finally {
-            store.setLoading(false)
-          }
-        }
-
-        fetchData();
-
+        store.handleGetUser(navigation);
 
         navigation.reset({
           index: 0,

@@ -3,6 +3,7 @@ import { Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } fro
 import OptionsContainer from '../components/OptionsContainer';
 import { Store } from '../store/store';
 import CategoriesModal from './CategoriesModal';
+import { MotiView } from 'moti';
 
 type propsType = {
   setVisible: React.Dispatch<React.SetStateAction<boolean>>
@@ -16,7 +17,15 @@ export default function AddModal({ setVisible }: propsType): React.JSX.Element {
 
   return (
     <Modal transparent={false} animationType='slide' >
-      <View style={[styles.container, showIncome ? { backgroundColor: "#2ABD42" } : { backgroundColor: "#FF4545" }]}>
+      <MotiView
+        style={styles.container}
+        from={{
+          backgroundColor: showIncome ? '#2ABD42' : '#FF4545',
+        }}
+        animate={{
+          backgroundColor: showIncome ? '#2ABD42' : '#FF4545',
+        }}
+      >
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={() => {
@@ -67,7 +76,6 @@ export default function AddModal({ setVisible }: propsType): React.JSX.Element {
               style={styles.input}
               maxLength={7}
             />
-
           </View>
         </View>
         <OptionsContainer
@@ -76,7 +84,7 @@ export default function AddModal({ setVisible }: propsType): React.JSX.Element {
           setVisible={setVisible}
           setShowCategories={setShowCategories}
         />
-      </View>
+      </MotiView>
       {showCategories &&
         <Modal visible={showCategories} animationType="slide">
           <CategoriesModal setShowCategories={setShowCategories} />
@@ -134,7 +142,7 @@ const styles = StyleSheet.create({
   },
   switchButtonText: {
     color: "#222",
-    fontSize: 20,
+    fontSize: 18,
     textTransform: "uppercase",
     fontFamily: "Montserrat-SemiBold",
   },

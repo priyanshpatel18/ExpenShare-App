@@ -1,11 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import FileViewer from "react-native-file-viewer"
 
 import { Store } from '../store/store';
+import { MotiView } from 'moti';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -15,6 +16,7 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
   const store = Store();
   const [isPdfVisible, setIsPdfVisible] = useState<boolean>(false);
   const [pdfPath, setPdfPath] = useState<string>('');
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   async function handleLogout() {
     await AsyncStorage.removeItem("token");
@@ -58,7 +60,14 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
           <Text style={styles.buttonText}>Account</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={createPDF}>
+      <TouchableOpacity onPress={() => {
+        if (store.transactions !== undefined) {
+          createPDF()
+        }
+        else {
+          store.showToastWithGravityAndOffset("Insufficient Data");
+        }
+      }}>
         <View style={styles.button}>
           <View style={[styles.iconContainer, { backgroundColor: "#ebcaff" }]}>
             <Image
@@ -69,7 +78,14 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
           <Text style={styles.buttonText}>Export</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Report")}>
+      <TouchableOpacity onPress={() => {
+        if (store.transactions !== undefined) {
+          navigation.navigate("Report");
+        }
+        else {
+          store.showToastWithGravityAndOffset("Insufficient Data");
+        }
+      }}>
         <View style={styles.button}>
           <View style={[styles.iconContainer, { backgroundColor: "#99f691" }]}>
             <Image
@@ -80,7 +96,7 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
           <Text style={styles.buttonText}>Report</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleLogout}>
+      <TouchableOpacity onPress={() => setShowAlert(!showAlert)}>
         <View style={styles.button}>
           <View style={[styles.iconContainer, { backgroundColor: "#ffbebe" }]}>
             <Image
@@ -89,8 +105,45 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
             />
           </View>
           <Text style={styles.buttonText}>Logout</Text>
+          <Modal transparent visible={showAlert}>
+            <Pressable style={styles.modalContainer}>
+              <MotiView
+                from={{
+                  opacity: 0,
+                  scale: 0.5,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                transition={{
+                  type: 'timing',
+                }}
+              >
+                <View style={styles.alertContainer}>
+                  <Text style={styles.alertText}>Are you sure you want to logout?</Text>
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={[styles.alertButton, styles.cancelButton]}
+                      onPress={() => setShowAlert(!showAlert)}
+                    >
+                      <Text style={[styles.alertButtonText]}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.alertButton, styles.okButton]}
+                      onPress={handleLogout}
+                    >
+                      <Text style={[styles.alertButtonText]}>OK</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </MotiView>
+            </Pressable>
+          </Modal>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity >
+
+
       <Modal visible={isPdfVisible} transparent={true} animationType="fade">
         <View style={styles.modalContainer}>
           <TouchableOpacity style={styles.closeButton} onPress={() => setIsPdfVisible(false)}>
@@ -102,7 +155,6 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
           </TouchableOpacity>
         </View>
       </Modal>
-
     </View >
   )
 }
@@ -176,4 +228,37 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
+  alertContainer: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  alertText: {
+    textAlign: "center",
+    width: "70%",
+    color: "#222",
+    fontSize: 20,
+  },
+  buttonContainer: {
+    marginTop: 15,
+    flexDirection: "row",
+    gap: 20
+  },
+  alertButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  cancelButton: {
+    backgroundColor: "#58B9E6"
+  },
+  okButton: {
+    backgroundColor: "#ff4545"
+  },
+  alertButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontSize: 20,
+  }
 })
