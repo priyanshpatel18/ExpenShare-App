@@ -2,7 +2,9 @@ import { NavigationProp } from '@react-navigation/native';
 import { Image, MotiView } from 'moti';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Store, TransactionType } from '../store/store';
+import { Store } from '../store/Store';
+import { TransactionStore, TransactionType } from '../store/TransactionStore';
+import { UserStore } from '../store/UserStore';
 
 type propsType = {
   route: {
@@ -17,7 +19,7 @@ type propsType = {
 const TransactionDetailsPage = ({ route, navigation }: propsType) => {
   const { transaction } = route.params;
 
-  const store = Store();
+  const store = TransactionStore();
 
   const date = new Date(transaction.transactionDate);
 
@@ -32,12 +34,12 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
   const [isInvoiceVisible, setIsInvoiceVisible] = useState(false);
 
   function handleDelete() {
-    if (transaction.type === "income" && store.totalBalance - Number(transaction.transactionAmount) < 0) {
-      store.showToastWithGravityAndOffset("Removing will cause a Negative Balance")
+    if (transaction.type === "income" && UserStore.getState().totalBalance - Number(transaction.transactionAmount) < 0) {
+      Store.getState().showSnackbar("Removing will cause a Negative Balance")
       return;
     }
 
-    store.showToastWithGravityAndOffset("Deleting Transaction")
+    Store.getState().showSnackbar("Deleting Transaction")
     store.handleDeleteTransaction(transaction._id, transaction.transactionAmount, navigation, transaction.type);
   }
 
@@ -115,10 +117,10 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
           </Text>
         </View>
       </View>
-      {store.loading ? (
+      {Store.getState().loading ? (
         <TouchableOpacity
           style={[styles.deleteButton, { backgroundColor: "#ff4545" }]}
-          onPress={() => store.showToastWithGravityAndOffset("Deleting Transaction")}
+          onPress={() => Store.getState().showSnackbar("Deleting Transaction")}
         >
           <Image
             source={require("../assets/dustbin.png")}

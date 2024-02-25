@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { Store } from '../store/store';
+import { UserStore } from '../store/UserStore';
 
 const AnimatedInput = Animated.createAnimatedComponent(TextInput);
 
 export default function Balance(): React.JSX.Element {
-  const store = Store();
+  const store = UserStore();
 
   const animatedValue = useRef(new Animated.Value(0)).current;
   const inputRef = useRef<TextInput>(null)

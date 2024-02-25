@@ -3,14 +3,15 @@ import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import GradientButton from '../components/GradientButton'
 import Input from '../components/TextInput'
-import { Store } from '../store/store'
+import { AuthenticationStore } from '../store/AuthenticationStore'
+import { Store } from '../store/Store'
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function LoginPage({ navigation }: propsType): React.JSX.Element {
-  const store = Store();
+  const store = AuthenticationStore();
 
   const [userNameOrEmail, setUserNameOrEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -43,10 +44,10 @@ export default function LoginPage({ navigation }: propsType): React.JSX.Element 
           Forgot Password ?
         </Text>
 
-        {store.loading ? (
+        {Store.getState().loading ? (
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => store.showToastWithGravityAndOffset("Logging In..")}
+            onPress={() => Store.getState().showSnackbar("Logging In..")}
           >
             <GradientButton text='login' />
           </TouchableOpacity>

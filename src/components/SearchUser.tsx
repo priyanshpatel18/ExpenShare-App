@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
 interface UserObject {
   userName: string;
@@ -40,14 +39,12 @@ export default function SearchUser({ userName, profilePicture, onSelectUser }: p
         }
         <Text style={styles.userName}>{userName}</Text>
       </View>
-      <BouncyCheckbox
-        size={35}
-        fillColor='#00BA00'
-        iconStyle={{ borderColor: "#0f0" }}
-        innerIconStyle={{ borderWidth: 2 }}
-        disableBuiltInState
-        isChecked={isSelected}
-      />
+      {isSelected &&
+        <Image
+          source={require("../assets/check.png")}
+          style={{ width: 20, height: 20 }}
+        />
+      }
     </TouchableOpacity>
   );
 }

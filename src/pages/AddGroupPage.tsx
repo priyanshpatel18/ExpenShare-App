@@ -2,7 +2,8 @@ import { NavigationProp } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import GradientButton from '../components/GradientButton'
-import { Store } from '../store/store'
+import { GroupStore } from '../store/GroupStore'
+import { Store } from '../store/Store'
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -66,7 +67,7 @@ export default function AddGroupPage({ navigation }: propsType) {
           </TouchableOpacity>
           :
           <TouchableOpacity style={styles.createButton}
-            onPress={() => store.handleCreateGroup(title, selectedImage, navigation)}
+            onPress={() => GroupStore.getState().handleCreateGroup(title, selectedImage, navigation)}
           >
             <GradientButton text='create' />
           </TouchableOpacity>

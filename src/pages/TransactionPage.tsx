@@ -8,7 +8,7 @@ import Transaction from '../components/Transaction';
 import TransactionDetails from '../components/TransactionDetails';
 import { getCategorySource as getExpenseCategorySource } from '../data/ExpenseCategories';
 import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCategories';
-import { Store, TransactionType } from '../store/store';
+import { TransactionStore, TransactionType } from '../store/TransactionStore';
 
 type PropsType = {
   navigation: NavigationProp<any>;
@@ -18,12 +18,12 @@ export default function TransactionPage({ navigation }: PropsType) {
   const [showIncome, setShowIncome] = useState(true);
   const [displayTransactions, setDisplayTransactions] = useState<TransactionType[] | undefined>(undefined);
   const [showNoTransaction, setShowNoTransaction] = useState<boolean>(false);
-  const store = Store();
+  const transactionStore = TransactionStore();
 
   useEffect(() => {
-    if (store.transactions) {
+    if (transactionStore.transactions) {
       if (showIncome) {
-        const incomeTransactions = store.transactions.filter(transaction => transaction.type === 'income');
+        const incomeTransactions = transactionStore.transactions.filter(transaction => transaction.type === 'income');
         if (incomeTransactions.length === 0) {
           setShowNoTransaction(true)
           return;
@@ -31,7 +31,7 @@ export default function TransactionPage({ navigation }: PropsType) {
         setShowNoTransaction(false)
         setDisplayTransactions(incomeTransactions);
       } else {
-        const expenseTransactions = store.transactions.filter(transaction => transaction.type === 'expense');
+        const expenseTransactions = transactionStore.transactions.filter(transaction => transaction.type === 'expense');
         if (expenseTransactions.length === 0) {
           setShowNoTransaction(true)
           return;
@@ -40,7 +40,7 @@ export default function TransactionPage({ navigation }: PropsType) {
         setDisplayTransactions(expenseTransactions);
       }
     }
-  }, [showIncome, store.transactions]);
+  }, [showIncome, transactionStore.transactions]);
 
   return (
     <View style={styles.container}>

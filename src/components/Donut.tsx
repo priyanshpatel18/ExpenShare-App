@@ -1,6 +1,6 @@
-import { StyleSheet, Animated, View, TextInput } from 'react-native'
-import React, { useEffect, useRef } from 'react'
-import Svg, { G, Circle } from 'react-native-svg'
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, TextInput, View } from 'react-native';
+import Svg, { Circle, G } from 'react-native-svg';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedInput = Animated.createAnimatedComponent(TextInput);

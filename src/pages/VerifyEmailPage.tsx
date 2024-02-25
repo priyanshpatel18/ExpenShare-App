@@ -1,9 +1,9 @@
 import { NavigationProp } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Store } from '../store/store';
-
 import GradientButton from '../components/GradientButton';
+import { AuthenticationStore } from '../store/AuthenticationStore';
+import { Store } from '../store/Store';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -34,12 +34,12 @@ export default function VerifyEmailPage({ navigation }: propsType): React.JSX.El
       {store.loading ? (
         <TouchableOpacity
           style={styles.button}
-          onPress={() => store.showToastWithGravityAndOffset("Creating Account...")}
+          onPress={() => store.showSnackbar("Creating Account...")}
         >
           <GradientButton text='verify' />
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity style={styles.button} onPress={() => store.handleVerifyEmail(otp, navigation)}>
+        <TouchableOpacity style={styles.button} onPress={() => AuthenticationStore.getState().handleVerifyEmail(otp, navigation)}>
           <GradientButton text='verify' />
         </TouchableOpacity>
       )

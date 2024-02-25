@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import GradientText from '../components/GradientText'
 import GroupComponent from '../components/GroupComponent'
 import MenuBar from '../components/MenuBar'
-import { Store } from '../store/store'
+import { GroupStore } from '../store/GroupStore'
 
 
 type propsType = {
@@ -12,7 +12,7 @@ type propsType = {
 }
 
 export default function GroupPage({ navigation }: propsType): React.JSX.Element {
-  const store = Store();
+  const store = GroupStore();
 
   return (
     <View style={styles.container}>

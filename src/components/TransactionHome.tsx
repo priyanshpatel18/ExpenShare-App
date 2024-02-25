@@ -1,31 +1,31 @@
 import { NavigationProp } from '@react-navigation/native'
+import { MotiView } from 'moti'
 import React, { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getCategorySource as getExpenseCategorySource } from '../data/ExpenseCategories'
 import { getCategorySource as getIncomeCategorySource } from '../data/IncomeCategories'
-import { Store, TransactionType } from '../store/store'
+import { TransactionStore, TransactionType } from '../store/TransactionStore'
 import NoTransaction from './NoTransaction'
 import Transaction from './Transaction'
-import { MotiView } from 'moti'
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function TransactionSectionHome({ navigation }: propsType): React.JSX.Element {
-  const store = Store();
+  const transactionStore = TransactionStore();
   const [displayTransactions, setDisplayTransactions] = useState<TransactionType[] | undefined>(undefined);
 
   useEffect(() => {
     const fetchData = async () => {
-      store.fetchTransactions();
+      transactionStore.fetchTransactions();
     }
     fetchData();
   }, []);
 
   useEffect(() => {
-    if (store.transactions) {
-      const sortedTransactions = [...store.transactions].sort((a, b) => {
+    if (transactionStore.transactions) {
+      const sortedTransactions = [...transactionStore.transactions].sort((a, b) => {
         return new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime();
       });
 
@@ -37,7 +37,7 @@ export default function TransactionSectionHome({ navigation }: propsType): React
 
       return () => clearTimeout(timeoutId);
     }
-  }, [store.transactions]);
+  }, [transactionStore.transactions]);
 
 
   return (

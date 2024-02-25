@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import GradientButton from '../components/GradientButton';
 import Input from '../components/TextInput';
-import { Store } from '../store/store';
+import { Store } from '../store/Store';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -20,29 +20,29 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
 
   async function handleRegister() {
     if (!email.trim() || !userName.trim() || !password.trim()) {
-      store.showToastWithGravityAndOffset("Enter all Credentials")
+      store.showSnackbar("Enter all Credentials")
       return
     }
 
     if (/\s/.test(email)) {
-      store.showToastWithGravityAndOffset("Email cannot contain spaces");
+      store.showSnackbar("Email cannot contain spaces");
       return;
     }
 
     if (/\s/.test(userName)) {
-      store.showToastWithGravityAndOffset("Username cannot contain spaces");
+      store.showSnackbar("Username cannot contain spaces");
       return;
     }
 
     console.log(userName.length);
 
     if (userName.length > 15) {
-      store.showToastWithGravityAndOffset("Username should be max 15 characters");
+      store.showSnackbar("Username should be max 15 characters");
       return;
     }
 
     if (!/^\S*$/.test(password)) {
-      store.showToastWithGravityAndOffset("Password cannot contain spaces");
+      store.showSnackbar("Password cannot contain spaces");
       return;
     }
 
@@ -63,12 +63,12 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
         message = "Password should be minimum 6 characters";
       }
 
-      store.showToastWithGravityAndOffset(message);
+      store.showSnackbar(message);
       return;
     }
 
     store.setLoading(true)
-    store.showToastWithGravityAndOffset("Sending Verification Mail..")
+    store.showSnackbar("Sending Verification Mail..")
 
     axios.post("/user/sendVerifyEmail", {
       email: email.toLowerCase(),
@@ -79,11 +79,11 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
       .then(async (res) => {
         await AsyncStorage.setItem("otpId", res.data.otpId);
         await AsyncStorage.setItem("userDataId", res.data.userDataId);
-        Store.getState().showToastWithGravityAndOffset(res.data.message)
+        Store.getState().showSnackbar(res.data.message)
         navigation.navigate("VerifyEmail");
       })
       .catch((err) => {
-        Store.getState().showToastWithGravityAndOffset(err.response.data.message)
+        Store.getState().showSnackbar(err.response.data.message)
       })
       .finally(async () => {
         store.setLoading(false)
@@ -148,7 +148,7 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
         {store.loading ? (
           <TouchableOpacity
             style={styles.registerButton}
-            onPress={() => store.showToastWithGravityAndOffset("Creating Account..")}
+            onPress={() => store.showSnackbar("Creating Account..")}
           >
             <GradientButton text='register' />
           </TouchableOpacity>

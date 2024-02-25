@@ -3,14 +3,15 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import GradientButton from '../components/GradientButton';
 import Input from '../components/TextInput';
-import { Store } from '../store/store';
+import { AuthenticationStore } from '../store/AuthenticationStore';
+import { Store } from '../store/Store';
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function ResetPasswordPage({ navigation }: propsType): React.JSX.Element {
-  const store = Store();
+  const store = AuthenticationStore();
 
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -35,10 +36,10 @@ export default function ResetPasswordPage({ navigation }: propsType): React.JSX.
           placeholder='Confirm Password'
           secureTextEntry={true}
         />
-        {store.loading ? (
+        {Store.getState().loading ? (
           <TouchableOpacity
             style={styles.resetButton}
-            onPress={() => store.showToastWithGravityAndOffset("Verifying Email...")}
+            onPress={() => Store.getState().showSnackbar("Verifying Email...")}
           >
             <GradientButton text='reset' />
           </TouchableOpacity>

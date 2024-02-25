@@ -43,6 +43,10 @@ export default function AddMemberPage({ navigation, }: propsType) {
     }
   }
 
+  function handleSendRequest() {
+    socket.emit("sendRequest", selectedUsers);
+  }
+
   function handleSelectUser(user: UserObject) {
     setSelectedUsers(prevSelectedUsers => [...prevSelectedUsers, user]);
   }
@@ -80,7 +84,10 @@ export default function AddMemberPage({ navigation, }: propsType) {
         </View>
       )}
 
-      <TouchableOpacity style={styles.sendButton}>
+      <TouchableOpacity
+        style={styles.sendButton}
+        onPress={handleSendRequest}
+      >
         <GradientText text='send request' style={styles.sendButtonText} />
       </TouchableOpacity>
     </View>

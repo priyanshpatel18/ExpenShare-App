@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Store } from '../store/store';
+import { UserStore } from '../store/UserStore';
 import Donut from './Donut';
 
 export default function DonutChart() {
-  const store = Store();
+  const store = UserStore();
 
   return (
     <View style={styles.container}>

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import { TransactionType } from '../store/store';
+import { TransactionType } from '../store/TransactionStore';
 
 type propsType = {
   transaction: TransactionType;

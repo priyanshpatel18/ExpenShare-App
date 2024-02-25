@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import GradientButton from '../components/GradientButton';
 import Input from '../components/TextInput';
-import { Store } from '../store/store';
+import { AuthenticationStore } from '../store/AuthenticationStore';
+import { Store } from '../store/Store';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -13,6 +14,7 @@ type propsType = {
 export default function ForgotPage({ navigation }: propsType): React.JSX.Element {
   const [email, setEmail] = useState<string>("");
   const store = Store()
+  const authStore = AuthenticationStore();
 
   return (
     <View style={styles.container}>
@@ -32,7 +34,7 @@ export default function ForgotPage({ navigation }: propsType): React.JSX.Element
         {store.loading ? (
           <TouchableOpacity
             style={styles.sendMailButton}
-            onPress={() => store.showToastWithGravityAndOffset("Sending Mail..")}
+            onPress={() => store.showSnackbar("Sending Mail..")}
           >
             <GradientButton text='send mail' />
           </TouchableOpacity>
@@ -41,7 +43,7 @@ export default function ForgotPage({ navigation }: propsType): React.JSX.Element
             style={styles.sendMailButton}
             onPress={async () => {
               await AsyncStorage.setItem("resetEmail", email);
-              store.handleSendMail(email, navigation);
+              authStore.handleSendMail(email, navigation);
             }}
           >
             <GradientButton text='send mail' />

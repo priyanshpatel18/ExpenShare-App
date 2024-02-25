@@ -4,7 +4,8 @@ import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Loading from '../components/Loading'
 import OptionsContainer from '../components/OptionsContainer'
-import { Store } from '../store/store'
+import { Store } from '../store/Store'
+import { TransactionStore } from '../store/TransactionStore'
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -13,10 +14,10 @@ type propsType = {
 export default function AddPage({ navigation }: propsType) {
   const [showIncome, setShowIncome] = useState(false);
   const [amount, setAmount] = useState<string>("");
-  const store = Store();
+  const store = TransactionStore();
 
   return (
-    store.loading ? <Loading /> :
+    Store.getState().loading ? <Loading /> :
       <MotiView
         style={styles.container}
         from={{

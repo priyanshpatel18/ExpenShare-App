@@ -4,15 +4,14 @@ import { Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from
 import Category from '../components/Category';
 import ExpenseList from "../data/ExpenseCategories";
 import IncomeList from "../data/IncomeCategories";
-import { Store } from '../store/store';
-import { MotiView } from 'moti';
+import { TransactionStore } from '../store/TransactionStore';
 
 type propsType = {
   navigation: NavigationProp<any>;
 }
 
 export default function CategoriesPage({ navigation }: propsType) {
-  const store = Store();
+  const store = TransactionStore();
   const CategoryList = store.transactionType === "income" ? IncomeList : ExpenseList;
 
   const [filteredData, setFilteredData] = useState(CategoryList);

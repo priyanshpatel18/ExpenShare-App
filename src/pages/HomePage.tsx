@@ -6,19 +6,20 @@ import Balance from '../components/Balance';
 import Loading from '../components/Loading';
 import MenuBar from '../components/MenuBar';
 import TransactionSection from '../components/TransactionHome';
-import { Store } from '../store/store';
+import { Store } from '../store/Store';
+import { UserStore } from '../store/UserStore';
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function HomePage({ navigation }: propsType): React.JSX.Element {
-  const store = Store()
+  const store = UserStore()
   const [profileClicked, setProfileClicked] = useState<boolean>(false);
 
   return (
     <>
-      {store.loading ? <Loading /> : (
+      {Store.getState().loading ? <Loading /> : (
         <View style={[styles.container]}>
           <MotiView
             from={{

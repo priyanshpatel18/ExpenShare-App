@@ -3,13 +3,13 @@ import { Image } from 'moti';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import NoFriendSection from '../components/NoFriendSection';
-import { GroupDocument } from '../store/store';
+import { Group } from '../store/GroupStore';
 
 type propsType = {
   navigation: NavigationProp<any>;
   route: {
     params: {
-      group: GroupDocument;
+      group: Group;
     }
   }
 }

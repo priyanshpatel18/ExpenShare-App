@@ -1,12 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
+import { NavigationProp } from '@react-navigation/native'
 import axios from 'axios'
 import { MotiView } from 'moti'
 import React, { useEffect, useState } from 'react'
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import { Store } from '../store/store'
+import { Store } from '../store/Store'
+import { TransactionStore } from '../store/TransactionStore'
+import { UserStore } from '../store/UserStore'
 import GradientButton from './GradientButton'
-import { NavigationProp } from '@react-navigation/native'
 
 type propsType = {
   amount: string,
@@ -15,20 +17,51 @@ type propsType = {
 }
 
 export default function OptionsContainer({ amount, showIncome, navigation }: propsType): React.JSX.Element {
+  // Store
+  const store = Store();
+  const userStore = UserStore();
+  const transactionStore = TransactionStore();
+
+  // Date and Time
   const [currentDate, setCurrentDate] = useState<string>('');
   const [currentTime, setCurrentTime] = useState<string>('');
+  const [time, setTime] = useState(new Date());
+  const [date, setDate] = useState(new Date());
 
   const maxDate = new Date();
   maxDate.setHours(0, 0, 0, 0);
+
+  function handleDateSelect(event: DateTimePickerEvent, selectedDate: Date | undefined) {
+    const currentDate = selectedDate || time;
+
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+    const dateFormatted = currentDate.toLocaleDateString('en-US', options);
+
+    setModalVisible(false)
+    setDate(currentDate)
+    setCurrentDate(dateFormatted);
+    setMode(null);
+  }
+
+  const handleTimeSelect = (event: DateTimePickerEvent, selectedDate: Date | undefined) => {
+    const currentTime = selectedDate || time;
+
+    const timeOptions: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+    const timeFormatted = currentTime.toLocaleTimeString('en-US', timeOptions);
+
+    setModalVisible(false);
+    setTime(currentTime)
+    setCurrentTime(timeFormatted);
+    setMode(null);
+  };
+
 
   const [invoiceImage, setInvoiceImage] = useState<string | undefined | null>(null);
   const [isInvoiceVisible, setIsInvoiceVisible] = useState<boolean>(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [mode, setMode] = useState<'date' | 'time' | null>(null);
-  const [time, setTime] = useState(new Date());
-  const [date, setDate] = useState(new Date());
-  const store = Store();
+
 
   // Request Inputs
   const [title, setTitle] = useState<string>("");
@@ -36,30 +69,30 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
 
   async function handleCreateExpense() {
     if (!amount.trim() || !title.trim()) {
-      store.showToastWithGravityAndOffset("Enter All Details");
+      store.showSnackbar("Enter All Details");
       return;
     }
 
-    if (store.transactionType === "expense" && store.totalBalance - Number(amount) < 0) {
-      store.showToastWithGravityAndOffset("Insufficient Balance");
+    if (transactionStore.transactionType === "expense" && userStore.totalBalance - Number(amount) < 0) {
+      store.showSnackbar("Insufficient Balance");
       return;
     }
 
     if (title.length > 15) {
-      store.showToastWithGravityAndOffset("Title must be short");
+      store.showSnackbar("Title must be short");
       return;
     }
 
     store.setLoading(true)
     const formData = new FormData()
 
-    formData.append("incomeFlag", store.transactionType);
+    formData.append("incomeFlag", transactionStore.transactionType);
     formData.append("token", await AsyncStorage.getItem("token"))
     formData.append("amount", amount)
-    if (store.transactionType === "income") {
-      formData.append("category", store.incomeTitle.toUpperCase())
+    if (transactionStore.transactionType === "income") {
+      formData.append("category", transactionStore.incomeTitle.toUpperCase())
     } else {
-      formData.append("category", store.expenseTitle.toUpperCase())
+      formData.append("category", transactionStore.expenseTitle.toUpperCase())
     }
     formData.append("title", title);
     formData.append("notes", notes);
@@ -92,26 +125,26 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
         },
       })
       .then(() => {
-        store.setTransactionType("expense")
+        transactionStore.setTransactionType("expense")
         if (showIncome) {
-          store.showToastWithGravityAndOffset("Income Added Successfully");
-          store.setTotalBalance(store.totalBalance + Number(amount));
-          store.setTotalIncome(store.totalIncome + Number(amount));
+          store.showSnackbar("Income Added Successfully");
+          userStore.setTotalBalance(userStore.totalBalance + Number(amount));
+          userStore.setTotalIncome(userStore.totalIncome + Number(amount));
         } else {
-          store.showToastWithGravityAndOffset("Expense Added Successfully");
-          store.setTotalBalance(store.totalBalance - Number(amount));
-          store.setTotalExpense(store.totalExpense + Number(amount));
+          store.showSnackbar("Expense Added Successfully");
+          userStore.setTotalBalance(userStore.totalBalance - Number(amount));
+          userStore.setTotalExpense(userStore.totalExpense + Number(amount));
         }
       })
       .catch((err) => {
         if (axios.isAxiosError(err)) {
-          store.showToastWithGravityAndOffset(err.response?.data.message)
+          store.showSnackbar(err.response?.data.message)
         } else {
           console.log(err);
         }
       })
       .finally(() => {
-        store.fetchTransactions();
+        transactionStore.fetchTransactions();
         store.setLoading(false);
       })
   }
@@ -130,30 +163,6 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
     setCurrentTime(timeFormatted);
   }, []);
 
-  function handleDateSelect(event: DateTimePickerEvent, selectedDate: Date | undefined) {
-    const currentDate = selectedDate || time;
-
-    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
-    const dateFormatted = currentDate.toLocaleDateString('en-US', options);
-
-    setModalVisible(false)
-    setDate(currentDate)
-    setCurrentDate(dateFormatted);
-    setMode(null);
-  }
-
-  const handleTimeSelect = (event: DateTimePickerEvent, selectedDate: Date | undefined) => {
-    const currentTime = selectedDate || time;
-
-    const timeOptions: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-    const timeFormatted = currentTime.toLocaleTimeString('en-US', timeOptions);
-
-    setModalVisible(false);
-    setTime(currentTime)
-    setCurrentTime(timeFormatted);
-    setMode(null);
-  };
-
   return (
     <View style={styles.optionsContainer}>
       <ScrollView>
@@ -163,12 +172,16 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
             <TouchableOpacity style={styles.categoryContainer} onPress={() => navigation.navigate("Category")}>
               <View style={styles.categoryIconContainer}>
                 <Image
-                  source={store.transactionType === "expense" ? store.expenseIcon : store.incomeIcon}
+                  source={transactionStore.transactionType === "expense" ?
+                    transactionStore.expenseIcon : transactionStore.incomeIcon
+                  }
                   style={styles.categoryIcon}
                 />
               </View>
               <Text style={styles.categoryText}>
-                {store.transactionType === "expense" ? store.expenseTitle : store.incomeTitle}
+                {transactionStore.transactionType === "expense" ?
+                  transactionStore.expenseTitle : transactionStore.incomeTitle
+                }
               </Text>
             </TouchableOpacity>
           </View>
@@ -264,7 +277,7 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
       </ScrollView >
       {store.loading ?
         <TouchableOpacity style={styles.continueButton}
-          onPress={() => Store.getState().showToastWithGravityAndOffset("Adding...")}
+          onPress={() => Store.getState().showSnackbar("Adding...")}
         >
           <GradientButton text='continue' />
         </TouchableOpacity>
