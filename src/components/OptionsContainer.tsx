@@ -6,15 +6,15 @@ import React, { useEffect, useState } from 'react'
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { Store } from '../store/store'
 import GradientButton from './GradientButton'
+import { NavigationProp } from '@react-navigation/native'
 
 type propsType = {
   amount: string,
   showIncome: boolean,
-  setVisible: React.Dispatch<React.SetStateAction<boolean>>
-  setShowCategories: React.Dispatch<React.SetStateAction<boolean>>
+  navigation: NavigationProp<any>
 }
 
-export default function OptionsContainer({ amount, showIncome, setVisible, setShowCategories }: propsType): React.JSX.Element {
+export default function OptionsContainer({ amount, showIncome, navigation }: propsType): React.JSX.Element {
   const [currentDate, setCurrentDate] = useState<string>('');
   const [currentTime, setCurrentTime] = useState<string>('');
 
@@ -102,7 +102,6 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
           store.setTotalBalance(store.totalBalance - Number(amount));
           store.setTotalExpense(store.totalExpense + Number(amount));
         }
-        setVisible(false)
       })
       .catch((err) => {
         if (axios.isAxiosError(err)) {
@@ -161,7 +160,7 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
         <View>
           <View style={styles.option}>
             <Text style={styles.labelText}>Select a Category</Text>
-            <TouchableOpacity style={styles.categoryContainer} onPress={() => setShowCategories(true)}>
+            <TouchableOpacity style={styles.categoryContainer} onPress={() => navigation.navigate("Category")}>
               <View style={styles.categoryIconContainer}>
                 <Image
                   source={store.transactionType === "expense" ? store.expenseIcon : store.incomeIcon}
@@ -274,7 +273,7 @@ export default function OptionsContainer({ amount, showIncome, setVisible, setSh
           <GradientButton text='continue' />
         </TouchableOpacity>
       }
-      {/* Modals */}
+
       <Modal
         visible={modalVisible}
         transparent={true}

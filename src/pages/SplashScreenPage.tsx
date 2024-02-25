@@ -3,7 +3,6 @@ import { NavigationProp } from '@react-navigation/native';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { Store } from '../store/store';
-import axios from 'axios';
 
 type propsType = {
   navigation: NavigationProp<any>;

@@ -1,25 +1,26 @@
+import { NavigationProp } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { Image, Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Category from '../components/Category';
 import ExpenseList from "../data/ExpenseCategories";
 import IncomeList from "../data/IncomeCategories";
 import { Store } from '../store/store';
+import { MotiView } from 'moti';
 
 type propsType = {
-  setShowCategories: React.Dispatch<React.SetStateAction<boolean>>
+  navigation: NavigationProp<any>;
 }
 
-export default function CategoriesModal({ setShowCategories }: propsType): React.JSX.Element {
+export default function CategoriesPage({ navigation }: propsType) {
   const store = Store();
   const CategoryList = store.transactionType === "income" ? IncomeList : ExpenseList;
 
-  const [Data, setData] = useState(CategoryList);
   const [filteredData, setFilteredData] = useState(CategoryList);
   const [search, setSearch] = useState<string>("");
 
   const handleSearch = (text: string) => {
     setSearch(text);
-    const filteredData = Data.filter(category =>
+    const filteredData = CategoryList.filter(category =>
       category.name.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredData(filteredData);
@@ -28,7 +29,7 @@ export default function CategoriesModal({ setShowCategories }: propsType): React
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => setShowCategories(false)}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image
             style={styles.backButton}
             source={require("../assets/backButton.png")}
@@ -49,7 +50,7 @@ export default function CategoriesModal({ setShowCategories }: propsType): React
               key={index}
               categoryIcon={category.source}
               categoryText={category.name}
-              setShowCategories={setShowCategories}
+              navigation={navigation}
             />
           )}
         </View>

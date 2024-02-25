@@ -112,7 +112,7 @@ interface StoreState {
   handleCreateGroup: (
     title: string,
     selectedImage: string | undefined | null,
-    setOpenAddGroup: React.Dispatch<React.SetStateAction<boolean>>,
+    navigation: NavigationProp<any>,
   ) => void;
   // Delete Transaction
   handleDeleteTransaction: (
@@ -424,7 +424,7 @@ export const Store = create<StoreState>(set => ({
   groups: [],
   setGroups: (groups: GroupDocument[]) => set({ groups }),
 
-  handleCreateGroup: async (title, selectedImage, setOpenAddGroup) => {
+  handleCreateGroup: async (title, selectedImage, navigation) => {
     if (!title.trim()) {
       Store.getState().showToastWithGravityAndOffset("Title is required");
       return;
@@ -466,7 +466,7 @@ export const Store = create<StoreState>(set => ({
           totalExpense: 0,
         };
         Store.getState().setGroups([...Store.getState().groups, newGroup]);
-        setOpenAddGroup(false);
+        navigation.goBack();
       })
       .catch(err => {
         if (axios.isAxiosError(err)) {

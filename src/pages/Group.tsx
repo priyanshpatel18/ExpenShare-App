@@ -1,9 +1,9 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
-import { NavigationProp } from '@react-navigation/native'
-import { GroupDocument } from '../store/store';
+import { NavigationProp } from '@react-navigation/native';
 import { Image } from 'moti';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import NoFriendSection from '../components/NoFriendSection';
+import { GroupDocument } from '../store/store';
 
 type propsType = {
   navigation: NavigationProp<any>;

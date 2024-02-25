@@ -1,7 +1,6 @@
 import { NavigationProp } from '@react-navigation/native'
-import React, { useState } from 'react'
-import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import AddGroup from '../components/AddGroup'
+import React from 'react'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import GradientText from '../components/GradientText'
 import GroupComponent from '../components/GroupComponent'
 import MenuBar from '../components/MenuBar'
@@ -14,14 +13,12 @@ type propsType = {
 
 export default function GroupPage({ navigation }: propsType): React.JSX.Element {
   const store = Store();
-  const [openAddGroup, setOpenAddGroup] = useState(false);
- 
 
   return (
     <View style={styles.container}>
       <Text style={styles.headingText}>groups</Text>
 
-      <TouchableOpacity style={styles.addButton} onPress={() => setOpenAddGroup(true)}>
+      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("AddGroup")}>
         <GradientText
           text='add a group'
           style={styles.buttonText}
@@ -48,10 +45,6 @@ export default function GroupPage({ navigation }: propsType): React.JSX.Element 
         </ScrollView>
       }
       <MenuBar navigation={navigation} />
-
-      <Modal visible={openAddGroup} animationType='slide'>
-        <AddGroup setOpenAddGroup={setOpenAddGroup} />
-      </Modal>
     </View>
   )
 }

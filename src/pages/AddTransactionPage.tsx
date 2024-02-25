@@ -1,24 +1,22 @@
-import React, { useState } from 'react';
-import { Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import OptionsContainer from '../components/OptionsContainer';
-import { Store } from '../store/store';
-import CategoriesModal from './CategoriesModal';
-import { MotiView } from 'moti';
-import Loading from './Loading';
+import { NavigationProp } from '@react-navigation/native'
+import { MotiView } from 'moti'
+import React, { useState } from 'react'
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import Loading from '../components/Loading'
+import OptionsContainer from '../components/OptionsContainer'
+import { Store } from '../store/store'
 
 type propsType = {
-  setVisible: React.Dispatch<React.SetStateAction<boolean>>
+  navigation: NavigationProp<any>
 }
 
-export default function AddModal({ setVisible }: propsType): React.JSX.Element {
+export default function AddPage({ navigation }: propsType) {
   const [showIncome, setShowIncome] = useState(false);
   const [amount, setAmount] = useState<string>("");
   const store = Store();
-  const [showCategories, setShowCategories] = useState<boolean>(false);
-
 
   return (
-    store.loading ? <Loading /> : <Modal transparent={false} animationType='slide' >
+    store.loading ? <Loading /> :
       <MotiView
         style={styles.container}
         from={{
@@ -31,7 +29,7 @@ export default function AddModal({ setVisible }: propsType): React.JSX.Element {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={() => {
-              setVisible(false);
+              navigation.goBack()
               store.setTransactionType("expense")
             }}
           >
@@ -83,16 +81,9 @@ export default function AddModal({ setVisible }: propsType): React.JSX.Element {
         <OptionsContainer
           amount={amount}
           showIncome={showIncome}
-          setVisible={setVisible}
-          setShowCategories={setShowCategories}
+          navigation={navigation}
         />
       </MotiView>
-      {showCategories &&
-        <Modal visible={showCategories} animationType="slide">
-          <CategoriesModal setShowCategories={setShowCategories} />
-        </Modal>
-      }
-    </Modal>
   )
 }
 

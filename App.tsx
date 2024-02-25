@@ -6,7 +6,12 @@ import { SafeAreaView, StyleSheet } from 'react-native';
 // File Imports
 import Loading from './src/components/Loading';
 import AccountPage from './src/pages/AccountPage';
+import AddGroupPage from './src/pages/AddGroupPage';
+import AddMemberPage from './src/pages/AddMemberPage';
+import AddTransactionPage from './src/pages/AddTransactionPage';
+import CategoriesPage from './src/pages/CategoriesPage';
 import ForgotPage from './src/pages/ForgotPage';
+import Group from './src/pages/Group';
 import GroupPage from './src/pages/GroupPage';
 import HomePage from './src/pages/HomePage';
 import LoginPage from './src/pages/LoginPage';
@@ -20,8 +25,6 @@ import TransactionPage from './src/pages/TransactionPage';
 import VerifyEmailPage from './src/pages/VerifyEmailPage';
 import VerifyOtpPage from './src/pages/VerifyOtpPage';
 import WelcomePage from "./src/pages/WelcomePage";
-import Group from './src/pages/Group';
-import AddMemberPage from './src/pages/AddMemberPage';
 
 axios.defaults.baseURL = "http://192.168.206.226:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
@@ -37,7 +40,6 @@ export default function App(): React.JSX.Element {
           initialRouteName='Splash'
           screenOptions={{ headerShown: false, presentation: "modal", animation: "fade", animationDuration: 1000 }}
         >
-          <Stack.Screen name='Loading' component={Loading} options={{ animation: "fade" }} />
           <Stack.Screen name="Home" component={HomePage} />
           <Stack.Screen name="Splash" component={SplashScreen} options={{ animation: "fade_from_bottom" }} />
           <Stack.Screen name="Welcome" component={WelcomePage} />
@@ -47,7 +49,10 @@ export default function App(): React.JSX.Element {
           <Stack.Screen name="VerifyOtp" component={VerifyOtpPage} />
           <Stack.Screen name="VerifyEmail" component={VerifyEmailPage} />
           <Stack.Screen name="ResetPassword" component={ResetPasswordPage} />
+          <Stack.Screen name="AddTransaction" component={AddTransactionPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
+          <Stack.Screen name="Category" component={CategoriesPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
           <Stack.Screen name="Transaction" component={TransactionPage} />
+          <Stack.Screen name="AddGroup" component={AddGroupPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
           <Stack.Screen name="GroupPage" component={GroupPage} />
           <Stack.Screen name="Group" component={Group} options={{ animation: "slide_from_right", animationDuration: 2000 }} />
           <Stack.Screen name="AddMember" component={AddMemberPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />

@@ -7,10 +7,10 @@ import { Store } from '../store/store';
 type propsType = {
   categoryIcon: any;
   categoryText: string;
-  setShowCategories: React.Dispatch<React.SetStateAction<boolean>>
+  navigation: NavigationProp<any>;
 }
 
-export default function Category({ categoryIcon, categoryText, setShowCategories }: propsType): React.JSX.Element {
+export default function Category({ categoryIcon, categoryText, navigation }: propsType): React.JSX.Element {
   const store = Store();
 
   function handleCategorySelect() {
@@ -22,7 +22,7 @@ export default function Category({ categoryIcon, categoryText, setShowCategories
       store.setExpenseIcon(categoryIcon)
       store.setExpenseTitle(categoryText.toUpperCase())
     }
-    setShowCategories(false);
+    navigation.goBack();
   }
 
   return (

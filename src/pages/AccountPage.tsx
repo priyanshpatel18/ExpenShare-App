@@ -1,11 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NavigationProp } from '@react-navigation/native'
+import axios from 'axios'
 import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import { Store } from '../store/store'
-import axios from 'axios'
-import Loading from '../components/Loading'
 import RNFS from "react-native-fs"
+import Loading from '../components/Loading'
+import { Store } from '../store/store'
 
 type propsType = {
   navigation: NavigationProp<any>

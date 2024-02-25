@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
 import { MotiView } from 'moti'
+import React from 'react'
+import { StyleSheet, View } from 'react-native'
 
 export default function Loading() {
   return (
