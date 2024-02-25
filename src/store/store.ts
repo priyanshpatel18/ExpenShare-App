@@ -29,7 +29,7 @@ export interface UserObject {
   totalExpense: number | undefined;
 }
 
-interface GroupDocument extends Document {
+export interface GroupDocument extends Document {
   groupName: string;
   groupProfile?: string;
   members: string[];
@@ -113,6 +113,13 @@ interface StoreState {
     title: string,
     selectedImage: string | undefined | null,
     setOpenAddGroup: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => void;
+  // Delete Transaction
+  handleDeleteTransaction: (
+    transactionId: string,
+    transactionAmount: string,
+    navigation: NavigationProp<any>,
+    type: string,
   ) => void;
 }
 
@@ -460,6 +467,54 @@ export const Store = create<StoreState>(set => ({
         };
         Store.getState().setGroups([...Store.getState().groups, newGroup]);
         setOpenAddGroup(false);
+      })
+      .catch(err => {
+        if (axios.isAxiosError(err)) {
+          Store.getState().showToastWithGravityAndOffset(
+            err.response?.data.message,
+          );
+        } else {
+          console.error(err);
+        }
+      })
+      .finally(() => {
+        set({ loading: false });
+      });
+  },
+
+  handleDeleteTransaction: async (
+    transactionId,
+    transactionAmount,
+    navigation,
+    type,
+  ) => {
+    const token = await AsyncStorage.getItem("token");
+
+    set({ loading: true });
+
+    axios
+      .post("/transaction/delete", { token, transactionId, transactionAmount })
+      .then(res => {
+        const { transactions } = Store.getState();
+
+        if (transactions) {
+          const updatedTransactions = transactions.filter(
+            transaction => transaction._id !== transactionId,
+          );
+          set({ transactions: updatedTransactions });
+        }
+        const amount = Number(transactionAmount);
+        let { totalBalance, totalIncome, totalExpense } = Store.getState();
+
+        if (type === "income") {
+          set({ totalBalance: (totalBalance -= amount) });
+          set({ totalIncome: (totalIncome -= amount) });
+        } else {
+          set({ totalBalance: (totalBalance += amount) });
+          set({ totalExpense: (totalExpense -= amount) });
+        }
+        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        navigation.goBack();
       })
       .catch(err => {
         if (axios.isAxiosError(err)) {

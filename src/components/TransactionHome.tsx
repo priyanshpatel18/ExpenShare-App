@@ -31,7 +31,11 @@ export default function TransactionSectionHome({ navigation }: propsType): React
 
       const lastFiveTransactions = sortedTransactions.slice(0, 5);
 
-      setDisplayTransactions(lastFiveTransactions);
+      const timeoutId = setTimeout(() => {
+        setDisplayTransactions(lastFiveTransactions);
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [store.transactions]);
 
@@ -63,7 +67,8 @@ export default function TransactionSectionHome({ navigation }: propsType): React
                 }}
                 transition={{
                   type: "timing",
-                  duration: 1300
+                  duration: 1000
+
                 }}
               >
                 <View>

@@ -60,6 +60,7 @@ export default function AddGroup({ setOpenAddGroup }: propsType) {
             cursorColor="#aaa"
             onChangeText={(text: string) => setTitle(text)}
             style={styles.titleInput}
+            autoFocus
           />
         </View>
         {store.loading ?

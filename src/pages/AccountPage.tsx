@@ -30,7 +30,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
       return;
     }
 
-    if (textInput !== store.userObject?.userName && textInput.length !== 15) {
+    if (textInput !== store.userObject?.userName && textInput.length > 15) {
       store.showToastWithGravityAndOffset("Username must be 15 characters long");
       return;
     }
@@ -221,6 +221,10 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
               }
             </View>
             <TouchableOpacity style={[styles.changeButton, { backgroundColor: "#ff4545" }]}>
+              <Image
+                source={require("../assets/dustbin.png")}
+                style={styles.deleteIcon}
+              />
               <Text style={styles.changeText}>Delete your account</Text>
             </TouchableOpacity>
           </View>
@@ -313,11 +317,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#58B9E6",
     borderRadius: 10,
     marginBottom: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
   },
   changeText: {
     color: "#fff",
     fontSize: 20,
-    fontFamily: "Montserrat-Bold",
-    textTransform: "uppercase"
+    fontFamily: "Montserrat-SemiBold",
+  },
+  deleteIcon: {
+    width: 30,
+    height: 30
   }
 })

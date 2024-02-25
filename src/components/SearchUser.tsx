@@ -2,16 +2,22 @@ import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
+interface UserObject {
+  userName: string;
+  profilePicture: string | undefined | null;
+}
 type propsType = {
   userName: string,
-  profilePicture: string
+  profilePicture: string | null | undefined
+  onSelectUser: (user: UserObject) => void
 }
 
-export default function SearchUser({ userName, profilePicture }: propsType) {
+export default function SearchUser({ userName, profilePicture, onSelectUser }: propsType) {
   const [isSelected, setIsSelected] = useState(false);
 
   function handleSelect() {
     setIsSelected(!isSelected);
+    onSelectUser({ userName, profilePicture });
   }
 
   return (

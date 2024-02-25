@@ -246,8 +246,8 @@ const styles = StyleSheet.create({
     gap: 20
   },
   alertButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
     borderRadius: 8,
   },
   cancelButton: {

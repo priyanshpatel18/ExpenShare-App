@@ -1,5 +1,4 @@
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { MotiView } from 'moti';
+import { NavigationProp } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -15,17 +14,11 @@ type PropsType = {
   navigation: NavigationProp<any>;
 };
 
-interface TransactionDetailsRouteParams {
-  transaction: TransactionType;
-}
-
 export default function TransactionPage({ navigation }: PropsType) {
   const [showIncome, setShowIncome] = useState(true);
   const [displayTransactions, setDisplayTransactions] = useState<TransactionType[] | undefined>(undefined);
   const [showNoTransaction, setShowNoTransaction] = useState<boolean>(false);
   const store = Store();
-
-  const redirect = useNavigation();
 
   useEffect(() => {
     if (store.transactions) {
@@ -88,84 +81,36 @@ export default function TransactionPage({ navigation }: PropsType) {
       </View>
       {showNoTransaction ? <NoTransaction /> : (
         <ScrollView style={styles.transactions}>
-          {showIncome
-            ? displayTransactions
-              ?.filter(transaction => transaction.type === 'income')
-              .sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime())
-              .map((transaction, index) => (
-                <MotiView
+          {displayTransactions
+            ?.sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime())
+            .map((transaction, index) => (
+              <View key={index}>
+                <TouchableOpacity
                   key={index}
-                  from={{
-                    top: -400 * (index + 0.7),
-                    zIndex: -9999
-                  }}
-                  animate={{
-                    top: 0,
-                    zIndex: 0
-                  }}
-                  transition={{
-                    type: "timing",
-                    duration: 700,
-                    delay: index * 50
-                  }}
-                >
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() =>
-                      navigation.navigate("TransactionDetails", { transaction, imageUrl: getIncomeCategorySource(transaction.category) })
-                    }
-                  >
-                    <TransactionDetails transaction={transaction} />
-                    <Transaction
-                      title={transaction.transactionTitle}
-                      amount={transaction.transactionAmount}
-                      imageUrl={
+                  onPress={() =>
+                    navigation.navigate("TransactionDetails", {
+                      transaction, imageUrl: transaction.type === "expense" ?
+                        getExpenseCategorySource(transaction.category) :
                         getIncomeCategorySource(transaction.category)
-                      }
-                    />
-                  </TouchableOpacity>
-                </MotiView>
-              ))
-            : displayTransactions
-              ?.filter(transaction => transaction.type === 'expense')
-              .sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime())
-              .map((transaction, index) => (
-                <MotiView
-                  key={index}
-                  from={{
-                    top: -400 * (index + 1),
-                    zIndex: -9999
-                  }}
-                  animate={{
-                    top: 0,
-                    zIndex: 0
-                  }}
-                  transition={{
-                    type: "timing",
-                    duration: 700,
-                    delay: index * 50
-                  }}
+                    })
+                  }
                 >
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() =>
-                      navigation.navigate("TransactionDetails", { transaction, imageUrl: getExpenseCategorySource(transaction.category) })
+                  <TransactionDetails transaction={transaction} />
+                  <Transaction
+                    title={transaction.transactionTitle}
+                    amount={transaction.transactionAmount}
+                    imageUrl={
+                      transaction.type === "expense" ?
+                        getExpenseCategorySource(transaction.category) :
+                        getIncomeCategorySource(transaction.category)
                     }
-                  >
-                    <TransactionDetails transaction={transaction} />
-                    <Transaction
-                      title={transaction.transactionTitle}
-                      amount={transaction.transactionAmount}
-                      imageUrl={
-                        getExpenseCategorySource(transaction.category)
-                      }
-                    />
-                  </TouchableOpacity>
-                </MotiView>
-              ))}
+                  />
+                </TouchableOpacity>
+              </View>
+            ))}
         </ScrollView>
-
       )}
+
       <MenuBar navigation={navigation} />
     </View >
   );

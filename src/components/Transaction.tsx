@@ -22,7 +22,7 @@ export default function Transaction({ title, type, amount, imageUrl }: propsType
         type === "income" ? { backgroundColor: "#DFD" } :
           { backgroundColor: "#CFCFCF" }
     ]}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={styles.mainTransaction}>
         <View style={styles.categoryIconContainer}>
           <Image
             source={imageUrl}
@@ -56,11 +56,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#CFCFCF",
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    marginBottom: 15
+    backgroundColor: "#ddd",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    borderColor: "#aaa",
+    borderWidth: 2,
+  },
+  mainTransaction: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   categoryIconContainer: {
     padding: 20,

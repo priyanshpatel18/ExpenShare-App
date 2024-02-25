@@ -7,7 +7,7 @@ type propsType = {
   totalMembers: number;
 }
 
-export default function Group({ groupPhoto, groupName, totalMembers }: propsType) {
+export default function GroupComponent({ groupPhoto, groupName, totalMembers }: propsType) {
   return (
     <View style={styles.container}>
       {groupPhoto ? (

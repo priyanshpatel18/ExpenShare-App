@@ -37,9 +37,9 @@ export default function MenuBar({ navigation }: propsType): React.JSX.Element {
           />
         </TouchableWithoutFeedback>
         <View style={styles.buttonContainerRight}>
-          <TouchableWithoutFeedback onPress={() => navigation.navigate("Group")}>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("GroupPage")}>
             <Image
-              source={route.name === 'Group' ? require("../assets/groupSelected.png") : require("../assets/group.png")}
+              source={route.name === 'GroupPage' ? require("../assets/groupSelected.png") : require("../assets/group.png")}
               style={styles.routeButton}
             />
           </TouchableWithoutFeedback>

@@ -24,7 +24,7 @@ export default function Balance(): React.JSX.Element {
   const animation = (toValue: number) => {
     return Animated.timing(animatedValue, {
       toValue,
-      duration: 600,
+      duration: 800,
       useNativeDriver: true,
       delay: 0
     }).start();

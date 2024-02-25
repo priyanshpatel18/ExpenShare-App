@@ -3,9 +3,10 @@ import React, { useState } from 'react'
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import AddGroup from '../components/AddGroup'
 import GradientText from '../components/GradientText'
-import Group from '../components/Group'
+import GroupComponent from '../components/GroupComponent'
 import MenuBar from '../components/MenuBar'
 import { Store } from '../store/store'
+
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -14,6 +15,7 @@ type propsType = {
 export default function GroupPage({ navigation }: propsType): React.JSX.Element {
   const store = Store();
   const [openAddGroup, setOpenAddGroup] = useState(false);
+ 
 
   return (
     <View style={styles.container}>
@@ -28,15 +30,15 @@ export default function GroupPage({ navigation }: propsType): React.JSX.Element 
       {store.groups.length > 0 &&
         <ScrollView style={styles.groupList}>
           {store.groups.map((group, index) => (
-            <TouchableOpacity key={index}>
+            <TouchableOpacity key={index} onPress={() => navigation.navigate("Group", { group })}>
               {group.groupProfile ? (
-                <Group
+                <GroupComponent
                   groupPhoto={group.groupProfile}
                   groupName={group.groupName}
                   totalMembers={group.members.length}
                 />
               ) : (
-                <Group
+                <GroupComponent
                   groupName={group.groupName}
                   totalMembers={group.members.length}
                 />

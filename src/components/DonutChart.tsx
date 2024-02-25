@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import Donut from './Donut'
-import { Store } from '../store/store'
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { Store } from '../store/store';
+import Donut from './Donut';
 
 export default function DonutChart() {
   const store = Store();

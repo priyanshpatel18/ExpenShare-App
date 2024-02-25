@@ -38,25 +38,28 @@ export default function Donut({ percentage, color, max }: propsType): React.JSX.
   useEffect(() => {
     animation(percentage);
 
-    animatedValue.addListener(v => {
-      if (circleRef.current) {
-        const maxPer = 100 * v.value / max;
-        const strokeDashoffset =
-          circleCircumference - (circleCircumference * maxPer) / 100
-        circleRef.current.setNativeProps({
-          strokeDashoffset
-        })
-      }
+    const timeoutId = setTimeout(() => {
+      animatedValue.addListener(v => {
+        if (circleRef.current) {
+          const maxPer = 100 * v.value / max;
+          const strokeDashoffset =
+            circleCircumference - (circleCircumference * maxPer) / 100
+          circleRef.current.setNativeProps({
+            strokeDashoffset
+          })
+        }
 
-      if (inputRef.current) {
-        inputRef.current.setNativeProps({
-          text: `${Math.round(v.value)}`
-        })
-      }
-    })
+        if (inputRef.current) {
+          inputRef.current.setNativeProps({
+            text: `${Math.round(v.value)}`
+          })
+        }
+      })
+    }, 100);
 
     return (() => {
       animatedValue.removeAllListeners()
+      clearTimeout(timeoutId);
     })
   }, [max, percentage])
 

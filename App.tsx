@@ -4,6 +4,7 @@ import axios from 'axios';
 import React from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 // File Imports
+import Loading from './src/components/Loading';
 import AccountPage from './src/pages/AccountPage';
 import ForgotPage from './src/pages/ForgotPage';
 import GroupPage from './src/pages/GroupPage';
@@ -11,15 +12,16 @@ import HomePage from './src/pages/HomePage';
 import LoginPage from './src/pages/LoginPage';
 import UserPage from './src/pages/ProfilePage';
 import RegisterPage from './src/pages/RegisterPage';
+import ReportScreen from './src/pages/ReportPage';
 import ResetPasswordPage from './src/pages/ResetPasswordPage';
 import SplashScreen from './src/pages/SplashScreenPage';
+import TransactionDetailsPage from './src/pages/TransactionDetailsPage';
 import TransactionPage from './src/pages/TransactionPage';
 import VerifyEmailPage from './src/pages/VerifyEmailPage';
 import VerifyOtpPage from './src/pages/VerifyOtpPage';
 import WelcomePage from "./src/pages/WelcomePage";
-import ReportScreen from './src/pages/ReportPage';
-import Loading from './src/components/Loading';
-import TransactionDetailsPage from './src/pages/TransactionDetailsPage';
+import Group from './src/pages/Group';
+import AddMemberPage from './src/pages/AddMemberPage';
 
 axios.defaults.baseURL = "http://192.168.206.226:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
@@ -46,7 +48,9 @@ export default function App(): React.JSX.Element {
           <Stack.Screen name="VerifyEmail" component={VerifyEmailPage} />
           <Stack.Screen name="ResetPassword" component={ResetPasswordPage} />
           <Stack.Screen name="Transaction" component={TransactionPage} />
-          <Stack.Screen name="Group" component={GroupPage} />
+          <Stack.Screen name="GroupPage" component={GroupPage} />
+          <Stack.Screen name="Group" component={Group} options={{ animation: "slide_from_right", animationDuration: 2000 }} />
+          <Stack.Screen name="AddMember" component={AddMemberPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
           <Stack.Screen name="User" component={UserPage} />
           <Stack.Screen name="Account" component={AccountPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
           <Stack.Screen name="Report" component={ReportScreen} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />

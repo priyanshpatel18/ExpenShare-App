@@ -34,8 +34,10 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
       return;
     }
 
-    if (userName.length !== 15) {
-      store.showToastWithGravityAndOffset("Username must be 15 characters long");
+    console.log(userName.length);
+
+    if (userName.length > 15) {
+      store.showToastWithGravityAndOffset("Username should be max 15 characters");
       return;
     }
 

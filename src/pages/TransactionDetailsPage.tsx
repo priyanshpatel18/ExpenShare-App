@@ -2,7 +2,7 @@ import { NavigationProp } from '@react-navigation/native';
 import { Image, MotiView } from 'moti';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { TransactionType } from '../store/store';
+import { Store, TransactionType } from '../store/store';
 
 type propsType = {
   route: {
@@ -16,7 +16,30 @@ type propsType = {
 
 const TransactionDetailsPage = ({ route, navigation }: propsType) => {
   const { transaction } = route.params;
+
+  const store = Store();
+
+  const date = new Date(transaction.transactionDate);
+
+  // Format the date
+  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+  const formattedDate = date.toLocaleDateString('en-US', options);
+
+  // Format the time
+  const timeOptions: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
+  const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
+
   const [isInvoiceVisible, setIsInvoiceVisible] = useState(false);
+
+  function handleDelete() {
+    if (transaction.type === "income" && store.totalBalance - Number(transaction.transactionAmount) < 0) {
+      store.showToastWithGravityAndOffset("Removing will cause a Negative Balance")
+      return;
+    }
+
+    store.showToastWithGravityAndOffset("Deleting Transaction")
+    store.handleDeleteTransaction(transaction._id, transaction.transactionAmount, navigation, transaction.type);
+  }
 
   return (
     <View style={styles.container}>
@@ -57,7 +80,7 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
         <Text style={styles.label}>
           Amount
         </Text>
-        <Text style={[styles.text, { fontSize: 25 }]}>
+        <Text style={[styles.text, { fontSize: 30 }, transaction.type === "expense" ? { color: "#f00" } : { color: "#00a200" }]}>
           ₹ {transaction.transactionAmount}
         </Text>
       </View>
@@ -79,7 +102,43 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
           }
         </View>
       </View>
+      <View style={styles.detailContainer}>
+        <Text style={styles.label}>
+          Transaction Date
+        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
+          <Text style={styles.text}>
+            {formattedDate}
+          </Text>
+          <Text style={styles.text}>
+            {formattedTime}
+          </Text>
+        </View>
+      </View>
+      {store.loading ? (
+        <TouchableOpacity
+          style={[styles.deleteButton, { backgroundColor: "#ff4545" }]}
+          onPress={() => store.showToastWithGravityAndOffset("Deleting Transaction")}
+        >
+          <Image
+            source={require("../assets/dustbin.png")}
+            style={styles.deleteIcon}
+          />
+          <Text style={styles.deleteText}>Delete Transaction</Text>
+        </TouchableOpacity>)
+        : (
+          <TouchableOpacity
+            style={[styles.deleteButton, { backgroundColor: "#ff4545" }]}
+            onPress={handleDelete}
+          >
+            <Image
+              source={require("../assets/dustbin.png")}
+              style={styles.deleteIcon}
+            />
+            <Text style={styles.deleteText}>Delete Transaction</Text>
+          </TouchableOpacity>
 
+        )}
 
       <Modal visible={isInvoiceVisible} transparent={true}>
         {isInvoiceVisible &&
@@ -147,6 +206,23 @@ const styles = StyleSheet.create({
   invoiceUrl: {
     alignSelf: "flex-end",
     color: "#539AEA"
+  },
+  deleteButton: {
+    padding: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    borderRadius: 10,
+    alignSelf: "center",
+  },
+  deleteIcon: {
+    width: 30,
+    height: 30,
+  },
+  deleteText: {
+    textAlign: "center",
+    color: "#fff",
+    fontSize: 20
   },
   modalContainer: {
     display: "flex",
