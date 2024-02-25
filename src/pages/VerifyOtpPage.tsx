@@ -4,8 +4,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import GradientButton from '../components/GradientButton';
-import { AuthenticationStore } from '../store/AuthenticationStore';
-import { Store } from '../store/Store';
+import { Store } from '../store/store';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -13,8 +12,7 @@ type propsType = {
 
 export default function VerifyOtpPage({ navigation }: propsType): React.JSX.Element {
   const [otp, setOtp] = useState('');
-  const authStore = AuthenticationStore()
-  const store = Store();
+  const store = Store()
 
   const handleVerifyOtp = async () => {
     if (!otp.trim()) {
@@ -26,19 +24,19 @@ export default function VerifyOtpPage({ navigation }: propsType): React.JSX.Elem
 
     axios.post('/user/verifyOtp', { userOtp: otp, otpId })
       .then(async () => {
-        if (authStore.isAuthenticatedChange === false) {
+        if (store.isAuthenticatedChange === false) {
           navigation.navigate("ResetPassword")
-          store.showSnackbar("Create a new Password")
+          store.showToastWithGravityAndOffset("Create a new Password")
         } else {
-          authStore.handleResetPassword(authStore.password, navigation);
+          store.handleResetPassword(store.password, navigation);
           navigation.navigate("Account")
-          authStore.setPassword("");
+          store.password = "";
           await AsyncStorage.removeItem("resetEmail")
         }
       })
       .catch((err) => {
         console.log(err);
-        store.showSnackbar(err.response.data.message)
+        store.showToastWithGravityAndOffset(err.response.data.message)
       })
       .finally(() => {
         store.setLoading(false)
@@ -66,7 +64,7 @@ export default function VerifyOtpPage({ navigation }: propsType): React.JSX.Elem
       {store.loading ? (
         <TouchableOpacity
           style={styles.verifyButton}
-          onPress={() => store.showSnackbar("Logging In..")}
+          onPress={() => store.showToastWithGravityAndOffset("Logging In..")}
         >
           <GradientButton text='verify' />
         </TouchableOpacity>

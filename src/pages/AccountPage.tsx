@@ -1,21 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NavigationProp } from '@react-navigation/native'
-import axios from 'axios'
 import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import RNFS from "react-native-fs"
+import { Store } from '../store/store'
+import axios from 'axios'
 import Loading from '../components/Loading'
-import { AuthenticationStore } from '../store/AuthenticationStore'
-import { Store } from '../store/Store'
-import { UserStore } from '../store/UserStore'
+import RNFS from "react-native-fs"
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function AccountPage({ navigation }: propsType): React.JSX.Element {
-  const commonStore = Store();
-  const store = UserStore();
+  const store = Store();
   const [textInput, setTextInput] = useState<string>(String(store.userObject?.userName));
   const [profilePicture, setProfilePicture] = useState<string | undefined | null>(String(store.userObject?.profilePicture))
   const [newPassword, setNewPassword] = useState<string>("");
@@ -23,18 +20,18 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
 
   async function handleSave() {
     if (textInput.trim() === store.userObject?.userName && profilePicture === store.userObject.profilePicture) {
-      commonStore.showSnackbar("No Changes");
+      store.showToastWithGravityAndOffset("No Changes");
       navigation.goBack();
       return;
     }
 
     if (textInput !== store.userObject?.userName && /\s/.test(textInput)) {
-      commonStore.showSnackbar("Username cannot contain spaces");
+      store.showToastWithGravityAndOffset("Username cannot contain spaces");
       return;
     }
 
     if (textInput !== store.userObject?.userName && textInput.length > 15) {
-      commonStore.showSnackbar("Username must be 15 characters long");
+      store.showToastWithGravityAndOffset("Username must be 15 characters long");
       return;
     }
 
@@ -43,7 +40,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
       const fileSizeInBytes = fileInfo.size;
       const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
       if (fileSizeInMegabytes > 3) {
-        commonStore.showSnackbar("File Size must be less than 3MB")
+        store.showToastWithGravityAndOffset("File Size must be less than 3MB")
         return;
       }
     }
@@ -63,9 +60,9 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
       })
     }
 
-    Store.getState().showSnackbar("Updating...")
+    Store.getState().showToastWithGravityAndOffset("Updating...")
 
-    commonStore.setLoading(true)
+    store.setLoading(true)
     axios.post("/user/update", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -80,20 +77,20 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
           totalIncome: store.userObject?.totalIncome,
           totalExpense: store.userObject?.totalExpense
         });
-        Store.getState().showSnackbar(res.data.message);
+        Store.getState().showToastWithGravityAndOffset(res.data.message);
       })
       .catch((err) => {
-        Store.getState().showSnackbar(err.response.data.message)
+        Store.getState().showToastWithGravityAndOffset(err.response.data.message)
       })
       .finally(() => {
-        commonStore.setLoading(false);
+        store.setLoading(false);
         navigation.goBack();
       })
   }
 
   async function handleChange() {
     if (!newPassword.trim() || !confirmPassword.trim()) {
-      commonStore.showSnackbar("Enter Both Passwords");
+      store.showToastWithGravityAndOffset("Enter Both Passwords");
       return;
     }
 
@@ -116,21 +113,21 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
         message = "Passwords don't match";
       }
 
-      commonStore.showSnackbar(message);
+      store.showToastWithGravityAndOffset(message);
       return;
     }
 
-    AuthenticationStore.setState({ isAuthenticatedChange: true });
-    AuthenticationStore.getState().setPassword(newPassword);
+    store.setIsAuthenticatedChange(true);
+    store.setPassword(newPassword);
     await AsyncStorage.setItem("resetEmail", String(store.userObject?.email));
-    AuthenticationStore.getState().handleSendMail(String(store.userObject?.email), navigation)
+    store.handleSendMail(String(store.userObject?.email), navigation)
     setNewPassword("");
     setConfirmPassword("");
   }
 
   return (
     <>
-      {commonStore.loading ? <Loading />
+      {store.loading ? <Loading />
         : (
           <View style={styles.container}>
             <View style={styles.headingContainer}>
@@ -143,8 +140,8 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
               <View style={{ flexDirection: "row", alignItems: "center", gap: 30 }}>
                 <Text style={styles.headingText}>Account</Text>
               </View>
-              {commonStore.loading ?
-                <TouchableOpacity onPress={() => Store.getState().showSnackbar("Updating...")}>
+              {store.loading ?
+                <TouchableOpacity onPress={() => Store.getState().showToastWithGravityAndOffset("Updating...")}>
                   <Image
                     style={styles.headingButton}
                     source={require("../assets/doneButton.png")}
@@ -160,7 +157,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
               }
             </View>
             <View style={styles.detailContainer}>
-              <TouchableWithoutFeedback onPress={() => commonStore.pickImage(setProfilePicture)}>
+              <TouchableWithoutFeedback onPress={() => store.pickImage(setProfilePicture)}>
                 <View>
                   {profilePicture ?
                     <Image
@@ -214,8 +211,8 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
                 keyboardType='default'
                 secureTextEntry={true}
               />
-              {commonStore.loading ?
-                <TouchableOpacity style={styles.changeButton} onPress={() => commonStore.showSnackbar("Sending Mail...")}>
+              {store.loading ?
+                <TouchableOpacity style={styles.changeButton} onPress={() => store.showToastWithGravityAndOffset("Sending Mail...")}>
                   <Text style={styles.changeText}>Change Password</Text>
                 </TouchableOpacity> :
                 <TouchableOpacity style={styles.changeButton} onPress={handleChange}>

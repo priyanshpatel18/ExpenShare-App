@@ -6,16 +6,14 @@ import FileViewer from "react-native-file-viewer";
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 
 import { MotiView } from 'moti';
-import { TransactionStore } from '../store/TransactionStore';
-import { Store } from '../store/Store';
+import { Store } from '../store/store';
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function UserProfileOptions({ navigation }: propsType): React.JSX.Element {
-  const transactionStore = TransactionStore();
-  const store = Store()
+  const store = Store();
   const [isPdfVisible, setIsPdfVisible] = useState<boolean>(false);
   const [pdfPath, setPdfPath] = useState<string>('');
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -23,7 +21,7 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
   async function handleLogout() {
     await AsyncStorage.removeItem("token");
     navigation.navigate("Welcome")
-    store.showSnackbar("Logged out Successfully")
+    store.showToastWithGravityAndOffset("Logged out Successfully")
   }
 
   async function createPDF() {
@@ -63,11 +61,11 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
         </View>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => {
-        if (transactionStore.transactions !== undefined) {
+        if (store.transactions !== undefined) {
           createPDF()
         }
         else {
-          store.showSnackbar("Insufficient Data");
+          store.showToastWithGravityAndOffset("Insufficient Data");
         }
       }}>
         <View style={styles.button}>
@@ -81,11 +79,11 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
         </View>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => {
-        if (transactionStore.transactions !== undefined) {
+        if (store.transactions !== undefined) {
           navigation.navigate("Report");
         }
         else {
-          store.showSnackbar("Insufficient Data");
+          store.showToastWithGravityAndOffset("Insufficient Data");
         }
       }}>
         <View style={styles.button}>

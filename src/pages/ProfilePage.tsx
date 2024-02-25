@@ -3,14 +3,14 @@ import React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import MenuBar from '../components/MenuBar'
 import UserProfileOptions from '../components/ProfileOptions'
-import { UserStore } from '../store/UserStore'
+import { Store } from '../store/store'
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function UserPage({ navigation }: propsType): React.JSX.Element {
-  const store = UserStore();
+  const store = Store();
 
   return (
     <View style={styles.container}>

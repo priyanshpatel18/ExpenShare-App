@@ -1,25 +1,24 @@
 import { NavigationProp } from '@react-navigation/native';
-import { MotiView } from 'moti';
 import React, { useState } from 'react';
 import { Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Balance from '../components/Balance';
 import Loading from '../components/Loading';
 import MenuBar from '../components/MenuBar';
 import TransactionSection from '../components/TransactionHome';
-import { Store } from '../store/Store';
-import { UserStore } from '../store/UserStore';
+import { Store } from '../store/store';
+import { MotiView } from 'moti';
 
 type propsType = {
   navigation: NavigationProp<any>
 }
 
 export default function HomePage({ navigation }: propsType): React.JSX.Element {
-  const store = UserStore()
+  const store = Store()
   const [profileClicked, setProfileClicked] = useState<boolean>(false);
 
   return (
     <>
-      {Store.getState().loading ? <Loading /> : (
+      {store.loading ? <Loading /> : (
         <View style={[styles.container]}>
           <MotiView
             from={{

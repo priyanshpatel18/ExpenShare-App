@@ -26,7 +26,7 @@ import VerifyEmailPage from './src/pages/VerifyEmailPage';
 import VerifyOtpPage from './src/pages/VerifyOtpPage';
 import WelcomePage from "./src/pages/WelcomePage";
 
-axios.defaults.baseURL = "http://192.168.206.226:8080";
+axios.defaults.baseURL = "http://192.168.189.101:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 axios.defaults.withCredentials = true;
 
@@ -40,6 +40,7 @@ export default function App(): React.JSX.Element {
           initialRouteName='Splash'
           screenOptions={{ headerShown: false, presentation: "modal", animation: "fade", animationDuration: 1000 }}
         >
+          <Stack.Screen name="Loading" component={Loading} />
           <Stack.Screen name="Home" component={HomePage} />
           <Stack.Screen name="Splash" component={SplashScreen} options={{ animation: "fade_from_bottom" }} />
           <Stack.Screen name="Welcome" component={WelcomePage} />

@@ -1,10 +1,10 @@
 import { NavigationProp } from '@react-navigation/native'
-import React from 'react'
+import React, { useState } from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import GradientText from '../components/GradientText'
 import GroupComponent from '../components/GroupComponent'
 import MenuBar from '../components/MenuBar'
-import { GroupStore } from '../store/GroupStore'
+import { Store } from '../store/store'
 
 
 type propsType = {
@@ -12,7 +12,7 @@ type propsType = {
 }
 
 export default function GroupPage({ navigation }: propsType): React.JSX.Element {
-  const store = GroupStore();
+  const store = Store();
 
   return (
     <View style={styles.container}>

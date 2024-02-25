@@ -2,7 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
-import { Store } from '../store/Store';
+import { Store } from '../store/store';
+import axios from 'axios';
 
 type propsType = {
   navigation: NavigationProp<any>;
@@ -23,7 +24,7 @@ const SplashScreen = ({ navigation }: propsType): React.JSX.Element => {
         // await AsyncStorage.removeItem("token");
         // console.log(await AsyncStorage.getItem("token"));
 
-        store.handleFetchData(navigation);
+        store.handleGetUser(navigation);
 
         navigation.reset({
           index: 0,
