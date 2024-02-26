@@ -4,7 +4,7 @@ import axios from 'axios';
 import React from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 // File Imports
-import Loading from './src/components/Loading';
+import { useEffect } from 'react';
 import AccountPage from './src/pages/AccountPage';
 import AddGroupPage from './src/pages/AddGroupPage';
 import AddMemberPage from './src/pages/AddMemberPage';
@@ -25,13 +25,41 @@ import TransactionPage from './src/pages/TransactionPage';
 import VerifyEmailPage from './src/pages/VerifyEmailPage';
 import VerifyOtpPage from './src/pages/VerifyOtpPage';
 import WelcomePage from "./src/pages/WelcomePage";
+import { Notification, Store } from './src/store/store';
+import socket from './src/utils/socket';
+import NotificationsPage from './src/pages/NotificationsPage';
 
-axios.defaults.baseURL = "http://192.168.189.101:8080";
+axios.defaults.baseURL = "http://192.168.100.27:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 axios.defaults.withCredentials = true;
 
+interface SocketResponse {
+  message: string
+  requestId: string
+  groupName: string
+}
+
 export default function App(): React.JSX.Element {
   const Stack = createNativeStackNavigator();
+  const store = Store()
+  const email = store.userObject?.email || undefined;
+
+  useEffect(() => {
+    socket.emit("login", email);
+
+    socket.on("requestReceived", (object: SocketResponse) => {
+      store.showToastWithGravityAndOffset(object.message)
+      const newNotification = {
+        groupName: object.groupName,
+        requestId: object.requestId
+      }
+      store.setNotifications([...store.notifications, newNotification]);
+    })
+
+    return () => {
+      socket.off("requestReceived");
+    };
+  }, [socket, email])
 
   return (
     <SafeAreaView style={styles.main}>
@@ -40,8 +68,8 @@ export default function App(): React.JSX.Element {
           initialRouteName='Splash'
           screenOptions={{ headerShown: false, presentation: "modal", animation: "fade", animationDuration: 1000 }}
         >
-          <Stack.Screen name="Loading" component={Loading} />
           <Stack.Screen name="Home" component={HomePage} />
+          <Stack.Screen name="Notifications" component={NotificationsPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
           <Stack.Screen name="Splash" component={SplashScreen} options={{ animation: "fade_from_bottom" }} />
           <Stack.Screen name="Welcome" component={WelcomePage} />
           <Stack.Screen name="Register" component={RegisterPage} />

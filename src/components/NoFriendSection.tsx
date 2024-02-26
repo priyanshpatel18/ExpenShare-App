@@ -1,18 +1,20 @@
 import { NavigationProp } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Group } from '../store/store';
 
 type propsType = {
   navigation: NavigationProp<any>
+  group: Group
 }
 
-export default function NoFriendSection({ navigation }: propsType) {
+export default function NoFriendSection({ navigation, group }: propsType) {
   return (
     <View style={styles.noFriendSection}>
       <Text style={{ color: "#666", fontSize: 15 }}>You're the only one here!</Text>
       <TouchableOpacity
         style={styles.addMemberContainer}
-        onPress={() => navigation.navigate("AddMember")}
+        onPress={() => navigation.navigate("AddMember", { group })}
       >
         <View style={styles.addMemberIconContainer}>
           <Image

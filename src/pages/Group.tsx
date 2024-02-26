@@ -15,7 +15,7 @@ type propsType = {
 }
 
 export default function Group({ navigation, route }: propsType) {
-  const { group } = route.params
+  const { group } = route.params;
 
   return (
     <View style={styles.container}>
@@ -45,7 +45,10 @@ export default function Group({ navigation, route }: propsType) {
       {group.members.length > 0 ? (
         <></>
       ) : (
-        <NoFriendSection navigation={navigation} />
+        <NoFriendSection
+          navigation={navigation}
+          group={group}
+        />
       )}
 
     </View>

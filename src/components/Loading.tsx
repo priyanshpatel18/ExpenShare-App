@@ -23,7 +23,7 @@ export default function Loading() {
         transition={{
           type: "timing",
           duration: 1000,
-          // loop: true,
+          loop: true,
         }}
         style={{
           width: 100,

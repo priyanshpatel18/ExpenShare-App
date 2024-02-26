@@ -1,13 +1,21 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp } from '@react-navigation/native';
 import { ScrollView } from 'moti';
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import GradientText from '../components/GradientText';
 import SearchUser from '../components/SearchUser';
+import { Group as GroupDocument } from '../store/Store';
+import { Store } from '../store/store';
 import socket from '../utils/socket';
 
 type propsType = {
   navigation: NavigationProp<any>;
+  route: {
+    params: {
+      group: GroupDocument;
+    }
+  }
 }
 
 interface UserObject {
@@ -15,22 +23,38 @@ interface UserObject {
   profilePicture: string | undefined | null;
 }
 
-export default function AddMemberPage({ navigation, }: propsType) {
+export default function AddMemberPage({ navigation, route }: propsType) {
+  const store = Store()
+
   const [textInput, setTextInput] = useState<string>("")
   const [selectedUsers, setSelectedUsers] = useState<UserObject[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserObject[]>([]);
 
+  const groupId = route.params.group._id
+  const groupName = route.params.group.groupName
+  const currentUserName = store.userObject?.userName;
+
+
   useEffect(() => {
     socket.on("filteredUsers", (users: UserObject[]) => {
-      const filtered = users.filter(user => !selectedUsers.find(selectedUser => selectedUser.userName === user.userName));
+
+      const filtered = users.filter(user =>
+        !selectedUsers.find(selectedUser => selectedUser.userName === user.userName) &&
+        user.userName !== currentUserName
+      );
 
       const merged = [...selectedUsers, ...filtered];
 
       setFilteredUsers(merged);
     });
 
+    socket.on("requestReceived", (message: string) => {
+      store.showToastWithGravityAndOffset(message);
+    })
+
     return () => {
       socket.off("filteredUsers");
+      socket.off("requestReceived");
     };
   }, [selectedUsers]);
 
@@ -43,8 +67,17 @@ export default function AddMemberPage({ navigation, }: propsType) {
     }
   }
 
-  function handleSendRequest() {
-    socket.emit("sendRequest", selectedUsers);
+  async function handleSendRequest() {
+    const data = {
+      token: await AsyncStorage.getItem("token"),
+      selectedUsers: selectedUsers.map(user => user.userName),
+      groupId: groupId,
+      groupName: groupName
+    }
+
+    store.showToastWithGravityAndOffset("Sending...");
+    socket.emit("sendRequest", data);
+    navigation.goBack();
   }
 
   function handleSelectUser(user: UserObject) {
@@ -108,7 +141,7 @@ const styles = StyleSheet.create({
   input: {
     color: "#333",
     fontSize: 20,
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     borderColor: "#aaa",
     marginBottom: 20
   },

@@ -24,26 +24,24 @@ export default function GroupPage({ navigation }: propsType): React.JSX.Element 
           style={styles.buttonText}
         />
       </TouchableOpacity>
-      {store.groups.length > 0 &&
-        <ScrollView style={styles.groupList}>
-          {store.groups.map((group, index) => (
-            <TouchableOpacity key={index} onPress={() => navigation.navigate("Group", { group })}>
-              {group.groupProfile ? (
-                <GroupComponent
-                  groupPhoto={group.groupProfile}
-                  groupName={group.groupName}
-                  totalMembers={group.members.length}
-                />
-              ) : (
-                <GroupComponent
-                  groupName={group.groupName}
-                  totalMembers={group.members.length}
-                />
-              )}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      }
+      <ScrollView style={styles.groupList}>
+        {store.groups.map((group, index) => (
+          <TouchableOpacity key={index} onPress={() => navigation.navigate("Group", { group })}>
+            {group.groupProfile ? (
+              <GroupComponent
+                groupPhoto={group.groupProfile}
+                groupName={group.groupName}
+                totalMembers={group.members.length}
+              />
+            ) : (
+              <GroupComponent
+                groupName={group.groupName}
+                totalMembers={group.members.length}
+              />
+            )}
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
       <MenuBar navigation={navigation} />
     </View>
   )

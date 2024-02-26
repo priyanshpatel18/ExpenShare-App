@@ -9,6 +9,7 @@ import {
 } from "react-native-image-picker";
 import { create } from "zustand";
 import Group from "../pages/Group";
+import socket from "../utils/socket";
 
 export interface TransactionType {
   _id: string;
@@ -31,6 +32,7 @@ export interface UserObject {
 }
 
 export interface Group {
+  _id: string;
   groupName: string;
   groupProfile?: string | undefined;
   createdBy: UserObject | undefined;
@@ -38,6 +40,11 @@ export interface Group {
   groupExpenses: TransactionType[];
   totalExpense: number;
   category: string;
+}
+
+export interface Notification {
+  requestId: string;
+  groupName: string;
 }
 
 interface StoreState {
@@ -109,7 +116,7 @@ interface StoreState {
   // Register
   handleRegister: (navigation: NavigationProp<any>) => void;
   // Get User
-  handleGetUser: (navigation: NavigationProp<any>) => void;
+  fetchData: (navigation: NavigationProp<any>) => void;
   // Group State
   groups: Group[] | [];
   setGroups: (groups: Group[]) => void;
@@ -128,6 +135,9 @@ interface StoreState {
   ) => void;
   // FetchGroups
   handleFetchGroups: () => void;
+  // Notifications
+  notifications: Notification[];
+  setNotifications: (notification: Notification[]) => void;
 }
 
 export const Store = create<StoreState>(set => ({
@@ -233,7 +243,7 @@ export const Store = create<StoreState>(set => ({
       .then(async res => {
         await AsyncStorage.setItem("token", res.data.token);
         const token = res.data.token;
-        Store.getState().handleGetUser(token);
+        Store.getState().fetchData(token);
         navigation.reset({
           index: 0,
           routes: [{ name: "Home" }],
@@ -333,7 +343,7 @@ export const Store = create<StoreState>(set => ({
         });
         await AsyncStorage.setItem("token", res.data.token);
 
-        Store.getState().handleGetUser(navigation);
+        Store.getState().fetchData(navigation);
         Store.getState().showToastWithGravityAndOffset(res.data.message);
       })
       .catch(err => {
@@ -351,17 +361,24 @@ export const Store = create<StoreState>(set => ({
       });
   },
 
-  handleGetUser: async navigation => {
+  fetchData: async navigation => {
     set({ loading: true });
 
     try {
-      const [userDataResponse, _] = await Promise.all([
+      const [userDataResponse, _, __, requestResponse] = await Promise.all([
         axios.post("/user/getUser", {
           token: await AsyncStorage.getItem("token"),
         }),
         Store.getState().fetchTransactions(),
+        Store.getState().handleFetchGroups(),
+        axios.post("/user/getRequests", {
+          token: await AsyncStorage.getItem("token"),
+        }),
       ]);
       const userData = userDataResponse.data.userObject;
+      const requestData = requestResponse.data.notifications;
+
+      set({ notifications: requestData });
 
       set({ userObject: userData });
       set({ totalBalance: Number(userData.totalBalance) });
@@ -466,6 +483,7 @@ export const Store = create<StoreState>(set => ({
         Store.getState().showToastWithGravityAndOffset(res.data.message);
         // Add Group to store
         const newGroup: Group = {
+          _id: res.data.group._id,
           groupName: title,
           groupProfile: selectedImage ? selectedImage : undefined,
           createdBy: Store.getState().userObject,
@@ -540,10 +558,17 @@ export const Store = create<StoreState>(set => ({
   },
 
   handleFetchGroups: async () => {
-    await AsyncStorage.getItem("token");
+    const token = await AsyncStorage.getItem("token");
 
-    axios.post("/group/getAll").then(res => {
+    axios.post("/group/getAll", { token }).then(res => {
       set({ groups: res.data.groups });
+    });
+  },
+
+  notifications: [],
+  setNotifications: (newNotification: Notification[]) => {
+    set({
+      notifications: [...Store.getState().notifications, ...newNotification],
     });
   },
 }));
