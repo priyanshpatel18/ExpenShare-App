@@ -34,7 +34,7 @@ export default function VerifyEmailPage({ navigation }: propsType): React.JSX.El
       {store.loading ? (
         <TouchableOpacity
           style={styles.button}
-          onPress={() => store.showToastWithGravityAndOffset("Creating Account...")}
+          onPress={() => store.showSnackbar("Creating Account...")}
         >
           <GradientButton text='verify' />
         </TouchableOpacity>

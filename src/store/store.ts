@@ -8,7 +8,6 @@ import {
   launchImageLibrary,
 } from "react-native-image-picker";
 import { create } from "zustand";
-import Group from "../pages/Group";
 import socket from "../utils/socket";
 
 export interface TransactionType {
@@ -23,6 +22,7 @@ export interface TransactionType {
 }
 
 export interface UserObject {
+  _id: string;
   email: string;
   userName: string;
   profilePicture: string | undefined | null;
@@ -31,12 +31,18 @@ export interface UserObject {
   totalExpense: number | undefined;
 }
 
-export interface Group {
+export interface GroupUser {
+  email: string;
+  userName: string;
+  profilePicture: string | undefined | null;
+}
+
+export interface GroupDocument {
   _id: string;
   groupName: string;
   groupProfile?: string | undefined;
-  createdBy: UserObject | undefined;
-  members: UserObject[];
+  createdBy: GroupUser | undefined;
+  members: GroupUser[];
   groupExpenses: TransactionType[];
   totalExpense: number;
   category: string;
@@ -44,6 +50,7 @@ export interface Group {
 
 export interface Notification {
   requestId: string;
+  groupId: string;
   groupName: string;
 }
 
@@ -90,7 +97,7 @@ interface StoreState {
   transactions: TransactionType[] | undefined;
   setTransactions: (transactions: TransactionType[] | undefined) => void;
   // Snackbar
-  showToastWithGravityAndOffset: (message: string) => void;
+  showSnackbar: (message: string) => void;
   // Pick Image
   pickImage: (
     setImage: React.Dispatch<React.SetStateAction<string | undefined | null>>,
@@ -118,8 +125,8 @@ interface StoreState {
   // Get User
   fetchData: (navigation: NavigationProp<any>) => void;
   // Group State
-  groups: Group[] | [];
-  setGroups: (groups: Group[]) => void;
+  groups: GroupDocument[] | [];
+  setGroups: (groups: GroupDocument[]) => void;
   // Create Group
   handleCreateGroup: (
     title: string,
@@ -138,6 +145,13 @@ interface StoreState {
   // Notifications
   notifications: Notification[];
   setNotifications: (notification: Notification[]) => void;
+  // Handle Request
+  handleRequest: (
+    type: string,
+    requestId: string,
+    groupId: string,
+    navigation: NavigationProp<any>,
+  ) => void;
 }
 
 export const Store = create<StoreState>(set => ({
@@ -195,7 +209,7 @@ export const Store = create<StoreState>(set => ({
       });
   },
 
-  showToastWithGravityAndOffset: (message: string) => {
+  showSnackbar: (message: string) => {
     ToastAndroid.showWithGravityAndOffset(
       message,
       ToastAndroid.SHORT,
@@ -226,12 +240,12 @@ export const Store = create<StoreState>(set => ({
 
   handleLogin: (userNameOrEmail, password, navigation) => {
     if (!userNameOrEmail.trim() || !password.trim()) {
-      Store.getState().showToastWithGravityAndOffset("Enter All Credentials");
+      Store.getState().showSnackbar("Enter All Credentials");
       return;
     }
 
     set({ loading: true });
-    Store.getState().showToastWithGravityAndOffset("Logging in...");
+    Store.getState().showSnackbar("Logging in...");
 
     const formData = {
       userNameOrEmail: String(userNameOrEmail.toLowerCase()),
@@ -248,12 +262,10 @@ export const Store = create<StoreState>(set => ({
           index: 0,
           routes: [{ name: "Home" }],
         });
-        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        Store.getState().showSnackbar(res.data.message);
       })
       .catch(err => {
-        Store.getState().showToastWithGravityAndOffset(
-          err.response.data.message,
-        );
+        Store.getState().showSnackbar(err.response.data.message);
       })
       .finally(() => {
         set({ loading: false });
@@ -262,24 +274,22 @@ export const Store = create<StoreState>(set => ({
 
   handleSendMail: (email, navigation) => {
     if (!email.trim()) {
-      Store.getState().showToastWithGravityAndOffset("Enter the Email");
+      Store.getState().showSnackbar("Enter the Email");
     }
 
     set({ loading: true });
-    Store.getState().showToastWithGravityAndOffset("Sending Mail...");
+    Store.getState().showSnackbar("Sending Mail...");
 
     axios
       .post(`/user/sendMail`, { email })
       .then(async res => {
-        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        Store.getState().showSnackbar(res.data.message);
         await AsyncStorage.setItem("otpId", res.data.otpId);
         navigation.navigate("VerifyOtp");
       })
       .catch(err => {
         console.log(err);
-        Store.getState().showToastWithGravityAndOffset(
-          err.response.data.message,
-        );
+        Store.getState().showSnackbar(err.response.data.message);
       })
       .finally(() => {
         set({ loading: false });
@@ -301,9 +311,7 @@ export const Store = create<StoreState>(set => ({
       })
       .catch(err => {
         if (err.response && err.response.data && err.response.data.message) {
-          Store.getState().showToastWithGravityAndOffset(
-            err.response.data.message,
-          );
+          Store.getState().showSnackbar(err.response.data.message);
         } else {
           console.error("Error:", err);
         }
@@ -328,7 +336,7 @@ export const Store = create<StoreState>(set => ({
       });
     }
 
-    Store.getState().showToastWithGravityAndOffset("Creating your account");
+    Store.getState().showSnackbar("Creating your account");
 
     axios
       .post(`/user/register`, formData, {
@@ -344,13 +352,11 @@ export const Store = create<StoreState>(set => ({
         await AsyncStorage.setItem("token", res.data.token);
 
         Store.getState().fetchData(navigation);
-        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        Store.getState().showSnackbar(res.data.message);
       })
       .catch(err => {
         if (axios.isAxiosError(err)) {
-          Store.getState().showToastWithGravityAndOffset(
-            err.response?.data.message,
-          );
+          Store.getState().showSnackbar(err.response?.data.message);
         } else {
           console.error("Error:", err);
         }
@@ -375,7 +381,7 @@ export const Store = create<StoreState>(set => ({
           token: await AsyncStorage.getItem("token"),
         }),
       ]);
-      const userData = userDataResponse.data.userObject;
+      const userData = userDataResponse.data.user;
       const requestData = requestResponse.data.notifications;
 
       set({ notifications: requestData });
@@ -387,9 +393,7 @@ export const Store = create<StoreState>(set => ({
     } catch (error) {
       if (axios.isAxiosError(error)) {
         navigation.navigate("Welcome");
-        Store.getState().showToastWithGravityAndOffset(
-          error.response?.data.message,
-        );
+        Store.getState().showSnackbar(error.response?.data.message);
       } else {
         console.error("Error fetching data:", error);
       }
@@ -406,18 +410,18 @@ export const Store = create<StoreState>(set => ({
         !confirmPassword ||
         !confirmPassword.trim()
       ) {
-        Store.getState().showToastWithGravityAndOffset("Enter All Credentials");
+        Store.getState().showSnackbar("Enter All Credentials");
         return;
       }
 
       if (password !== confirmPassword) {
-        Store.getState().showToastWithGravityAndOffset("Passwords must match");
+        Store.getState().showSnackbar("Passwords must match");
         return;
       }
     }
 
     set({ loading: true });
-    Store.getState().showToastWithGravityAndOffset("Resetting");
+    Store.getState().showSnackbar("Resetting");
 
     const formData = {
       password: password,
@@ -427,7 +431,7 @@ export const Store = create<StoreState>(set => ({
     axios
       .post(`/user/resetPassword`, formData)
       .then(async res => {
-        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        Store.getState().showSnackbar(res.data.message);
         if (!Store.getState().isAuthenticatedChange) {
           navigation.navigate("Login");
           return;
@@ -436,9 +440,7 @@ export const Store = create<StoreState>(set => ({
       })
       .catch(err => {
         console.log(err);
-        Store.getState().showToastWithGravityAndOffset(
-          err.response?.data.message,
-        );
+        Store.getState().showSnackbar(err.response?.data.message);
       })
       .finally(async () => {
         set({ loading: false });
@@ -446,16 +448,16 @@ export const Store = create<StoreState>(set => ({
   },
 
   groups: [],
-  setGroups: (groups: Group[]) => set({ groups }),
+  setGroups: (groups: GroupDocument[]) => set({ groups }),
 
   handleCreateGroup: async (title, selectedImage, navigation) => {
     if (!title.trim()) {
-      Store.getState().showToastWithGravityAndOffset("Title is required");
+      Store.getState().showSnackbar("Title is required");
       return;
     }
 
     set({ loading: true });
-    Store.getState().showToastWithGravityAndOffset("Creating...");
+    Store.getState().showSnackbar("Creating...");
 
     const formData = new FormData();
 
@@ -480,26 +482,28 @@ export const Store = create<StoreState>(set => ({
         },
       })
       .then(res => {
-        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        Store.getState().showSnackbar(res.data.message);
+
+        console.log(res.data.group.members.length);
+
         // Add Group to store
-        const newGroup: Group = {
+        const newGroup: GroupDocument = {
           _id: res.data.group._id,
           groupName: title,
           groupProfile: selectedImage ? selectedImage : undefined,
-          createdBy: Store.getState().userObject,
-          members: [],
+          createdBy: res.data.group.createdBy,
+          members: res.data.group.members,
           groupExpenses: [],
           totalExpense: 0,
           category: "NONE",
         };
-        Store.getState().setGroups([...Store.getState().groups, newGroup]);
+
+        set({ groups: [...Store.getState().groups, newGroup] });
         navigation.goBack();
       })
       .catch(err => {
         if (axios.isAxiosError(err)) {
-          Store.getState().showToastWithGravityAndOffset(
-            err.response?.data.message,
-          );
+          Store.getState().showSnackbar(err.response?.data.message);
         } else {
           console.error(err);
         }
@@ -540,14 +544,12 @@ export const Store = create<StoreState>(set => ({
           set({ totalBalance: (totalBalance += amount) });
           set({ totalExpense: (totalExpense -= amount) });
         }
-        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        Store.getState().showSnackbar(res.data.message);
         navigation.goBack();
       })
       .catch(err => {
         if (axios.isAxiosError(err)) {
-          Store.getState().showToastWithGravityAndOffset(
-            err.response?.data.message,
-          );
+          Store.getState().showSnackbar(err.response?.data.message);
         } else {
           console.error(err);
         }
@@ -570,5 +572,33 @@ export const Store = create<StoreState>(set => ({
     set({
       notifications: [...Store.getState().notifications, ...newNotification],
     });
+  },
+
+  handleRequest: async (type, requestId, groupId, navigation) => {
+    const token = await AsyncStorage.getItem("token");
+
+    axios
+      .post("/user/handleRequest", { token, requestId, type })
+      .then(() => {
+        if (type === "accept") {
+          socket.emit("acceptRequest", { groupId: groupId });
+          navigation.navigate("GroupPage");
+        }
+        set(prevState => ({
+          notifications: prevState.notifications.filter(
+            notification => notification.requestId !== requestId,
+          ),
+        }));
+        Store.getState().showSnackbar(
+          type === "accept" ? "Request Accepted" : "Request Rejected",
+        );
+      })
+      .catch(err => {
+        if (axios.isAxiosError(err)) {
+          Store.getState().showSnackbar(err.response?.data.message);
+        } else {
+          console.error(err);
+        }
+      });
   },
 }));

@@ -1,7 +1,8 @@
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { NavigationProp } from '@react-navigation/native';
 import { Image, MotiView } from 'moti';
 import React, { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Store, TransactionType } from '../store/store';
 
 type propsType = {
@@ -16,42 +17,101 @@ type propsType = {
 
 const TransactionDetailsPage = ({ route, navigation }: propsType) => {
   const { transaction } = route.params;
-
   const store = Store();
+  const [editMode, setEditMode] = useState(false);
 
-  const date = new Date(transaction.transactionDate);
+  const transactionDate = new Date(transaction.transactionDate);
 
-  // Format the date
-  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
-  const formattedDate = date.toLocaleDateString('en-US', options);
-
-  // Format the time
+  const dateOptions: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
   const timeOptions: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
-  const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
+  const [formattedDate, setFormattedDate] = useState(transactionDate.toLocaleDateString('en-US', dateOptions));
+  const [formattedTime, setFormattedTime] = useState(transactionDate.toLocaleTimeString('en-US', timeOptions));
 
-  const [isInvoiceVisible, setIsInvoiceVisible] = useState(false);
+  function handleDateSelect(event: DateTimePickerEvent, selectedDate: Date | undefined) {
+    const currentDate = selectedDate || time;
+
+    const dateFormatted = currentDate.toLocaleDateString('en-US', dateOptions); // Update dateFormatted here
+
+    setFormattedDate(dateFormatted);
+    setModalVisible(false);
+    setDate(currentDate);
+    setMode(null);
+  }
+
+  const handleTimeSelect = (event: DateTimePickerEvent, selectedDate: Date | undefined) => {
+    const currentTime = selectedDate || time;
+
+    const timeFormatted = currentTime.toLocaleTimeString('en-US', timeOptions);
+
+    setFormattedTime(timeFormatted);
+    setModalVisible(false);
+    setTime(currentTime);
+    setMode(null);
+  };
 
   function handleDelete() {
     if (transaction.type === "income" && store.totalBalance - Number(transaction.transactionAmount) < 0) {
-      store.showToastWithGravityAndOffset("Removing will cause a Negative Balance")
+      store.showSnackbar("Removing will cause a Negative Balance")
       return;
     }
 
-    store.showToastWithGravityAndOffset("Deleting Transaction")
+    store.showSnackbar("Deleting Transaction")
     store.handleDeleteTransaction(transaction._id, transaction.transactionAmount, navigation, transaction.type);
+  }
+
+  // Edit States
+  const [title, setTitle] = useState<string>(transaction.transactionTitle);
+  const [amount, setAmount] = useState<string>(transaction.transactionAmount);
+  const [notes, setNotes] = useState<string>(transaction.notes);
+  const [invoiceImage, setInvoiceImage] = useState<string | undefined | null>(transaction.invoiceUrl);
+  const [isInvoiceVisible, setIsInvoiceVisible] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [mode, setMode] = useState<'date' | 'time' | null>(null);
+  const [time, setTime] = useState(new Date(transaction.transactionDate));
+  const [date, setDate] = useState(new Date(transaction.transactionDate));
+
+  const maxDate = new Date();
+  maxDate.setHours(0, 0, 0, 0);
+
+  function handleEdit() {
+    setEditMode(!editMode);
   }
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Image
-          source={require("../assets/backButton.png")}
-          style={styles.backButtonIcon}
-        />
-      </TouchableOpacity>
+      <View style={styles.headingContainer}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Image
+            source={require("../assets/backButton.png")}
+            style={styles.backButtonIcon}
+          />
+        </TouchableOpacity>
+        {editMode ?
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={handleEdit}
+          >
+            <Image
+              source={require("../assets/doneButton.png")}
+              style={styles.backButtonIcon}
+            />
+          </TouchableOpacity>
+          :
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => setEditMode(!editMode)}
+          >
+            <Image
+              source={require("../assets/editIcon.png")}
+              style={styles.backButtonIcon}
+            />
+          </TouchableOpacity>
+        }
+      </View>
       <View style={styles.detailContainer}>
         <Text style={styles.label}>
           Transaction Id
@@ -71,29 +131,68 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
           <Text style={styles.label}>
             Title
           </Text>
-          <Text style={styles.text}>
-            {transaction.transactionTitle}
-          </Text>
+          <TextInput
+            value={title}
+            style={styles.text}
+            editable={editMode}
+            onChangeText={setTitle}
+          />
         </View>
       </View>
       <View style={styles.detailContainer}>
         <Text style={styles.label}>
           Amount
         </Text>
-        <Text style={[styles.text, { fontSize: 30 }, transaction.type === "expense" ? { color: "#f00" } : { color: "#00a200" }]}>
-          ₹ {transaction.transactionAmount}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={[styles.text, { fontSize: 30 }, transaction.type === "expense" ? { color: "#f00" } : { color: "#00a200" }]}>₹</Text>
+          <TextInput
+            value={amount}
+            style={[styles.text, { fontSize: 30 }, transaction.type === "expense" ? { color: "#f00" } : { color: "#00a200" }]}
+            editable={editMode}
+            onChangeText={setAmount}
+          />
+        </View>
       </View>
       <View style={styles.detailContainer}>
         <Text style={styles.label}>
           Notes
         </Text>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <Text style={[styles.text, transaction.invoiceUrl ? { maxWidth: "80%" } : { maxWidth: "100%" }]} numberOfLines={5} ellipsizeMode="tail">
-            {transaction.notes ? transaction.notes : `    -`}
-          </Text>
-          {transaction.invoiceUrl &&
-            <Pressable onPress={() => setIsInvoiceVisible(true)}>
+          {editMode ? (
+            <TextInput
+              value={notes}
+              style={[styles.text, { maxWidth: "70%" }]}
+              editable={editMode}
+              onChangeText={setNotes}
+              numberOfLines={1}
+            />
+          ) : (
+            <Text
+              style={[styles.text, transaction.invoiceUrl ? { maxWidth: "80%" } : { maxWidth: "100%" }]}
+              numberOfLines={5}
+              ellipsizeMode="tail"
+            >
+              {notes ? notes : "     -"}
+            </Text>
+          )}
+
+          {editMode &&
+            <View>
+              <TouchableOpacity onPress={() => store.pickImage(setInvoiceImage)}>
+                <Image
+                  source={require("../assets/addImageIcon.png")}
+                  style={styles.invoiceIcon}
+                />
+              </TouchableOpacity>
+              <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
+                <Text style={styles.viewImage}>
+                  View Image
+                </Text>
+              </Pressable>
+            </View>
+          }
+          {transaction.invoiceUrl && !editMode &&
+            <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
               <Image
                 source={require("../assets/invoice.png")}
                 style={styles.invoiceIcon}
@@ -110,38 +209,65 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
           <Text style={styles.text}>
             {formattedDate}
           </Text>
+          {editMode &&
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(!modalVisible)
+                setMode("date")
+              }}
+            >
+              <Image
+                style={styles.iconsStyle}
+                source={require("../assets/calendar.png")}
+              />
+            </TouchableOpacity>
+          }
           <Text style={styles.text}>
             {formattedTime}
           </Text>
+          {editMode &&
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(!modalVisible)
+                setMode('time');
+              }}
+            >
+              <Image
+                style={styles.iconsStyle}
+                source={require("../assets/clock.png")}
+              />
+            </TouchableOpacity>
+          }
         </View>
       </View>
-      {store.loading ? (
-        <TouchableOpacity
-          style={[styles.deleteButton, { backgroundColor: "#ff4545" }]}
-          onPress={() => store.showToastWithGravityAndOffset("Deleting Transaction")}
-        >
-          <Image
-            source={require("../assets/dustbin.png")}
-            style={styles.deleteIcon}
-          />
-          <Text style={styles.deleteText}>Delete Transaction</Text>
-        </TouchableOpacity>)
-        : (
+      {
+        store.loading ? (
           <TouchableOpacity
             style={[styles.deleteButton, { backgroundColor: "#ff4545" }]}
-            onPress={handleDelete}
+            onPress={() => store.showSnackbar("Deleting Transaction")}
           >
             <Image
               source={require("../assets/dustbin.png")}
               style={styles.deleteIcon}
             />
             <Text style={styles.deleteText}>Delete Transaction</Text>
-          </TouchableOpacity>
-
-        )}
+          </TouchableOpacity>)
+          : (
+            <TouchableOpacity
+              style={[styles.deleteButton, { backgroundColor: "#ff4545" }]}
+              onPress={handleDelete}
+            >
+              <Image
+                source={require("../assets/dustbin.png")}
+                style={styles.deleteIcon}
+              />
+              <Text style={styles.deleteText}>Delete Transaction</Text>
+            </TouchableOpacity>
+          )
+      }
 
       <Modal visible={isInvoiceVisible} transparent={true}>
-        {isInvoiceVisible &&
+        {invoiceImage &&
           <Pressable onPress={() => setIsInvoiceVisible(false)} style={styles.modalContainer}>
             <MotiView
               from={{
@@ -157,12 +283,30 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
               }}
               style={styles.shape}
             >
-              <Image source={{ uri: transaction.invoiceUrl }} style={styles.modalImage} />
+              <Image source={{ uri: invoiceImage }} style={styles.modalImage} />
             </MotiView>
           </Pressable>
         }
       </Modal>
-    </View>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+      >
+        <TouchableOpacity>
+          {mode && (
+            <DateTimePicker
+              testID='dateAndTimePicker'
+              value={mode === "time" ? time : date}
+              mode={mode}
+              display="default"
+              onChange={mode === "time" ? handleTimeSelect : handleDateSelect}
+              maximumDate={maxDate}
+            />
+          )}
+        </TouchableOpacity>
+      </Modal>
+    </View >
   );
 };
 
@@ -172,6 +316,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  headingContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between"
   },
   backButton: {
     marginBottom: 20
@@ -187,12 +335,25 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
   },
+  iconsStyle: {
+    height: 30,
+    width: 30,
+  },
   label: {
     color: "#888"
   },
   text: {
     color: "#222",
     fontSize: 20
+  },
+  addImageIcon: {
+    height: 40,
+    width: 40
+  },
+  viewImage: {
+    marginTop: 5,
+    alignSelf: "flex-end",
+    color: "#539AEA"
   },
   invoiceIcon: {
     width: 40,

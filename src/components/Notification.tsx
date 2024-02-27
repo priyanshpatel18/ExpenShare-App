@@ -1,18 +1,17 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Store } from '../store/store'
+import { NavigationProp } from '@react-navigation/native'
 
 type propsType = {
   requestId: string,
   groupName: string,
+  groupId: string,
+  navigation: NavigationProp<any>;
 }
 
-export default function Notification({ requestId, groupName }: propsType) {
-  function handleAccept() {
-
-  }
-  function handleReject() {
-
-  }
+export default function Notification({ requestId, groupName, groupId, navigation }: propsType) {
+  const store = Store();
 
   return (
     <View style={styles.notification}>
@@ -25,7 +24,7 @@ export default function Notification({ requestId, groupName }: propsType) {
       </Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={handleReject}
+          onPress={() => store.handleRequest("accept", requestId, groupId, navigation)}
         >
           <Image
             style={styles.button}
@@ -33,7 +32,7 @@ export default function Notification({ requestId, groupName }: propsType) {
           />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={handleReject}
+          onPress={() => store.handleRequest("reject", requestId, groupId, navigation)}
         >
           <Image
             style={styles.button}
@@ -50,6 +49,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: "#666",
+    paddingBottom: 20,
+    marginBottom: 20
   },
   groupPhoto: {
     width: 60,

@@ -21,7 +21,7 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
   async function handleLogout() {
     await AsyncStorage.removeItem("token");
     navigation.navigate("Welcome")
-    store.showToastWithGravityAndOffset("Logged out Successfully")
+    store.showSnackbar("Logged out Successfully")
   }
 
   async function createPDF() {
@@ -65,7 +65,7 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
           createPDF()
         }
         else {
-          store.showToastWithGravityAndOffset("Insufficient Data");
+          store.showSnackbar("Insufficient Data");
         }
       }}>
         <View style={styles.button}>
@@ -83,7 +83,7 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
           navigation.navigate("Report");
         }
         else {
-          store.showToastWithGravityAndOffset("Insufficient Data");
+          store.showSnackbar("Insufficient Data");
         }
       }}>
         <View style={styles.button}>

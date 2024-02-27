@@ -20,18 +20,18 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
 
   async function handleSave() {
     if (textInput.trim() === store.userObject?.userName && profilePicture === store.userObject.profilePicture) {
-      store.showToastWithGravityAndOffset("No Changes");
+      store.showSnackbar("No Changes");
       navigation.goBack();
       return;
     }
 
     if (textInput !== store.userObject?.userName && /\s/.test(textInput)) {
-      store.showToastWithGravityAndOffset("Username cannot contain spaces");
+      store.showSnackbar("Username cannot contain spaces");
       return;
     }
 
     if (textInput !== store.userObject?.userName && textInput.length > 15) {
-      store.showToastWithGravityAndOffset("Username must be 15 characters long");
+      store.showSnackbar("Username must be 15 characters long");
       return;
     }
 
@@ -40,7 +40,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
       const fileSizeInBytes = fileInfo.size;
       const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
       if (fileSizeInMegabytes > 3) {
-        store.showToastWithGravityAndOffset("File Size must be less than 3MB")
+        store.showSnackbar("File Size must be less than 3MB")
         return;
       }
     }
@@ -60,7 +60,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
       })
     }
 
-    Store.getState().showToastWithGravityAndOffset("Updating...")
+    Store.getState().showSnackbar("Updating...")
 
     store.setLoading(true)
     axios.post("/user/update", formData, {
@@ -77,10 +77,10 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
           totalIncome: store.userObject?.totalIncome,
           totalExpense: store.userObject?.totalExpense
         });
-        Store.getState().showToastWithGravityAndOffset(res.data.message);
+        Store.getState().showSnackbar(res.data.message);
       })
       .catch((err) => {
-        Store.getState().showToastWithGravityAndOffset(err.response.data.message)
+        Store.getState().showSnackbar(err.response.data.message)
       })
       .finally(() => {
         store.setLoading(false);
@@ -90,7 +90,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
 
   async function handleChange() {
     if (!newPassword.trim() || !confirmPassword.trim()) {
-      store.showToastWithGravityAndOffset("Enter Both Passwords");
+      store.showSnackbar("Enter Both Passwords");
       return;
     }
 
@@ -113,7 +113,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
         message = "Passwords don't match";
       }
 
-      store.showToastWithGravityAndOffset(message);
+      store.showSnackbar(message);
       return;
     }
 
@@ -141,7 +141,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
                 <Text style={styles.headingText}>Account</Text>
               </View>
               {store.loading ?
-                <TouchableOpacity onPress={() => Store.getState().showToastWithGravityAndOffset("Updating...")}>
+                <TouchableOpacity onPress={() => Store.getState().showSnackbar("Updating...")}>
                   <Image
                     style={styles.headingButton}
                     source={require("../assets/doneButton.png")}
@@ -212,7 +212,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
                 secureTextEntry={true}
               />
               {store.loading ?
-                <TouchableOpacity style={styles.changeButton} onPress={() => store.showToastWithGravityAndOffset("Sending Mail...")}>
+                <TouchableOpacity style={styles.changeButton} onPress={() => store.showSnackbar("Sending Mail...")}>
                   <Text style={styles.changeText}>Change Password</Text>
                 </TouchableOpacity> :
                 <TouchableOpacity style={styles.changeButton} onPress={handleChange}>

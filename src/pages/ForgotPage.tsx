@@ -32,7 +32,7 @@ export default function ForgotPage({ navigation }: propsType): React.JSX.Element
         {store.loading ? (
           <TouchableOpacity
             style={styles.sendMailButton}
-            onPress={() => store.showToastWithGravityAndOffset("Sending Mail..")}
+            onPress={() => store.showSnackbar("Sending Mail..")}
           >
             <GradientButton text='send mail' />
           </TouchableOpacity>

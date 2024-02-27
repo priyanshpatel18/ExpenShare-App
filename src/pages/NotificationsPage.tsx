@@ -23,12 +23,22 @@ export default function NotificationsPage({ navigation }: propsType) {
       <Text style={styles.headingText}>Notifications</Text>
       {store.notifications ? (
         <ScrollView style={styles.notificationContainer}>
-          {store.notifications.map((notification, index) => (
-            <Notification key={index} requestId={notification.requestId} groupName={notification.groupName} />
-          ))}
+          {store.notifications.map((notification, index) => {
+            return (
+              <Notification
+                key={index}
+                requestId={notification.requestId}
+                groupName={notification.groupName}
+                groupId={notification.groupId}
+                navigation={navigation}
+              />
+            )
+          })}
         </ScrollView>
       ) :
-        <></>
+        <>
+
+        </>
       }
     </View>
   )

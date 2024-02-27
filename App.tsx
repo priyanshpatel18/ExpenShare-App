@@ -15,6 +15,7 @@ import Group from './src/pages/Group';
 import GroupPage from './src/pages/GroupPage';
 import HomePage from './src/pages/HomePage';
 import LoginPage from './src/pages/LoginPage';
+import NotificationsPage from './src/pages/NotificationsPage';
 import UserPage from './src/pages/ProfilePage';
 import RegisterPage from './src/pages/RegisterPage';
 import ReportScreen from './src/pages/ReportPage';
@@ -25,18 +26,20 @@ import TransactionPage from './src/pages/TransactionPage';
 import VerifyEmailPage from './src/pages/VerifyEmailPage';
 import VerifyOtpPage from './src/pages/VerifyOtpPage';
 import WelcomePage from "./src/pages/WelcomePage";
-import { Notification, Store } from './src/store/store';
+// File imports
+import { GroupDocument, Store } from './src/store/store';
 import socket from './src/utils/socket';
-import NotificationsPage from './src/pages/NotificationsPage';
 
 axios.defaults.baseURL = "http://192.168.100.27:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
+
 axios.defaults.withCredentials = true;
 
 interface SocketResponse {
   message: string
   requestId: string
   groupName: string
+  groupId: string
 }
 
 export default function App(): React.JSX.Element {
@@ -45,19 +48,44 @@ export default function App(): React.JSX.Element {
   const email = store.userObject?.email || undefined;
 
   useEffect(() => {
-    socket.emit("login", email);
+    if (email) {
+      socket.emit("login", email);
+    }
 
     socket.on("requestReceived", (object: SocketResponse) => {
-      store.showToastWithGravityAndOffset(object.message)
+      store.showSnackbar(object.message)
+
       const newNotification = {
+        requestId: object.requestId,
+        groupId: object.groupId,
         groupName: object.groupName,
-        requestId: object.requestId
       }
+
       store.setNotifications([...store.notifications, newNotification]);
     })
 
+    socket.on("updateGroup", (data: { group: GroupDocument }) => {
+      const { group } = data;
+
+      const oldGroups = Store.getState().groups;
+
+      const indexToUpdate = oldGroups.findIndex((oldGroup) => oldGroup._id === group._id);
+
+      if (indexToUpdate !== -1) {
+        // If the group exists in the store, update it
+        const updatedGroups = [...oldGroups];
+        updatedGroups[indexToUpdate] = group;
+        store.setGroups(updatedGroups);
+      } else {
+        const updatedGroups = [...oldGroups, group];
+        store.setGroups(updatedGroups);
+      }
+    });
+
+
     return () => {
       socket.off("requestReceived");
+      socket.off("updateGroup");
     };
   }, [socket, email])
 
@@ -98,7 +126,7 @@ export default function App(): React.JSX.Element {
 const styles = StyleSheet.create({
   main: {
     height: "100%",
-    backgroundColor: "#e6e6e6",
+    backgroundColor: "#fff",
     fontFamily: "Montserrat"
   }
 });

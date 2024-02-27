@@ -9,8 +9,6 @@ type propsType = {
 }
 
 export default function ReportPage({ navigation }: propsType) {
-  
-
   const percentages = [100, 80, 60, 40, 20, 10];
   const colors = ['#38D39F', '#FF4757', "#FFDD59", "#12CBC4", "#FA8231", "#1E90FF"];
 

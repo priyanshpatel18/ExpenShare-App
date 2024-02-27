@@ -36,17 +36,17 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
 
   async function handleCreateExpense() {
     if (!amount.trim() || !title.trim()) {
-      store.showToastWithGravityAndOffset("Enter All Details");
+      store.showSnackbar("Enter All Details");
       return;
     }
 
     if (store.transactionType === "expense" && store.totalBalance - Number(amount) < 0) {
-      store.showToastWithGravityAndOffset("Insufficient Balance");
+      store.showSnackbar("Insufficient Balance");
       return;
     }
 
     if (title.length > 15) {
-      store.showToastWithGravityAndOffset("Title must be short");
+      store.showSnackbar("Title must be short");
       return;
     }
 
@@ -94,24 +94,25 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
       .then(() => {
         store.setTransactionType("expense")
         if (showIncome) {
-          store.showToastWithGravityAndOffset("Income Added Successfully");
+          store.showSnackbar("Income Added Successfully");
           store.setTotalBalance(store.totalBalance + Number(amount));
           store.setTotalIncome(store.totalIncome + Number(amount));
         } else {
-          store.showToastWithGravityAndOffset("Expense Added Successfully");
+          store.showSnackbar("Expense Added Successfully");
           store.setTotalBalance(store.totalBalance - Number(amount));
           store.setTotalExpense(store.totalExpense + Number(amount));
         }
       })
       .catch((err) => {
         if (axios.isAxiosError(err)) {
-          store.showToastWithGravityAndOffset(err.response?.data.message)
+          store.showSnackbar(err.response?.data.message)
         } else {
           console.log(err);
         }
       })
       .finally(() => {
         store.fetchTransactions();
+        navigation.goBack();
         store.setLoading(false);
       })
   }
@@ -264,7 +265,7 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
       </ScrollView >
       {store.loading ?
         <TouchableOpacity style={styles.continueButton}
-          onPress={() => Store.getState().showToastWithGravityAndOffset("Adding...")}
+          onPress={() => Store.getState().showSnackbar("Adding...")}
         >
           <GradientButton text='continue' />
         </TouchableOpacity>

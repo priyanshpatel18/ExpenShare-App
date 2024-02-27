@@ -38,7 +38,7 @@ export default function ResetPasswordPage({ navigation }: propsType): React.JSX.
         {store.loading ? (
           <TouchableOpacity
             style={styles.resetButton}
-            onPress={() => store.showToastWithGravityAndOffset("Verifying Email...")}
+            onPress={() => store.showSnackbar("Verifying Email...")}
           >
             <GradientButton text='reset' />
           </TouchableOpacity>

@@ -1,5 +1,5 @@
 import { NavigationProp } from '@react-navigation/native'
-import React, { useState } from 'react'
+import React from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import GradientText from '../components/GradientText'
 import GroupComponent from '../components/GroupComponent'
@@ -26,7 +26,10 @@ export default function GroupPage({ navigation }: propsType): React.JSX.Element 
       </TouchableOpacity>
       <ScrollView style={styles.groupList}>
         {store.groups.map((group, index) => (
-          <TouchableOpacity key={index} onPress={() => navigation.navigate("Group", { group })}>
+          <TouchableOpacity
+            key={index}
+            onPress={() => navigation.navigate("Group", { group })}
+          >
             {group.groupProfile ? (
               <GroupComponent
                 groupPhoto={group.groupProfile}

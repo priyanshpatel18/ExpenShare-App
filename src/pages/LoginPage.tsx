@@ -46,7 +46,7 @@ export default function LoginPage({ navigation }: propsType): React.JSX.Element 
         {store.loading ? (
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => store.showToastWithGravityAndOffset("Logging In..")}
+            onPress={() => store.showSnackbar("Logging In..")}
           >
             <GradientButton text='login' />
           </TouchableOpacity>

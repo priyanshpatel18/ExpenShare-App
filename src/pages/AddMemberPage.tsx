@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import GradientText from '../components/GradientText';
 import SearchUser from '../components/SearchUser';
-import { Group as GroupDocument } from '../store/Store';
+import { GroupDocument } from '../store/Store';
 import { Store } from '../store/store';
 import socket from '../utils/socket';
 
@@ -36,25 +36,26 @@ export default function AddMemberPage({ navigation, route }: propsType) {
 
 
   useEffect(() => {
-    socket.on("filteredUsers", (users: UserObject[]) => {
+    socket.on("requestSent", (message: string) => {
+      console.log(message);
+      store.showSnackbar(message);
+    })
 
+    socket.on("filteredUsers", (users: UserObject[]) => {
       const filtered = users.filter(user =>
         !selectedUsers.find(selectedUser => selectedUser.userName === user.userName) &&
-        user.userName !== currentUserName
+        user.userName !== currentUserName &&
+        !route.params.group.members.some(member => member.userName === user.userName)
       );
 
       const merged = [...selectedUsers, ...filtered];
-
       setFilteredUsers(merged);
     });
 
-    socket.on("requestReceived", (message: string) => {
-      store.showToastWithGravityAndOffset(message);
-    })
 
     return () => {
       socket.off("filteredUsers");
-      socket.off("requestReceived");
+      socket.off("requestSent");
     };
   }, [selectedUsers]);
 
@@ -72,10 +73,10 @@ export default function AddMemberPage({ navigation, route }: propsType) {
       token: await AsyncStorage.getItem("token"),
       selectedUsers: selectedUsers.map(user => user.userName),
       groupId: groupId,
-      groupName: groupName
+      groupName: groupName,
     }
 
-    store.showToastWithGravityAndOffset("Sending...");
+    store.showSnackbar("Sending...");
     socket.emit("sendRequest", data);
     navigation.goBack();
   }

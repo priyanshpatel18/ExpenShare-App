@@ -28,7 +28,6 @@ export default function MainChart({ percentages, colors }: propsType): React.JSX
       animation.start();
     })
 
-
     return () => {
       animatedValues.forEach((value) => {
         value.removeAllListeners();

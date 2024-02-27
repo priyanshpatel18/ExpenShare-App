@@ -33,7 +33,6 @@ export default function Transaction({ title, type, amount, imageUrl }: propsType
           {title}
         </Text>
       </View>
-
       {
         type ? (
           <Text style={[styles.amount, type === "expense" ? styles.expenseAmount : styles.incomeAmount]}>

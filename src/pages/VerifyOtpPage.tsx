@@ -26,7 +26,7 @@ export default function VerifyOtpPage({ navigation }: propsType): React.JSX.Elem
       .then(async () => {
         if (store.isAuthenticatedChange === false) {
           navigation.navigate("ResetPassword")
-          store.showToastWithGravityAndOffset("Create a new Password")
+          store.showSnackbar("Create a new Password")
         } else {
           store.handleResetPassword(store.password, navigation);
           navigation.navigate("Account")
@@ -36,7 +36,7 @@ export default function VerifyOtpPage({ navigation }: propsType): React.JSX.Elem
       })
       .catch((err) => {
         console.log(err);
-        store.showToastWithGravityAndOffset(err.response.data.message)
+        store.showSnackbar(err.response.data.message)
       })
       .finally(() => {
         store.setLoading(false)
@@ -64,7 +64,7 @@ export default function VerifyOtpPage({ navigation }: propsType): React.JSX.Elem
       {store.loading ? (
         <TouchableOpacity
           style={styles.verifyButton}
-          onPress={() => store.showToastWithGravityAndOffset("Logging In..")}
+          onPress={() => store.showSnackbar("Logging In..")}
         >
           <GradientButton text='verify' />
         </TouchableOpacity>
