@@ -70,6 +70,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
     })
       .then((res) => {
         store.setUserObject({
+          _id: store.userObject?._id || '',
           userName: textInput,
           email: store.userObject?.email || '',
           profilePicture: res.data.profileUrl || String(store.userObject?.profilePicture),

@@ -17,7 +17,7 @@ export default function AddPage({ navigation }: propsType) {
   const store = Store();
 
   return (
-    Store.getState().loading ? <Loading /> :
+    store.loading ? <Loading /> :
       <MotiView
         style={styles.container}
         from={{

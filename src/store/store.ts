@@ -32,6 +32,7 @@ export interface UserObject {
 }
 
 export interface GroupUser {
+  _id: string;
   email: string;
   userName: string;
   profilePicture: string | undefined | null;
@@ -149,6 +150,13 @@ interface StoreState {
   handleRequest: (
     type: string,
     requestId: string,
+    groupId: string,
+    navigation: NavigationProp<any>,
+  ) => void;
+
+  // Handle Remove Member
+  handleRemoveMember: (
+    memberEmail: string,
     groupId: string,
     navigation: NavigationProp<any>,
   ) => void;
@@ -599,6 +607,28 @@ export const Store = create<StoreState>(set => ({
         } else {
           console.error(err);
         }
+      });
+  },
+
+  handleRemoveMember: async (memberEmail, groupId, navigation) => {
+    const token = await AsyncStorage.getItem("token");
+
+    set({ loading: true });
+
+    axios
+      .post("/group/removeMember", { token, memberEmail, groupId })
+      .then(() => {
+        socket.emit("removeMember", { groupId: groupId });
+      })
+      .catch(err => {
+        if (axios.isAxiosError(err)) {
+          Store.getState().showSnackbar(err.response?.data.message);
+        } else {
+          console.error(err);
+        }
+      })
+      .finally(() => {
+        set({ loading: false });
       });
   },
 }));

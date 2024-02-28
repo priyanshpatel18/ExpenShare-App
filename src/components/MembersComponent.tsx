@@ -1,8 +1,8 @@
-import React from 'react'
-import { Image, ScrollView, StyleSheet, View, Text, TouchableOpacity } from 'react-native'
-import { GroupDocument, Store } from '../store/store'
-import NoFriendSection from './NoFriendSection';
 import { NavigationProp } from '@react-navigation/native';
+import React from 'react';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { GroupDocument, Store } from '../store/store';
+import NoFriendSection from './NoFriendSection';
 
 type propsType = {
   group: GroupDocument;
@@ -17,38 +17,45 @@ export default function MembersComponent({ group, navigation }: propsType) {
 
   const targetGroup = store.groups.find(grp => grp._id === group._id);
 
-
   return (
-    <ScrollView style={styles.container}>
-      {targetGroup?.members.map((member, index) => {
-        return (<View style={styles.memberContainer} key={index}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            {member.profilePicture ?
-              <Image
-                source={{ uri: member.profilePicture }}
-                style={styles.userProfile}
-              />
-              :
-              <Image
-                source={require("../assets/defaultUser.png")}
-                style={styles.userProfile}
-              />
-            }
-            <Text style={styles.userName}>
-              {member.userName}
-            </Text>
-          </View>
-          {userEmail === groupCreator &&
-            <TouchableOpacity>
-              <Image
-                source={require("../assets/removeButton.png")}
-                style={styles.removeIcon}
-              />
-            </TouchableOpacity>}
-        </View>)
-      })}
-      <NoFriendSection group={group} navigation={navigation} />
-    </ScrollView>
+    <>
+      <ScrollView style={styles.container}>
+        {targetGroup?.members.map((member, index) => {
+          return (
+            <View key={index}>
+              <View style={styles.memberContainer} >
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                  {member.profilePicture ?
+                    <Image
+                      source={{ uri: member.profilePicture }}
+                      style={styles.userProfile}
+                    />
+                    :
+                    <Image
+                      source={require("../assets/defaultUser.png")}
+                      style={styles.userProfile}
+                    />
+                  }
+                  <Text style={styles.userName}>
+                    {member.userName}
+                  </Text>
+                </View>
+                {userEmail === groupCreator && member.email !== userEmail &&
+                  <TouchableOpacity
+                    onPress={() => store.handleRemoveMember(member.email, group._id, navigation)}
+                  >
+                    <Image
+                      source={require("../assets/removeButton.png")}
+                      style={styles.removeIcon}
+                    />
+                  </TouchableOpacity>}
+              </View>
+            </View>
+          )
+        })}
+        <NoFriendSection group={group} navigation={navigation} />
+      </ScrollView>
+    </>
   )
 }
 
@@ -78,5 +85,5 @@ const styles = StyleSheet.create({
   removeIcon: {
     width: 30,
     height: 30
-  }
+  },
 })

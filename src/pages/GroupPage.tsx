@@ -5,6 +5,7 @@ import GradientText from '../components/GradientText'
 import GroupComponent from '../components/GroupComponent'
 import MenuBar from '../components/MenuBar'
 import { Store } from '../store/store'
+import Loading from '../components/Loading'
 
 
 type propsType = {
@@ -15,38 +16,39 @@ export default function GroupPage({ navigation }: propsType): React.JSX.Element 
   const store = Store();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headingText}>groups</Text>
+    store.loading ? <Loading />
+      : <View style={styles.container}>
+        <Text style={styles.headingText}>groups</Text>
 
-      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("AddGroup")}>
-        <GradientText
-          text='add a group'
-          style={styles.buttonText}
-        />
-      </TouchableOpacity>
-      <ScrollView style={styles.groupList}>
-        {store.groups.map((group, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => navigation.navigate("Group", { group })}
-          >
-            {group.groupProfile ? (
-              <GroupComponent
-                groupPhoto={group.groupProfile}
-                groupName={group.groupName}
-                totalMembers={group.members.length}
-              />
-            ) : (
-              <GroupComponent
-                groupName={group.groupName}
-                totalMembers={group.members.length}
-              />
-            )}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      <MenuBar navigation={navigation} />
-    </View>
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("AddGroup")}>
+          <GradientText
+            text='add a group'
+            style={styles.buttonText}
+          />
+        </TouchableOpacity>
+        <ScrollView style={styles.groupList}>
+          {store.groups.map((group, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => navigation.navigate("Group", { group })}
+            >
+              {group.groupProfile ? (
+                <GroupComponent
+                  groupPhoto={group.groupProfile}
+                  groupName={group.groupName}
+                  totalMembers={group.members.length}
+                />
+              ) : (
+                <GroupComponent
+                  groupName={group.groupName}
+                  totalMembers={group.members.length}
+                />
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <MenuBar navigation={navigation} />
+      </View>
   )
 }
 

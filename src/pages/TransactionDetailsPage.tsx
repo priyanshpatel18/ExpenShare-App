@@ -4,6 +4,7 @@ import { Image, MotiView } from 'moti';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Store, TransactionType } from '../store/store';
+import Loading from '../components/Loading';
 
 type propsType = {
   route: {
@@ -79,234 +80,236 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headingContainer}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
+    store.loading ? <Loading />
+      :
+      <View style={styles.container}>
+        <View style={styles.headingContainer}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Image
+              source={require("../assets/backButton.png")}
+              style={styles.backButtonIcon}
+            />
+          </TouchableOpacity>
+          {editMode ?
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleEdit}
+            >
+              <Image
+                source={require("../assets/doneButton.png")}
+                style={styles.backButtonIcon}
+              />
+            </TouchableOpacity>
+            :
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => setEditMode(!editMode)}
+            >
+              <Image
+                source={require("../assets/editIcon.png")}
+                style={styles.backButtonIcon}
+              />
+            </TouchableOpacity>
+          }
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>
+            Transaction Id
+          </Text>
+          <Text style={styles.text}>
+            {transaction._id}
+          </Text>
+        </View>
+        <View
+          style={[styles.detailContainer, { flexDirection: "row", alignItems: "center", gap: 20 }]}
         >
           <Image
-            source={require("../assets/backButton.png")}
-            style={styles.backButtonIcon}
+            source={route.params.imageUrl}
+            style={styles.categoryContainer}
           />
-        </TouchableOpacity>
-        {editMode ?
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={handleEdit}
-          >
-            <Image
-              source={require("../assets/doneButton.png")}
-              style={styles.backButtonIcon}
-            />
-          </TouchableOpacity>
-          :
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => setEditMode(!editMode)}
-          >
-            <Image
-              source={require("../assets/editIcon.png")}
-              style={styles.backButtonIcon}
-            />
-          </TouchableOpacity>
-        }
-      </View>
-      <View style={styles.detailContainer}>
-        <Text style={styles.label}>
-          Transaction Id
-        </Text>
-        <Text style={styles.text}>
-          {transaction._id}
-        </Text>
-      </View>
-      <View
-        style={[styles.detailContainer, { flexDirection: "row", alignItems: "center", gap: 20 }]}
-      >
-        <Image
-          source={route.params.imageUrl}
-          style={styles.categoryContainer}
-        />
-        <View>
-          <Text style={styles.label}>
-            Title
-          </Text>
-          <TextInput
-            value={title}
-            style={styles.text}
-            editable={editMode}
-            onChangeText={setTitle}
-          />
-        </View>
-      </View>
-      <View style={styles.detailContainer}>
-        <Text style={styles.label}>
-          Amount
-        </Text>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={[styles.text, { fontSize: 30 }, transaction.type === "expense" ? { color: "#f00" } : { color: "#00a200" }]}>₹</Text>
-          <TextInput
-            value={amount}
-            style={[styles.text, { fontSize: 30 }, transaction.type === "expense" ? { color: "#f00" } : { color: "#00a200" }]}
-            editable={editMode}
-            onChangeText={setAmount}
-          />
-        </View>
-      </View>
-      <View style={styles.detailContainer}>
-        <Text style={styles.label}>
-          Notes
-        </Text>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          {editMode ? (
-            <TextInput
-              value={notes}
-              style={[styles.text, { maxWidth: "70%" }]}
-              editable={editMode}
-              onChangeText={setNotes}
-              numberOfLines={1}
-            />
-          ) : (
-            <Text
-              style={[styles.text, transaction.invoiceUrl ? { maxWidth: "80%" } : { maxWidth: "100%" }]}
-              numberOfLines={5}
-              ellipsizeMode="tail"
-            >
-              {notes ? notes : "     -"}
+          <View>
+            <Text style={styles.label}>
+              Title
             </Text>
-          )}
+            <TextInput
+              value={title}
+              style={styles.text}
+              editable={editMode}
+              onChangeText={setTitle}
+            />
+          </View>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>
+            Amount
+          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={[styles.text, { fontSize: 30 }, transaction.type === "expense" ? { color: "#f00" } : { color: "#00a200" }]}>₹</Text>
+            <TextInput
+              value={amount}
+              style={[styles.text, { fontSize: 30 }, transaction.type === "expense" ? { color: "#f00" } : { color: "#00a200" }]}
+              editable={editMode}
+              onChangeText={setAmount}
+            />
+          </View>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>
+            Notes
+          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            {editMode ? (
+              <TextInput
+                value={notes}
+                style={[styles.text, { maxWidth: "70%" }]}
+                editable={editMode}
+                onChangeText={setNotes}
+                numberOfLines={1}
+              />
+            ) : (
+              <Text
+                style={[styles.text, transaction.invoiceUrl ? { maxWidth: "80%" } : { maxWidth: "100%" }]}
+                numberOfLines={5}
+                ellipsizeMode="tail"
+              >
+                {notes ? notes : "     -"}
+              </Text>
+            )}
 
-          {editMode &&
-            <View>
-              <TouchableOpacity onPress={() => store.pickImage(setInvoiceImage)}>
+            {editMode &&
+              <View>
+                <TouchableOpacity onPress={() => store.pickImage(setInvoiceImage)}>
+                  <Image
+                    source={require("../assets/addImageIcon.png")}
+                    style={styles.invoiceIcon}
+                  />
+                </TouchableOpacity>
+                <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
+                  <Text style={styles.viewImage}>
+                    View Image
+                  </Text>
+                </Pressable>
+              </View>
+            }
+            {transaction.invoiceUrl && !editMode &&
+              <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
                 <Image
-                  source={require("../assets/addImageIcon.png")}
+                  source={require("../assets/invoice.png")}
                   style={styles.invoiceIcon}
                 />
-              </TouchableOpacity>
-              <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
-                <Text style={styles.viewImage}>
-                  View Image
-                </Text>
               </Pressable>
-            </View>
-          }
-          {transaction.invoiceUrl && !editMode &&
-            <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
-              <Image
-                source={require("../assets/invoice.png")}
-                style={styles.invoiceIcon}
-              />
-            </Pressable>
-          }
+            }
+          </View>
         </View>
-      </View>
-      <View style={styles.detailContainer}>
-        <Text style={styles.label}>
-          Transaction Date
-        </Text>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
-          <Text style={styles.text}>
-            {formattedDate}
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>
+            Transaction Date
           </Text>
-          {editMode &&
-            <TouchableOpacity
-              onPress={() => {
-                setModalVisible(!modalVisible)
-                setMode("date")
-              }}
-            >
-              <Image
-                style={styles.iconsStyle}
-                source={require("../assets/calendar.png")}
-              />
-            </TouchableOpacity>
-          }
-          <Text style={styles.text}>
-            {formattedTime}
-          </Text>
-          {editMode &&
-            <TouchableOpacity
-              onPress={() => {
-                setModalVisible(!modalVisible)
-                setMode('time');
-              }}
-            >
-              <Image
-                style={styles.iconsStyle}
-                source={require("../assets/clock.png")}
-              />
-            </TouchableOpacity>
-          }
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
+            <Text style={styles.text}>
+              {formattedDate}
+            </Text>
+            {editMode &&
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(!modalVisible)
+                  setMode("date")
+                }}
+              >
+                <Image
+                  style={styles.iconsStyle}
+                  source={require("../assets/calendar.png")}
+                />
+              </TouchableOpacity>
+            }
+            <Text style={styles.text}>
+              {formattedTime}
+            </Text>
+            {editMode &&
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(!modalVisible)
+                  setMode('time');
+                }}
+              >
+                <Image
+                  style={styles.iconsStyle}
+                  source={require("../assets/clock.png")}
+                />
+              </TouchableOpacity>
+            }
+          </View>
         </View>
-      </View>
-      {
-        store.loading ? (
-          <TouchableOpacity
-            style={[styles.deleteButton, { backgroundColor: "#ff4545" }]}
-            onPress={() => store.showSnackbar("Deleting Transaction")}
-          >
-            <Image
-              source={require("../assets/dustbin.png")}
-              style={styles.deleteIcon}
-            />
-            <Text style={styles.deleteText}>Delete Transaction</Text>
-          </TouchableOpacity>)
-          : (
+        {
+          store.loading ? (
             <TouchableOpacity
               style={[styles.deleteButton, { backgroundColor: "#ff4545" }]}
-              onPress={handleDelete}
+              onPress={() => store.showSnackbar("Deleting Transaction")}
             >
               <Image
                 source={require("../assets/dustbin.png")}
                 style={styles.deleteIcon}
               />
               <Text style={styles.deleteText}>Delete Transaction</Text>
-            </TouchableOpacity>
-          )
-      }
-
-      <Modal visible={isInvoiceVisible} transparent={true}>
-        {invoiceImage &&
-          <Pressable onPress={() => setIsInvoiceVisible(false)} style={styles.modalContainer}>
-            <MotiView
-              from={{
-                opacity: 0,
-                scale: 0.5,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-              }}
-              transition={{
-                type: 'timing',
-              }}
-              style={styles.shape}
-            >
-              <Image source={{ uri: invoiceImage }} style={styles.modalImage} />
-            </MotiView>
-          </Pressable>
+            </TouchableOpacity>)
+            : (
+              <TouchableOpacity
+                style={[styles.deleteButton, { backgroundColor: "#ff4545" }]}
+                onPress={handleDelete}
+              >
+                <Image
+                  source={require("../assets/dustbin.png")}
+                  style={styles.deleteIcon}
+                />
+                <Text style={styles.deleteText}>Delete Transaction</Text>
+              </TouchableOpacity>
+            )
         }
-      </Modal>
 
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-      >
-        <TouchableOpacity>
-          {mode && (
-            <DateTimePicker
-              testID='dateAndTimePicker'
-              value={mode === "time" ? time : date}
-              mode={mode}
-              display="default"
-              onChange={mode === "time" ? handleTimeSelect : handleDateSelect}
-              maximumDate={maxDate}
-            />
-          )}
-        </TouchableOpacity>
-      </Modal>
-    </View >
+        <Modal visible={isInvoiceVisible} transparent={true}>
+          {invoiceImage &&
+            <Pressable onPress={() => setIsInvoiceVisible(false)} style={styles.modalContainer}>
+              <MotiView
+                from={{
+                  opacity: 0,
+                  scale: 0.5,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                transition={{
+                  type: 'timing',
+                }}
+                style={styles.shape}
+              >
+                <Image source={{ uri: invoiceImage }} style={styles.modalImage} />
+              </MotiView>
+            </Pressable>
+          }
+        </Modal>
+
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+        >
+          <TouchableOpacity>
+            {mode && (
+              <DateTimePicker
+                testID='dateAndTimePicker'
+                value={mode === "time" ? time : date}
+                mode={mode}
+                display="default"
+                onChange={mode === "time" ? handleTimeSelect : handleDateSelect}
+                maximumDate={maxDate}
+              />
+            )}
+          </TouchableOpacity>
+        </Modal>
+      </View >
   );
 };
 

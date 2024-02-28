@@ -82,10 +82,21 @@ export default function App(): React.JSX.Element {
       }
     });
 
+    socket.on("removedMember", (data: { groupId: string, message: string }) => {
+      const { message, groupId } = data;
+
+      const updatedGroups = Store.getState().groups.filter(
+        (group) => group._id !== groupId)
+
+      store.setGroups(updatedGroups)
+
+      store.showSnackbar(message)
+    })
 
     return () => {
       socket.off("requestReceived");
       socket.off("updateGroup");
+      socket.off("removedMember");
     };
   }, [socket, email])
 

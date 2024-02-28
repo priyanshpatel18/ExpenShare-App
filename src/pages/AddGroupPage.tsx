@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import GradientButton from '../components/GradientButton'
 import { Store } from '../store/store'
+import Loading from '../components/Loading'
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -13,66 +14,68 @@ export default function AddGroupPage({ navigation }: propsType) {
   const [selectedImage, setSelectedImage] = useState<string | undefined | null>();
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headingContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-        >
-          <Image
-            source={require("../assets/backButton.png")}
-            style={styles.backButton}
-          />
-        </TouchableOpacity>
-        <Text style={styles.headingText}>add group</Text>
-      </View>
-      <View>
-        <TouchableWithoutFeedback
-          onPress={() => store.pickImage(setSelectedImage)}
-        >
-          <View style={styles.imageContainer}>
-            {selectedImage ? (
-              <Image
-                style={styles.profileImage}
-                source={{ uri: selectedImage }}
-              />
-            ) : (
-              <Image
-                style={styles.defaultProfile}
-                source={require("../assets/defaultGroup.png")}
-              />
-            )}
-            <View style={styles.addIconContainer}>
-              <Text style={styles.addIcon}>+</Text>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-        <View style={styles.inputContainer}>
-          <Text style={styles.labelText}>Group Title</Text>
-          <TextInput
-            value={title}
-            placeholder='Group Name'
-            placeholderTextColor="#aaa"
-            cursorColor="#aaa"
-            onChangeText={(text: string) => setTitle(text)}
-            style={styles.titleInput}
-            autoFocus
-          />
-        </View>
-        {store.loading ?
-          <TouchableOpacity style={styles.createButton}>
-            <GradientButton text='create' />
-          </TouchableOpacity>
-          :
-          <TouchableOpacity style={styles.createButton}
-            onPress={() => store.handleCreateGroup(title, selectedImage, navigation)}
+    store.loading ? <Loading />
+      :
+      <View style={styles.container}>
+        <View style={styles.headingContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}
           >
-            <GradientButton text='create' />
+            <Image
+              source={require("../assets/backButton.png")}
+              style={styles.backButton}
+            />
           </TouchableOpacity>
-        }
+          <Text style={styles.headingText}>add group</Text>
+        </View>
+        <View>
+          <TouchableWithoutFeedback
+            onPress={() => store.pickImage(setSelectedImage)}
+          >
+            <View style={styles.imageContainer}>
+              {selectedImage ? (
+                <Image
+                  style={styles.profileImage}
+                  source={{ uri: selectedImage }}
+                />
+              ) : (
+                <Image
+                  style={styles.defaultProfile}
+                  source={require("../assets/defaultGroup.png")}
+                />
+              )}
+              <View style={styles.addIconContainer}>
+                <Text style={styles.addIcon}>+</Text>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+          <View style={styles.inputContainer}>
+            <Text style={styles.labelText}>Group Title</Text>
+            <TextInput
+              value={title}
+              placeholder='Group Name'
+              placeholderTextColor="#aaa"
+              cursorColor="#aaa"
+              onChangeText={(text: string) => setTitle(text)}
+              style={styles.titleInput}
+              autoFocus
+            />
+          </View>
+          {store.loading ?
+            <TouchableOpacity style={styles.createButton}>
+              <GradientButton text='create' />
+            </TouchableOpacity>
+            :
+            <TouchableOpacity style={styles.createButton}
+              onPress={() => store.handleCreateGroup(title, selectedImage, navigation)}
+            >
+              <GradientButton text='create' />
+            </TouchableOpacity>
+          }
+        </View>
       </View>
-    </View>
   )
 }
 
