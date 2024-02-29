@@ -1,28 +1,25 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
-import axios from 'axios'
-import { MotiView } from 'moti'
-import React, { useEffect, useState } from 'react'
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import { Store } from '../store/store'
-import GradientButton from './GradientButton'
-import { NavigationProp } from '@react-navigation/native'
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { NavigationProp } from '@react-navigation/native';
+import { ScrollView } from 'moti';
+import React, { useEffect, useState } from 'react';
+import { Image, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import { GroupDocument, GroupUser, Store } from '../store/store';
+import GradientButton from './GradientButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type propsType = {
-  amount: string,
-  showIncome: boolean,
-  navigation: NavigationProp<any>
+  navigation: NavigationProp<any>;
+  group: GroupDocument;
+  transactionAmount: Number;
 }
 
-export default function OptionsContainer({ amount, showIncome, navigation }: propsType): React.JSX.Element {
+export default function GroupOptionsContainer({ transactionAmount, navigation, group }: propsType) {
   const [currentDate, setCurrentDate] = useState<string>('');
   const [currentTime, setCurrentTime] = useState<string>('');
 
   const maxDate = new Date();
   maxDate.setHours(0, 0, 0, 0);
-
-  const [invoiceImage, setInvoiceImage] = useState<string | undefined | null>(null);
-  const [isInvoiceVisible, setIsInvoiceVisible] = useState<boolean>(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [mode, setMode] = useState<'date' | 'time' | null>(null);
@@ -30,92 +27,7 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
   const [date, setDate] = useState(new Date());
   const store = Store();
 
-  // Request Inputs
   const [title, setTitle] = useState<string>("");
-  const [notes, setNotes] = useState<string>("");
-
-  async function handleCreateExpense() {
-    if (!amount.trim() || !title.trim()) {
-      store.showSnackbar("Enter All Details");
-      return;
-    }
-
-    if (store.transactionType === "expense" && store.totalBalance - Number(amount) < 0) {
-      store.showSnackbar("Insufficient Balance");
-      return;
-    }
-
-    if (title.length > 15) {
-      store.showSnackbar("Title must be short");
-      return;
-    }
-
-    store.setLoading(true)
-    const formData = new FormData()
-
-    formData.append("incomeFlag", store.transactionType);
-    formData.append("token", await AsyncStorage.getItem("token"))
-    formData.append("amount", amount)
-    if (store.transactionType === "income") {
-      formData.append("category", store.incomeTitle.toUpperCase())
-    } else {
-      formData.append("category", store.expenseTitle.toUpperCase())
-    }
-    formData.append("title", title);
-    formData.append("notes", notes);
-
-    const combinedDateTime = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      time.getHours(),
-      time.getMinutes(),
-      time.getSeconds()
-    );
-    const isoDate = combinedDateTime.toISOString();
-
-    formData.append("transactionDate", isoDate);
-
-    if (invoiceImage) {
-      const extension = invoiceImage.split(".").pop();
-      formData.append("invoice", {
-        uri: invoiceImage,
-        name: `profilePicture.${extension}`,
-        type: `image/${extension}`,
-      });
-    }
-
-    axios
-      .post("/transaction/add", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then(() => {
-        store.setTransactionType("expense")
-        if (showIncome) {
-          store.showSnackbar("Income Added Successfully");
-          store.setTotalBalance(store.totalBalance + Number(amount));
-          store.setTotalIncome(store.totalIncome + Number(amount));
-        } else {
-          store.showSnackbar("Expense Added Successfully");
-          store.setTotalBalance(store.totalBalance - Number(amount));
-          store.setTotalExpense(store.totalExpense + Number(amount));
-        }
-      })
-      .catch((err) => {
-        if (axios.isAxiosError(err)) {
-          store.showSnackbar(err.response?.data.message)
-        } else {
-          console.log(err);
-        }
-      })
-      .finally(() => {
-        store.fetchTransactions();
-        navigation.goBack();
-        store.setLoading(false);
-      })
-  }
 
   useEffect(() => {
     const now = new Date();
@@ -155,6 +67,35 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
     setMode(null);
   };
 
+  // Split
+  const [showSplit, setShowSplit] = useState<boolean>(false);
+
+  const adder: GroupUser | "" = group.members.find(member => member.email === store.userObject?.email) || '';
+
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([adder ? adder._id : '']);
+
+  const toggleMemberSelection = (memberId: string) => {
+    if (adder && memberId === adder._id) return;
+
+    if (selectedMembers.includes(memberId)) {
+      setSelectedMembers(selectedMembers.filter(id => id !== memberId));
+    } else {
+      setSelectedMembers([...selectedMembers, memberId]);
+    }
+  };
+
+  async function AddGroupTransaction() {
+    const token = await AsyncStorage.getItem("token");
+
+    const formData = {
+      groupId: group._id,
+      paidBy: adder ? adder._id : "",
+      transactionAmount,
+      title,
+    }
+  }
+
+
   return (
     <View style={styles.optionsContainer}>
       <ScrollView>
@@ -183,54 +124,14 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
               onChangeText={(title: string) => setTitle(title)}
             />
           </View>
-          <View style={styles.option}>
-            <Text style={styles.labelText}>Notes</Text>
-            <View style={styles.notesInputContainer}>
-              <TextInput
-                style={styles.notesInput}
-                placeholder='[Optional]'
-                placeholderTextColor="#aaa"
-                value={notes}
-                onChangeText={(notes: string) => setNotes(notes)}
-              />
-              <TouchableWithoutFeedback onPress={() => {
-                store.pickImage(setInvoiceImage)
-              }}
-              >
-                <Image
-                  source={require("../assets/addImageIcon.png")}
-                  style={styles.addImageIcon}
-                />
-              </TouchableWithoutFeedback>
-            </View>
-            {invoiceImage &&
-              <>
-                <Text style={styles.viewImage} onPress={() => setIsInvoiceVisible(true)}>View Image</Text>
-                <Modal visible={isInvoiceVisible} transparent={true}>
-                  {isInvoiceVisible &&
-                    <Pressable onPress={() => setIsInvoiceVisible(false)} style={styles.modalContainer}>
-                      <MotiView
-                        from={{
-                          opacity: 0,
-                          scale: 0.5,
-                        }}
-                        animate={{
-                          opacity: 1,
-                          scale: 1,
-                        }}
-                        transition={{
-                          type: 'timing',
-                        }}
-                        style={styles.shape}
-                      >
-                        <Image source={{ uri: invoiceImage }} style={styles.modalImage} />
-                      </MotiView>
-                    </Pressable>
-                  }
-                </Modal>
-              </>
-            }
-          </View>
+
+          <TouchableOpacity
+            style={styles.option}
+            onPress={() => setShowSplit(!showSplit)}
+          >
+            <Text style={[styles.labelText, { fontSize: 20, paddingVertical: 10 }]}>Select Splitting</Text>
+          </TouchableOpacity>
+
           <View style={styles.dateAndTimeContainer}>
             <TouchableWithoutFeedback
               onPress={() => {
@@ -262,7 +163,8 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
             </TouchableWithoutFeedback>
           </View>
         </View>
-      </ScrollView >
+      </ScrollView>
+
       {store.loading ?
         <TouchableOpacity style={styles.continueButton}
           onPress={() => Store.getState().showSnackbar("Adding...")}
@@ -270,7 +172,7 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
           <GradientButton text='continue' />
         </TouchableOpacity>
         :
-        <TouchableOpacity style={styles.continueButton} onPress={handleCreateExpense}>
+        <TouchableOpacity style={styles.continueButton}>
           <GradientButton text='continue' />
         </TouchableOpacity>
       }
@@ -292,7 +194,72 @@ export default function OptionsContainer({ amount, showIncome, navigation }: pro
           )}
         </TouchableOpacity>
       </Modal>
-    </View>
+
+      <Modal
+        visible={showSplit}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowSplit(!showSplit)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <ScrollView contentContainerStyle={styles.memberList}>
+              <TouchableOpacity
+                style={styles.selectAllButton}
+                onPress={() => {
+                  setSelectedMembers(group.members.map(member => member._id))
+                }}
+              >
+                <Text style={styles.selectAllButtonText}>Select All</Text>
+              </TouchableOpacity>
+
+              {group.members.map((member, index) => {
+                const isChecked = selectedMembers.includes(member._id);
+                return (
+                  <Pressable
+                    key={index}
+                    style={[styles.memberItem, { backgroundColor: isChecked ? '#F0F0F0' : 'transparent' }]}
+                    onPress={() => toggleMemberSelection(member._id)}
+                  >
+                    <BouncyCheckbox
+                      disableBuiltInState
+                      size={25}
+                      unfillColor='#fff'
+                      fillColor='#08AA08'
+                      iconStyle={{ borderColor: '#08AA08' }}
+                      isChecked={isChecked}
+                    />
+                    <Text style={styles.memberName}>{member.userName}</Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: '#FF3547' }]}
+                onPress={() => {
+                  setShowSplit(false)
+                  setSelectedMembers([])
+                }}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: '#3CB371' }]}
+                onPress={() => setShowSplit(!showSplit)}
+              >
+                <Text style={styles.buttonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+
+
+    </View >
   )
 }
 
@@ -353,32 +320,10 @@ const styles = StyleSheet.create({
     padding: 0,
     fontFamily: "Montserrat-SemiBold",
   },
-  notesInputContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between"
-  },
-  notesInput: {
-    fontSize: 22,
-    color: "#222",
-    padding: 0,
-    width: "85%",
-    fontFamily: "Montserrat-SemiBold",
-  },
-  addImageIcon: {
-    height: 40,
-    width: 40
-  },
-  viewImage: {
-    marginTop: 5,
-    alignSelf: "flex-end",
-    color: "#539AEA"
-  },
   dateAndTimeContainer: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "100%",
     gap: 10,
   },
   dateAndTimeOption: {
@@ -398,7 +343,7 @@ const styles = StyleSheet.create({
   },
   dateAndTimeText: {
     color: "#222",
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Montserrat-Medium",
   },
   continueButton: {
@@ -407,25 +352,58 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
   modalContainer: {
-    display: "flex",
-    height: "100%",
-    width: "100%",
-    backgroundColor: "rgba(0,0,0,0.5)",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  shape: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
-    alignItems: "center",
-    borderRadius: 10,
-    marginRight: 10,
-    resizeMode: 'contain',
-    height: "100%",
-    width: "100%"
+    alignItems: 'center',
   },
-  modalImage: {
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
     width: '80%',
-    height: '100%',
-    resizeMode: 'contain',
+    maxHeight: '80%',
+    padding: 20,
+    elevation: 5,
+  },
+  memberList: {
+    flexGrow: 1,
+  },
+  memberItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#CCCCCC',
+  },
+  memberName: {
+    color: "#222",
+    fontSize: 16,
+  },
+  selectAllButton: {
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: '#fcc93f',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  selectAllButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 20,
+  },
+  button: {
+    marginLeft: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
   },
 })

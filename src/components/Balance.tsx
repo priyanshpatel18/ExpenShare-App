@@ -128,7 +128,6 @@ const styles = StyleSheet.create({
   },
   mainBalance: {
     textAlign: "center",
-    marginBottom: 5,
     fontSize: 45,
     color: "#fff",
     fontFamily: "Montserrat-ExtraBold"
@@ -137,7 +136,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-evenly",
-    margin: 20
+    margin: 10
   },
   box: {
     display: "flex",

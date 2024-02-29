@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
   container: {
     position: "absolute",
     height: "100%",
+    width: "100%",
     bottom: 0,
     left: 0,
     alignItems: "center",
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#CFCFCF",
     borderTopStartRadius: 20,
     borderTopEndRadius: 20,
-    width: "100%",
+    // width: "100%",
     height: "10%",
     display: "flex",
     flexDirection: "row",
@@ -92,17 +93,5 @@ const styles = StyleSheet.create({
   routeButton: {
     height: 40,
     width: 40,
-  },
-  animatedContainer: {
-    position: 'absolute',
-    height: "100%",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    top: 0,
-    backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    zIndex: 1
   },
 });

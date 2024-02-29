@@ -1,13 +1,12 @@
 import { NavigationProp } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import { MotiView } from 'moti';
+import React, { useState } from 'react';
 import { Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Balance from '../components/Balance';
 import Loading from '../components/Loading';
 import MenuBar from '../components/MenuBar';
 import TransactionSection from '../components/TransactionHome';
 import { Store } from '../store/store';
-import { MotiView } from 'moti';
-import socket from '../utils/socket';
 
 type propsType = {
   navigation: NavigationProp<any>

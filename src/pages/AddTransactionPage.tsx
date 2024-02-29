@@ -3,7 +3,7 @@ import { MotiView } from 'moti'
 import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Loading from '../components/Loading'
-import OptionsContainer from '../components/OptionsContainer'
+import PersonalOptionsContainer from '../components/PersonalOptionsContainer'
 import { Store } from '../store/store'
 
 
@@ -79,7 +79,7 @@ export default function AddPage({ navigation }: propsType) {
             />
           </View>
         </View>
-        <OptionsContainer
+        <PersonalOptionsContainer
           amount={amount}
           showIncome={showIncome}
           navigation={navigation}
@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF4545",
     padding: 10
   },
-
   buttonContainer: {
     padding: 20,
     width: "100%",
@@ -173,17 +172,5 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat-Bold",
     color: "#fff",
     width: "100%"
-  },
-  animatedContainer: {
-    position: 'absolute',
-    height: "100%",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    top: 0,
-    backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    zIndex: 1
   },
 })

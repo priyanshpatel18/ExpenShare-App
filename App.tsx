@@ -29,8 +29,9 @@ import WelcomePage from "./src/pages/WelcomePage";
 // File imports
 import { GroupDocument, Store } from './src/store/store';
 import socket from './src/utils/socket';
+import AddGroupTransactionPage from './src/pages/AddGroupTransactionPage';
 
-axios.defaults.baseURL = "http://192.168.100.27:8080";
+axios.defaults.baseURL = "http://192.168.147.249:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 
 axios.defaults.withCredentials = true;
@@ -123,6 +124,7 @@ export default function App(): React.JSX.Element {
           <Stack.Screen name="AddGroup" component={AddGroupPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
           <Stack.Screen name="GroupPage" component={GroupPage} />
           <Stack.Screen name="Group" component={Group} options={{ animation: "slide_from_right", animationDuration: 2000 }} />
+          <Stack.Screen name="AddGroupTransaction" component={AddGroupTransactionPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
           <Stack.Screen name="AddMember" component={AddMemberPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />
           <Stack.Screen name="User" component={UserPage} />
           <Stack.Screen name="Account" component={AccountPage} options={{ animation: "slide_from_bottom", animationDuration: 2000 }} />

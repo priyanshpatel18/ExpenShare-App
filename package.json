@@ -1,5 +1,5 @@
 {
-  "name": "ExpenShare",
+  "name": "expenshare",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -18,7 +18,8 @@
     "axios": "^1.6.7",
     "moti": "^0.27.5",
     "react": "^18.2.0",
-    "react-native": "^0.73.4",
+    "react-native": "^0.73.5",
+    "react-native-bouncy-checkbox": "^3.0.7",
     "react-native-file-viewer": "^2.1.5",
     "react-native-fs": "^2.20.0",
     "react-native-html-to-pdf": "^0.12.0",

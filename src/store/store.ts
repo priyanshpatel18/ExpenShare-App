@@ -38,13 +38,24 @@ export interface GroupUser {
   profilePicture: string | undefined | null;
 }
 
+export interface GroupTransaction {
+  _id: string;
+  groupId: string;
+  paidBy: GroupUser;
+  splitAmong: GroupUser[];
+  category: string;
+  transactionTitle: string;
+  transactionAmount: number;
+  transactionDate: string;
+}
+
 export interface GroupDocument {
   _id: string;
   groupName: string;
   groupProfile?: string | undefined;
   createdBy: GroupUser | undefined;
   members: GroupUser[];
-  groupExpenses: TransactionType[];
+  groupExpenses: GroupTransaction[];
   totalExpense: number;
   category: string;
 }

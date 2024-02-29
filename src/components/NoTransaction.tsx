@@ -17,16 +17,15 @@ export default function NoTransaction(): React.JSX.Element {
 
 const styles = StyleSheet.create({
   noTransaction: {
-    paddingTop: 50,
     alignItems: "center"
   },
   emptyWallet: {
-    height: 100,
-    width: 100
+    height: 80,
+    width: 80
   },
   noText: {
     color: "#aaa",
     fontFamily: "Montserrat-SemiBold",
-    fontSize: 22
+    fontSize: 20
   },
 })
