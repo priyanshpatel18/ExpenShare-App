@@ -27,11 +27,11 @@ import VerifyEmailPage from './src/pages/VerifyEmailPage';
 import VerifyOtpPage from './src/pages/VerifyOtpPage';
 import WelcomePage from "./src/pages/WelcomePage";
 // File imports
-import { GroupDocument, Store } from './src/store/store';
+import { GroupDocument, GroupUser, Store } from './src/store/store';
 import socket from './src/utils/socket';
 import AddGroupTransactionPage from './src/pages/AddGroupTransactionPage';
 
-axios.defaults.baseURL = "http://192.168.1.3:8080";
+axios.defaults.baseURL = "http://192.168.32.249:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 
 axios.defaults.withCredentials = true;
@@ -67,8 +67,6 @@ export default function App(): React.JSX.Element {
 
     socket.on("updateGroup", (data: { group: GroupDocument }) => {
       const { group } = data;
-      console.log(Store.getState().userObject?.userName, group.groupName);
-
 
       const oldGroups = Store.getState().groups;
 
@@ -82,7 +80,26 @@ export default function App(): React.JSX.Element {
       store.setGroups(newGroups);
     });
 
+    socket.on("newTransaction", (message: string) => {
+      store.showSnackbar(message);
+    })
+
+    socket.on("updateGroup", ({ group }) => {
+      const oldGroups: GroupDocument[] = Store.getState().groups;
+
+      const indexToUpdate = oldGroups.findIndex(oldGroup => oldGroup._id === group._id);
+
+      if (indexToUpdate !== -1) {
+        // Update the group if it exists
+        oldGroups[indexToUpdate] = group;
+      } else {
+        oldGroups.push(group);
+      }
+      store.setGroups(oldGroups)
+    })
+
     return () => {
+      socket.off("updateGroup");
       socket.off("requestReceived");
       socket.off("updateGroup");
     };

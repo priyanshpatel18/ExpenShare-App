@@ -2,6 +2,7 @@ import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Store } from '../store/store'
 import { NavigationProp } from '@react-navigation/native'
+import socket from '../utils/socket'
 
 type propsType = {
   requestId: string,
@@ -24,7 +25,9 @@ export default function Notification({ requestId, groupName, groupId, navigation
       </Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={() => store.handleRequest("accept", requestId, groupId, navigation)}
+          onPress={() => {
+            store.handleRequest("accept", requestId, groupId, navigation)
+          }}
         >
           <Image
             style={styles.button}

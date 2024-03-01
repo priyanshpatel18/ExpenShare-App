@@ -1,6 +1,6 @@
 import React from 'react'
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { GroupDocument } from '../store/store'
+import { GroupDocument, Store } from '../store/store'
 import GroupTransaction from './GroupTransaction';
 import { getCategorySource } from '../data/ExpenseCategories';
 import { NavigationProp } from '@react-navigation/native';
@@ -11,10 +11,12 @@ type propsType = {
 }
 
 export default function TransactionsComponent({ group, navigation }: propsType) {
+  const groupTransaction = Store().groups.find((grp) => grp._id === group._id)
+
   return (
     <View style={styles.container}>
       <ScrollView>
-        {group.groupExpenses.map((transaction, index) => (
+        {groupTransaction?.groupExpenses.map((transaction, index) => (
           <GroupTransaction
             key={index}
             transactionTitle={transaction.transactionTitle}

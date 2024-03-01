@@ -31,7 +31,7 @@ export default function Group({ navigation, route }: propsType) {
       case "Settle Up":
         return <SettleUpComponent />;
       case "Balance":
-        return <BalanceComponent />;
+        return <BalanceComponent group={group} />;
       case "Totals":
         return <TotalsComponent />;
       case "Transactions":
