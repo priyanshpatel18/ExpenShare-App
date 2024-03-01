@@ -23,16 +23,15 @@ export default function GroupTransaction({
 
   const DateObject = new Date(transactionDate);
   const month: Intl.DateTimeFormatOptions = { month: 'short' };
-  const date: Intl.DateTimeFormatOptions = { day: "2-digit" }
+  const date = DateObject.getDate();
   const displayMonth = DateObject.toLocaleDateString('en-US', month);
-  const displayDate = DateObject.toLocaleTimeString("en-US", date);
 
   return (
     <View style={styles.transaction}>
       <View style={styles.leftPart}>
         <View >
           <Text style={styles.dateText}>{displayMonth}</Text>
-          <Text style={styles.dateText}>{displayDate}</Text>
+          <Text style={styles.dateText}>{date}</Text>
         </View>
         <View style={styles.categoryIconContainer}>
           <Image
@@ -46,10 +45,18 @@ export default function GroupTransaction({
         </View>
       </View>
       <View>
-        <Text style={[styles.lentText, styles.rightPartText]}>You
-          {paidBy.userName === store.userObject?.userName ? "lent" : "borrowed"}
+        <Text style={[
+          styles.lentText,
+          styles.rightPartText,
+          paidBy.userName === store.userObject?.userName ? { color: "#00a200" } : { color: "#f00" }
+        ]}>
+          You {paidBy.userName === store.userObject?.userName ? " lent" : " borrowed"}
         </Text>
-        <Text style={[styles.lentText, styles.rightPartText]}>₹1000</Text>
+        <Text style={[
+          styles.lentText,
+          styles.rightPartText,
+          paidBy.userName === store.userObject?.userName ? { color: "#00a200" } : { color: "#f00" }
+        ]}>₹{transactionAmount / splitAmong.length}</Text>
       </View>
     </View>
   )

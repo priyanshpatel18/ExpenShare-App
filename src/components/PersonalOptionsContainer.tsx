@@ -35,8 +35,13 @@ export default function PersonalOptionsContainer({ amount, showIncome, navigatio
   const [notes, setNotes] = useState<string>("");
 
   async function handleCreateExpense() {
-    if (!amount.trim() || !title.trim()) {
-      store.showSnackbar("Enter All Details");
+    if (!amount.trim()) {
+      store.showSnackbar("Enter the amount");
+      return;
+    }
+
+    if (!title.trim()) {
+      store.showSnackbar("Enter the title");
       return;
     }
 
@@ -274,7 +279,7 @@ export default function PersonalOptionsContainer({ amount, showIncome, navigatio
           <GradientButton text='continue' />
         </TouchableOpacity>
       }
-  
+
       <Modal
         visible={modalVisible}
         transparent={true}

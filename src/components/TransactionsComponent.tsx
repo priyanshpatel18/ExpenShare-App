@@ -14,14 +14,15 @@ export default function TransactionsComponent({ group, navigation }: propsType) 
   return (
     <View style={styles.container}>
       <ScrollView>
-        {group.groupExpenses.map((transaction) => (
+        {group.groupExpenses.map((transaction, index) => (
           <GroupTransaction
+            key={index}
             transactionTitle={transaction.transactionTitle}
             transactionAmount={transaction.transactionAmount}
             transactionDate={transaction.transactionDate}
             paidBy={transaction.paidBy}
             splitAmong={transaction.splitAmong}
-            categoryIcon={getCategorySource(transaction.transactionTitle)}
+            categoryIcon={getCategorySource(transaction.category)}
           />
         ))}
       </ScrollView>

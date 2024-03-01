@@ -7,6 +7,9 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import { GroupDocument, GroupUser, Store } from '../store/store';
 import GradientButton from './GradientButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { LightSpeedOutLeft } from 'react-native-reanimated';
+import socket from '../utils/socket';
 
 type propsType = {
   navigation: NavigationProp<any>;
@@ -84,15 +87,63 @@ export default function GroupOptionsContainer({ transactionAmount, navigation, g
     }
   };
 
-  async function AddGroupTransaction() {
+  async function addGroupTransaction() {
+    if (!transactionAmount.toString().trim() || transactionAmount === 0) {
+      store.showSnackbar("Enter the amount");
+      return;
+    }
+
+    if (!title.trim()) {
+      store.showSnackbar("Enter the title");
+      return;
+    }
+
+    if (selectedMembers.length === 1) {
+      store.showSnackbar("Select someone to split with");
+      return;
+    }
+
     const token = await AsyncStorage.getItem("token");
 
+    store.setLoading(true);
+
+    const combinedDateTime = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      time.getHours(),
+      time.getMinutes(),
+      time.getSeconds()
+    );
+    const isoDate = combinedDateTime.toISOString();
+
     const formData = {
+      token,
       groupId: group._id,
       paidBy: adder ? adder._id : "",
+      splitAmong: selectedMembers,
+      category: store.expenseTitle.toUpperCase(),
+      transactionTitle: title,
       transactionAmount,
-      title,
+      transactionDate: isoDate,
     }
+
+    axios
+      .post("/group/addTransaction", formData)
+      .then((res) => {
+        store.showSnackbar(res.data.message);
+        socket.emit("addTransaction", { groupId: group._id });
+      })
+      .catch(err => {
+        if (axios.isAxiosError(err)) {
+          store.showSnackbar(err.response?.data.message);
+        } else {
+          store.showSnackbar(err.message);
+        }
+      }).finally(() => {
+        store.setLoading(false)
+        navigation.navigate("Group", { group });
+      })
   }
 
 
@@ -172,7 +223,10 @@ export default function GroupOptionsContainer({ transactionAmount, navigation, g
           <GradientButton text='continue' />
         </TouchableOpacity>
         :
-        <TouchableOpacity style={styles.continueButton}>
+        <TouchableOpacity
+          style={styles.continueButton}
+          onPress={addGroupTransaction}
+        >
           <GradientButton text='continue' />
         </TouchableOpacity>
       }

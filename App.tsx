@@ -31,7 +31,7 @@ import { GroupDocument, Store } from './src/store/store';
 import socket from './src/utils/socket';
 import AddGroupTransactionPage from './src/pages/AddGroupTransactionPage';
 
-axios.defaults.baseURL = "http://192.168.147.249:8080";
+axios.defaults.baseURL = "http://192.168.1.3:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 
 axios.defaults.withCredentials = true;
@@ -67,37 +67,24 @@ export default function App(): React.JSX.Element {
 
     socket.on("updateGroup", (data: { group: GroupDocument }) => {
       const { group } = data;
+      console.log(Store.getState().userObject?.userName, group.groupName);
+
 
       const oldGroups = Store.getState().groups;
 
-      const indexToUpdate = oldGroups.findIndex((oldGroup) => oldGroup._id === group._id);
+      const newGroups = oldGroups.map(oldGroup => {
+        if (oldGroup._id === group._id) {
+          return group;
+        }
+        return oldGroup;
+      })
 
-      if (indexToUpdate !== -1) {
-        // If the group exists in the store, update it
-        const updatedGroups = [...oldGroups];
-        updatedGroups[indexToUpdate] = group;
-        store.setGroups(updatedGroups);
-      } else {
-        const updatedGroups = [...oldGroups, group];
-        store.setGroups(updatedGroups);
-      }
+      store.setGroups(newGroups);
     });
-
-    socket.on("removedMember", (data: { groupId: string, message: string }) => {
-      const { message, groupId } = data;
-
-      const updatedGroups = Store.getState().groups.filter(
-        (group) => group._id !== groupId)
-
-      store.setGroups(updatedGroups)
-
-      store.showSnackbar(message)
-    })
 
     return () => {
       socket.off("requestReceived");
       socket.off("updateGroup");
-      socket.off("removedMember");
     };
   }, [socket, email])
 

@@ -329,8 +329,8 @@ export const Store = create<StoreState>(set => ({
         Store.getState().handleRegister(navigation);
       })
       .catch(err => {
-        if (err.response && err.response.data && err.response.data.message) {
-          Store.getState().showSnackbar(err.response.data.message);
+        if (axios.isAxiosError(err)) {
+          Store.getState().showSnackbar(err.response?.data.message);
         } else {
           console.error("Error:", err);
         }
@@ -503,8 +503,6 @@ export const Store = create<StoreState>(set => ({
       .then(res => {
         Store.getState().showSnackbar(res.data.message);
 
-        console.log(res.data.group.members.length);
-
         // Add Group to store
         const newGroup: GroupDocument = {
           _id: res.data.group._id,
@@ -600,7 +598,7 @@ export const Store = create<StoreState>(set => ({
       .post("/user/handleRequest", { token, requestId, type })
       .then(() => {
         if (type === "accept") {
-          socket.emit("acceptRequest", { groupId: groupId });
+          socket.emit("acceptRequest", { groupId });
           navigation.navigate("GroupPage");
         }
         set(prevState => ({
@@ -629,7 +627,7 @@ export const Store = create<StoreState>(set => ({
     axios
       .post("/group/removeMember", { token, memberEmail, groupId })
       .then(() => {
-        socket.emit("removeMember", { groupId: groupId });
+        socket.emit("removeMember", { groupId });
       })
       .catch(err => {
         if (axios.isAxiosError(err)) {
