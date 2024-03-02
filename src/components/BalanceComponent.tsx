@@ -1,58 +1,52 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
-import { GroupDocument } from '../store/store'
+import { GroupDocument, Store } from '../store/store'
+import BalanceUser from './BalanceUser';
+import { ScrollView } from 'moti';
 
 type propsType = {
   group: GroupDocument;
 }
 
 export default function BalanceComponent({ group }: propsType) {
-  const balances = group.balances;
+  const store = Store()
+  const targetGroup = store.groups.find(grp => grp._id === group._id);
+
+  // Function to calculate total balance for each member
+  const calculateTotalBalance = (userId: string) => {
+    let totalBalance = 0;
+    targetGroup?.balances.forEach(balance => {
+      const totalMembers = balance.debtorIds.length + 1;
+
+      if (balance.creditorId._id === userId) {
+        totalBalance += balance.amount / (totalMembers);
+      }
+      if (balance.debtorIds.some(debtorId => debtorId._id === userId)) {
+        totalBalance -= balance.amount / totalMembers;
+      }
+    });
+    return totalBalance.toFixed(2);
+  }
 
   return (
-    <View>
+    <ScrollView>
       {group.members.map((member, index) => (
         <View
           key={index}
-          style={styles.userBalance}
         >
-          {member.profilePicture ? (
-            <Image
-              source={{ uri: member.profilePicture }}
-              style={styles.profilePicture}
-            />
-          ) : (
-            <Image
-              source={require("../assets/defaultUser.png")}
-              style={styles.profilePicture}
-            />
-          )}
-          <Text style={styles.userName}>
-            {member.userName} in total
-          </Text>
+          <BalanceUser
+            member={member}
+            amount={Number(calculateTotalBalance(member._id))}
+            targetGroup={targetGroup}
+          />
         </View>
       ))}
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  userBalance: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    borderBottomColor: "#ccc",
-    borderBottomWidth: 1,
-    paddingBottom: 10,
-    marginBottom: 10
-  },
-  profilePicture: {
-    height: 60,
-    width: 60,
-    borderRadius: 30
-  },
-  userName: {
-    color: "#222",
-    fontSize: 18
-  },
+  balanceContainer: {
+
+  }
 })

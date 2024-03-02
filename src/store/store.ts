@@ -38,6 +38,15 @@ export interface GroupUser {
   profilePicture: string | undefined | null;
 }
 
+export interface GroupBalance {
+  groupId: string;
+  debtorIds: GroupUser[];
+  creditorId: GroupUser;
+  amount: number;
+  status: boolean;
+  date: string;
+}
+
 export interface GroupTransaction {
   _id: string;
   groupId: string;
@@ -49,22 +58,13 @@ export interface GroupTransaction {
   transactionDate: string;
 }
 
-export interface GroupBalance {
-  groupId: string;
-  debtorIds: GroupUser[];
-  creditorId: GroupUser;
-  amount: number;
-  settled: boolean;
-  date: string;
-}
-
 export interface GroupDocument {
   _id: string;
   groupName: string;
   groupProfile?: string | undefined;
   createdBy: GroupUser | undefined;
   members: GroupUser[];
-  groupTransactions: GroupTransaction[];
+  groupExpenses: GroupTransaction[];
   balances: GroupBalance[];
   totalExpense: number;
   category: string;
@@ -520,7 +520,7 @@ export const Store = create<StoreState>(set => ({
           groupProfile: selectedImage ? selectedImage : undefined,
           createdBy: res.data.group.createdBy,
           members: res.data.group.members,
-          groupTransactions: [],
+          groupExpenses: [],
           balances: [],
           totalExpense: 0,
           category: "NONE",

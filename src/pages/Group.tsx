@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import TransactionsComponent from '../components/TransactionsComponent';
 import MembersComponent from '../components/MembersComponent';
-import SettleUpComponent from '../components/SettleUpComponent';
 import BalanceComponent from '../components/BalanceComponent';
 import TotalsComponent from '../components/TotalsComponent';
 import { GroupDocument } from '../store/Store';
@@ -22,18 +21,16 @@ export default function Group({ navigation, route }: propsType) {
 
   const [selectedOption, setSelectedOption] = useState<string>("Transactions");
 
-  const options: string[] = ["Transactions", "Members", "Settle Up", "Balance", "Totals"];
+  const options: string[] = ["Transactions", "Members", "Balance", "Totals"];
 
   const renderComponent = () => {
     switch (selectedOption) {
       case "Members":
         return <MembersComponent group={group} navigation={navigation} />;
-      case "Settle Up":
-        return <SettleUpComponent />;
       case "Balance":
         return <BalanceComponent group={group} />;
       case "Totals":
-        return <TotalsComponent />;
+        return <TotalsComponent group={group} />;
       case "Transactions":
       default:
         return <TransactionsComponent group={group} navigation={navigation} />;

@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Store, TransactionType } from '../store/store';
 import Loading from '../components/Loading';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type propsType = {
   route: {
@@ -75,7 +77,88 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
   const maxDate = new Date();
   maxDate.setHours(0, 0, 0, 0);
 
-  function handleEdit() {
+  async function handleSave() {
+    if (title.trim() === "" || amount.trim() === "") {
+      store.showSnackbar("Title and Amount cannot be empty");
+      return;
+    }
+
+    if (title.trim() === transaction.transactionTitle &&
+      amount.trim() === transaction.transactionAmount.toString() &&
+      notes.trim() === transaction.notes &&
+      invoiceImage === transaction.invoiceUrl &&
+      date.toISOString() === transaction.transactionDate &&
+      time.toISOString() === transaction.transactionDate
+    ) {
+      setEditMode(!editMode);
+      store.showSnackbar("No Changes");
+      return;
+    }
+
+    const token = await AsyncStorage.getItem("token");
+
+    const formData = new FormData();
+    formData.append("token", token);
+
+    const combinedDateTime = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      time.getHours(),
+      time.getMinutes(),
+      time.getSeconds()
+    );
+
+    if (invoiceImage) {
+      const extension = invoiceImage.split('.').pop();
+      formData.append("invoice", {
+        uri: invoiceImage,
+        type: `image/${extension}`,
+        name: `invoice.${extension}`,
+      })
+    }
+
+    formData.append("transactionId", transaction._id);
+    formData.append("transactionAmount", amount ? amount : transaction.transactionAmount);
+    formData.append("category", transaction.category);
+    formData.append("transactionTitle", title ? title : transaction.transactionTitle);
+    formData.append("transactionDate", combinedDateTime.toISOString());
+    formData.append("type", transaction.type);
+    formData.append("notes", notes ? notes : transaction.notes);
+
+
+    store.setLoading(true);
+
+    axios
+      .post(
+        "/transaction/update",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      )
+      .then(res => {
+        store.setTotalBalance(res.data.totals.balance);
+        if (transaction.type === "income") {
+          store.setTotalIncome(res.data.totals.income);
+        } else {
+          store.setTotalExpense(res.data.totals.expense);
+        }
+        store.showSnackbar("Transaction Updated");
+      })
+      .catch(err => {
+        if (axios.isAxiosError(err)) {
+          Store.getState().showSnackbar(err.response?.data.message);
+        } else {
+          console.error(err);
+        }
+      })
+      .finally(() => {
+        store.setLoading(false);
+      });
+
     setEditMode(!editMode);
   }
 
@@ -96,7 +179,7 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
           {editMode ?
             <TouchableOpacity
               style={styles.backButton}
-              onPress={handleEdit}
+              onPress={handleSave}
             >
               <Image
                 source={require("../assets/doneButton.png")}
@@ -153,6 +236,7 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
               style={[styles.text, { fontSize: 30 }, transaction.type === "expense" ? { color: "#f00" } : { color: "#00a200" }]}
               editable={editMode}
               onChangeText={setAmount}
+              keyboardType='numeric'
             />
           </View>
         </View>
@@ -187,11 +271,13 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
                     style={styles.invoiceIcon}
                   />
                 </TouchableOpacity>
-                <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
-                  <Text style={styles.viewImage}>
-                    View Image
-                  </Text>
-                </Pressable>
+                {transaction.invoiceUrl &&
+                  <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
+                    <Text style={styles.viewImage}>
+                      View Image
+                    </Text>
+                  </Pressable>
+                }
               </View>
             }
             {transaction.invoiceUrl && !editMode &&

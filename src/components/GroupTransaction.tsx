@@ -56,7 +56,7 @@ export default function GroupTransaction({
           styles.lentText,
           styles.rightPartText,
           paidBy.userName === store.userObject?.userName ? { color: "#00a200" } : { color: "#f00" }
-        ]}>₹{transactionAmount / splitAmong.length}</Text>
+        ]}>₹{(transactionAmount / splitAmong.length).toFixed(2)}</Text>
       </View>
     </View>
   )

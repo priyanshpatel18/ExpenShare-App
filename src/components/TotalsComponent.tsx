@@ -1,12 +1,72 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { GroupDocument, Store } from '../store/store'
 
-export default function TotalsComponent() {
+type propsType = {
+  group: GroupDocument;
+}
+
+export default function TotalsComponent({ group }: propsType) {
+  const store = Store();
+
+  const targetGroup = store.groups.find(grp => grp._id === group._id);
+  const userName: string | undefined = store.userObject?.userName
+  let totalSpending: number = 0;
+  let totalPaid: number = 0;
+  let totalShare: number = 0;
+
+  if (targetGroup) {
+    targetGroup?.balances.forEach(balance => {
+      if (balance.creditorId.userName === userName) {
+        totalPaid += Number(balance.amount);
+
+        totalShare += balance.amount / (balance.debtorIds.length + 1);
+      }
+
+      balance.debtorIds.forEach(debtorId => {
+        if (debtorId.userName === userName) {
+          totalShare += balance.amount / (balance.debtorIds.length + 1);
+        }
+      })
+
+      totalSpending += Number(balance.amount);
+    });
+  }
+
+
   return (
     <View>
-      <Text>TotalsComponent</Text>
+      <View style={styles.propertyContainer}>
+        <Text style={styles.propertyText}>
+          Total Group Spending
+        </Text>
+        <Text style={styles.propertyValue}>₹{totalSpending.toFixed(2)}</Text>
+      </View>
+      <View style={styles.propertyContainer}>
+        <Text style={styles.propertyText}>Total You Paid For</Text>
+        <Text style={styles.propertyValue}>₹{totalPaid.toFixed(2)}</Text>
+      </View>
+      <View style={styles.propertyContainer}>
+        <Text style={styles.propertyText}>Your Total Share</Text>
+        <Text style={styles.propertyValue}>₹{totalShare.toFixed(2)}</Text>
+      </View>
     </View>
   )
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  propertyContainer: {
+    marginBottom: 20
+  },
+  propertyText: {
+    color: "#222",
+    fontSize: 16,
+    textTransform: "uppercase",
+    fontFamily: "Montserrat-Medium",
+  },
+  propertyValue: {
+    color: "#222",
+    fontSize: 26,
+    fontFamily: "Montserrat-SemiBold",
+  }
+})

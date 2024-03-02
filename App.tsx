@@ -31,7 +31,7 @@ import { GroupDocument, GroupUser, Store } from './src/store/store';
 import socket from './src/utils/socket';
 import AddGroupTransactionPage from './src/pages/AddGroupTransactionPage';
 
-axios.defaults.baseURL = "http://192.168.32.249:8080";
+axios.defaults.baseURL = "http://192.168.1.3:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 
 axios.defaults.withCredentials = true;

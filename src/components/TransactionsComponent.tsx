@@ -11,12 +11,14 @@ type propsType = {
 }
 
 export default function TransactionsComponent({ group, navigation }: propsType) {
-  const groupTransaction = Store().groups.find((grp) => grp._id === group._id)
+  const store = Store();
+
+  const targetGroup = store.groups.find(grp => grp._id === group._id);
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        {groupTransaction?.groupExpenses.map((transaction, index) => (
+        {group.groupExpenses.map((transaction, index) => (
           <GroupTransaction
             key={index}
             transactionTitle={transaction.transactionTitle}
