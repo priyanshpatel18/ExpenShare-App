@@ -271,7 +271,7 @@ const TransactionDetailsPage = ({ route, navigation }: propsType) => {
                     style={styles.invoiceIcon}
                   />
                 </TouchableOpacity>
-                {transaction.invoiceUrl &&
+                {invoiceImage &&
                   <Pressable onPress={() => setIsInvoiceVisible(!isInvoiceVisible)}>
                     <Text style={styles.viewImage}>
                       View Image

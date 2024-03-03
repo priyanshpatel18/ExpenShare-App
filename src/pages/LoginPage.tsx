@@ -4,6 +4,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import GradientButton from '../components/GradientButton'
 import Input from '../components/TextInput'
 import { Store } from '../store/store'
+import Loading from '../components/Loading'
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -16,50 +17,51 @@ export default function LoginPage({ navigation }: propsType): React.JSX.Element 
   const [password, setPassword] = useState<string>("");
 
   return (
-    <View style={styles.container}>
-      <Image
-        style={styles.logo}
-        source={require("../assets/APP-LOGO.png")}
-      />
-      <Text style={styles.headingText}>Login</Text>
-      <View style={styles.formContainer}>
-        <Input
-          imageUrl={require("../assets/email.png")}
-          value={userNameOrEmail}
-          setValue={setUserNameOrEmail}
-          keyboardType='default'
-          placeholder='Email or Username'
-          secureTextEntry={false}
+    store.loading ? <Loading /> :
+      <View style={styles.container}>
+        <Image
+          style={styles.logo}
+          source={require("../assets/APP-LOGO.png")}
         />
-        <Input
-          imageUrl={require("../assets/password.png")}
-          value={password}
-          setValue={setPassword}
-          keyboardType='default'
-          placeholder='Password'
-          secureTextEntry={true}
-        />
-        <Text onPress={() => navigation.navigate("Forgot")} style={styles.forgotLink}>
-          Forgot Password ?
-        </Text>
+        <Text style={styles.headingText}>Login</Text>
+        <View style={styles.formContainer}>
+          <Input
+            imageUrl={require("../assets/email.png")}
+            value={userNameOrEmail}
+            setValue={setUserNameOrEmail}
+            keyboardType='default'
+            placeholder='Email or Username'
+            secureTextEntry={false}
+          />
+          <Input
+            imageUrl={require("../assets/password.png")}
+            value={password}
+            setValue={setPassword}
+            keyboardType='default'
+            placeholder='Password'
+            secureTextEntry={true}
+          />
+          <Text onPress={() => navigation.navigate("Forgot")} style={styles.forgotLink}>
+            Forgot Password ?
+          </Text>
 
-        {store.loading ? (
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => store.showSnackbar("Logging In..")}
-          >
-            <GradientButton text='login' />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => { store.handleLogin(userNameOrEmail, password, navigation) }}
-          >
-            <GradientButton text='login' />
-          </TouchableOpacity>
-        )}
+          {store.loading ? (
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => store.showSnackbar("Logging In..")}
+            >
+              <GradientButton text='login' />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => { store.handleLogin(userNameOrEmail, password, navigation) }}
+            >
+              <GradientButton text='login' />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
   )
 }
 

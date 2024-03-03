@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import GradientButton from '../components/GradientButton';
 import { Store } from '../store/store';
+import Loading from '../components/Loading';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -44,39 +45,40 @@ export default function VerifyOtpPage({ navigation }: propsType): React.JSX.Elem
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headingText}>Verify OTP</Text>
-      <Text style={styles.mainInstruction}>
-        One Time Password (OTP) has been sent via mail to you email
-      </Text>
-      <Text style={styles.subHeading}>
-        Enter the OTP below to verify it.
-      </Text>
-      <TextInput
-        style={styles.input}
-        value={otp}
-        onChangeText={setOtp}
-        placeholder="Enter OTP"
-        keyboardType="numeric"
-        maxLength={6}
-        placeholderTextColor="#999"
-      />
-      {store.loading ? (
-        <TouchableOpacity
-          style={styles.verifyButton}
-          onPress={() => store.showSnackbar("Logging In..")}
-        >
-          <GradientButton text='verify' />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={styles.verifyButton}
-          onPress={() => handleVerifyOtp()}
-        >
-          <GradientButton text='verify' />
-        </TouchableOpacity>
-      )}
-    </View>
+    store.loading ? <Loading /> :
+      <View style={styles.container}>
+        <Text style={styles.headingText}>Verify OTP</Text>
+        <Text style={styles.mainInstruction}>
+          One Time Password (OTP) has been sent via mail to you email
+        </Text>
+        <Text style={styles.subHeading}>
+          Enter the OTP below to verify it.
+        </Text>
+        <TextInput
+          style={styles.input}
+          value={otp}
+          onChangeText={setOtp}
+          placeholder="Enter OTP"
+          keyboardType="numeric"
+          maxLength={6}
+          placeholderTextColor="#999"
+        />
+        {store.loading ? (
+          <TouchableOpacity
+            style={styles.verifyButton}
+            onPress={() => store.showSnackbar("Logging In..")}
+          >
+            <GradientButton text='verify' />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.verifyButton}
+            onPress={() => handleVerifyOtp()}
+          >
+            <GradientButton text='verify' />
+          </TouchableOpacity>
+        )}
+      </View>
   );
 }
 

@@ -1,8 +1,9 @@
 import { NavigationProp } from '@react-navigation/native';
-import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GroupDocument, Store } from '../store/store';
 import NoFriendSection from './NoFriendSection';
+import { MotiView } from 'moti';
 
 type propsType = {
   group: GroupDocument;
@@ -10,12 +11,15 @@ type propsType = {
 }
 
 export default function MembersComponent({ group, navigation }: propsType) {
-  const store = Store()
+  const store = Store();
 
   const userEmail = store.userObject?.email;
   const groupCreator = group.createdBy?.email;
 
   const targetGroup = store.groups.find(grp => grp._id === group._id);
+
+  // Define state for tracking which member's alert is shown
+  const [showAlertForMember, setShowAlertForMember] = useState<string | null>(null);
 
   return (
     <>
@@ -42,7 +46,7 @@ export default function MembersComponent({ group, navigation }: propsType) {
                 </View>
                 {userEmail === groupCreator && member.email !== userEmail &&
                   <TouchableOpacity
-                    onPress={() => store.handleRemoveMember(member.email, group._id, navigation)}
+                    onPress={() => setShowAlertForMember(member.userName)} // Set alert for the clicked member
                   >
                     <Image
                       source={require("../assets/removeButton.png")}
@@ -50,6 +54,46 @@ export default function MembersComponent({ group, navigation }: propsType) {
                     />
                   </TouchableOpacity>}
               </View>
+              {showAlertForMember === member.userName && (
+                <Modal transparent visible={true}>
+                  <Pressable style={styles.modalContainer}>
+                    <MotiView
+                      from={{
+                        opacity: 0,
+                        scale: 0.5,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        scale: 1,
+                      }}
+                      transition={{
+                        type: 'timing',
+                      }}
+                    >
+                      <View style={styles.alertContainer}>
+                        <Text style={styles.alertText}>Are you sure you want to remove {member.userName}?</Text>
+                        <View style={styles.buttonContainer}>
+                          <TouchableOpacity
+                            style={[styles.alertButton, styles.cancelButton]}
+                            onPress={() => setShowAlertForMember(null)}
+                          >
+                            <Text style={[styles.alertButtonText]}>Cancel</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[styles.alertButton, styles.okButton]}
+                            onPress={() => {
+                              setShowAlertForMember(null);
+                              store.handleRemoveMember(member.email, targetGroup);
+                            }}
+                          >
+                            <Text style={[styles.alertButtonText]}>OK</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </MotiView>
+                  </Pressable>
+                </Modal>
+              )}
             </View>
           )
         })}
@@ -58,6 +102,7 @@ export default function MembersComponent({ group, navigation }: propsType) {
     </>
   )
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -86,4 +131,45 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30
   },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  alertContainer: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    maxWidth: "90%"
+  },
+  alertText: {
+    textAlign: "center",
+    width: "70%",
+    color: "#222",
+    fontSize: 20,
+  },
+  buttonContainer: {
+    marginTop: 15,
+    flexDirection: "row",
+    gap: 20
+  },
+  alertButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  cancelButton: {
+    backgroundColor: "#58B9E6"
+  },
+  okButton: {
+    backgroundColor: "#ff4545"
+  },
+  alertButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontSize: 20,
+  }
 })

@@ -10,27 +10,21 @@ export default function TotalsComponent({ group }: propsType) {
   const store = Store();
 
   const targetGroup = store.groups.find(grp => grp._id === group._id);
-  const userName: string | undefined = store.userObject?.userName
-  let totalSpending: number = 0;
+  const userName: string | undefined = store.userObject?.userName;
   let totalPaid: number = 0;
   let totalShare: number = 0;
 
   if (targetGroup) {
-    targetGroup?.balances.forEach(balance => {
-      if (balance.creditorId.userName === userName) {
-        totalPaid += Number(balance.amount);
-
-        totalShare += balance.amount / (balance.debtorIds.length + 1);
+    targetGroup.groupExpenses.forEach(expense => {
+      if (expense.paidBy.userName === userName) {
+        totalPaid += expense.transactionAmount;
       }
-
-      balance.debtorIds.forEach(debtorId => {
-        if (debtorId.userName === userName) {
-          totalShare += balance.amount / (balance.debtorIds.length + 1);
+      expense.splitAmong.forEach(member => {
+        if (member.userName === userName) {
+          totalShare += expense.transactionAmount / expense.splitAmong.length;
         }
       })
-
-      totalSpending += Number(balance.amount);
-    });
+    })
   }
 
 
@@ -40,7 +34,7 @@ export default function TotalsComponent({ group }: propsType) {
         <Text style={styles.propertyText}>
           Total Group Spending
         </Text>
-        <Text style={styles.propertyValue}>₹{totalSpending.toFixed(2)}</Text>
+        <Text style={styles.propertyValue}>₹{targetGroup?.totalExpense ? targetGroup.totalExpense.toFixed(2) : `0.00`}</Text>
       </View>
       <View style={styles.propertyContainer}>
         <Text style={styles.propertyText}>Total You Paid For</Text>

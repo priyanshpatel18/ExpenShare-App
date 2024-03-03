@@ -4,6 +4,7 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import { Store } from '../store/store';
 
 import GradientButton from '../components/GradientButton';
+import Loading from '../components/Loading';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -14,37 +15,38 @@ export default function VerifyEmailPage({ navigation }: propsType): React.JSX.El
   const store = Store();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headingText}>Verify Email</Text>
-      <Text style={styles.mainInstruction}>
-        One Time Password (OTP) has been sent via mail to your email
-      </Text>
-      <Text style={styles.subHeading}>
-        Enter the OTP below to verify it.
-      </Text>
-      <TextInput
-        style={styles.input}
-        value={otp}
-        onChangeText={setOtp}
-        placeholder="Enter OTP"
-        keyboardType="numeric"
-        placeholderTextColor="#999"
-        maxLength={6}
-      />
-      {store.loading ? (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => store.showSnackbar("Creating Account...")}
-        >
-          <GradientButton text='verify' />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={() => store.handleVerifyEmail(otp, navigation)}>
-          <GradientButton text='verify' />
-        </TouchableOpacity>
-      )
-      }
-    </View >
+    store.loading ? <Loading /> :
+      <View style={styles.container}>
+        <Text style={styles.headingText}>Verify Email</Text>
+        <Text style={styles.mainInstruction}>
+          One Time Password (OTP) has been sent via mail to your email
+        </Text>
+        <Text style={styles.subHeading}>
+          Enter the OTP below to verify it.
+        </Text>
+        <TextInput
+          style={styles.input}
+          value={otp}
+          onChangeText={setOtp}
+          placeholder="Enter OTP"
+          keyboardType="numeric"
+          placeholderTextColor="#999"
+          maxLength={6}
+        />
+        {store.loading ? (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => store.showSnackbar("Creating Account...")}
+          >
+            <GradientButton text='verify' />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={() => store.handleVerifyEmail(otp, navigation)}>
+            <GradientButton text='verify' />
+          </TouchableOpacity>
+        )
+        }
+      </View >
   );
 }
 

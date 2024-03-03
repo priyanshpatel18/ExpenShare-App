@@ -6,6 +6,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, Vi
 import GradientButton from '../components/GradientButton';
 import Input from '../components/TextInput';
 import { Store } from '../store/store';
+import Loading from '../components/Loading';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -33,7 +34,7 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
       store.showSnackbar("Username cannot contain spaces");
       return;
     }
-    
+
     if (userName.length > 15) {
       store.showSnackbar("Username should be max 15 characters");
       return;
@@ -96,74 +97,75 @@ export default function RegisterPage({ navigation }: propsType): React.JSX.Eleme
   }
 
   return (
-    <View style={styles.container}>
-      <Image
-        style={styles.logo}
-        source={require("../assets/APP-LOGO.png")}
-      />
-      <Text style={styles.headingText}>register</Text>
-      <View style={styles.formContainer}>
-        <TouchableWithoutFeedback
-          onPress={() => store.pickImage(setSelectedImage)}
-        >
-          <View style={styles.imageContainer}>
-            {selectedImage ? (
-              <Image
-                style={styles.profileImage}
-                source={{ uri: selectedImage }}
-              />
-            ) : (
-              <Image
-                style={styles.profileImage}
-                source={require("../assets/defaultUser.png")}
-              />
-            )}
-            <View style={styles.addIconContainer}>
-              <Text style={styles.addIcon}>+</Text>
+    store.loading ? <Loading /> :
+      <View style={styles.container}>
+        <Image
+          style={styles.logo}
+          source={require("../assets/APP-LOGO.png")}
+        />
+        <Text style={styles.headingText}>register</Text>
+        <View style={styles.formContainer}>
+          <TouchableWithoutFeedback
+            onPress={() => store.pickImage(setSelectedImage)}
+          >
+            <View style={styles.imageContainer}>
+              {selectedImage ? (
+                <Image
+                  style={styles.profileImage}
+                  source={{ uri: selectedImage }}
+                />
+              ) : (
+                <Image
+                  style={styles.profileImage}
+                  source={require("../assets/defaultUser.png")}
+                />
+              )}
+              <View style={styles.addIconContainer}>
+                <Text style={styles.addIcon}>+</Text>
+              </View>
             </View>
-          </View>
-        </TouchableWithoutFeedback>
-        <Input
-          imageUrl={require("../assets/username.png")}
-          value={userName}
-          setValue={setUserName}
-          keyboardType='default'
-          placeholder='Username'
-          secureTextEntry={false}
-        />
-        <Input
-          imageUrl={require("../assets/email.png")}
-          value={email}
-          setValue={setEmail}
-          keyboardType='email-address'
-          placeholder='Email address'
-          secureTextEntry={false}
-        />
-        <Input
-          imageUrl={require("../assets/password.png")}
-          value={password}
-          setValue={setPassword}
-          keyboardType='default'
-          secureTextEntry={true}
-          placeholder='Password'
-        />
-        {store.loading ? (
-          <TouchableOpacity
-            style={styles.registerButton}
-            onPress={() => store.showSnackbar("Creating Account..")}
-          >
-            <GradientButton text='register' />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.registerButton}
-            onPress={() => handleRegister()}
-          >
-            <GradientButton text='register' />
-          </TouchableOpacity>
-        )}
+          </TouchableWithoutFeedback>
+          <Input
+            imageUrl={require("../assets/username.png")}
+            value={userName}
+            setValue={setUserName}
+            keyboardType='default'
+            placeholder='Username'
+            secureTextEntry={false}
+          />
+          <Input
+            imageUrl={require("../assets/email.png")}
+            value={email}
+            setValue={setEmail}
+            keyboardType='email-address'
+            placeholder='Email address'
+            secureTextEntry={false}
+          />
+          <Input
+            imageUrl={require("../assets/password.png")}
+            value={password}
+            setValue={setPassword}
+            keyboardType='default'
+            secureTextEntry={true}
+            placeholder='Password'
+          />
+          {store.loading ? (
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={() => store.showSnackbar("Creating Account..")}
+            >
+              <GradientButton text='register' />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={() => handleRegister()}
+            >
+              <GradientButton text='register' />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
   )
 }
 

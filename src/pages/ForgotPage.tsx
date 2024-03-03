@@ -5,6 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import GradientButton from '../components/GradientButton';
 import Input from '../components/TextInput';
 import { Store } from '../store/store';
+import Loading from '../components/Loading';
 
 type propsType = {
   navigation: NavigationProp<any>
@@ -15,40 +16,41 @@ export default function ForgotPage({ navigation }: propsType): React.JSX.Element
   const store = Store()
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headingText}>forgot password?</Text>
-      <Text style={styles.subHeading}>
-        That's no fun. Enter your email and we'll send you instructions to reset your password.
-      </Text>
-      <View style={styles.formContainer}>
-        <Input
-          imageUrl={require("../assets/email.png")}
-          value={email}
-          setValue={setEmail}
-          keyboardType='email-address'
-          placeholder='Email Address'
-          secureTextEntry={false}
-        />
-        {store.loading ? (
-          <TouchableOpacity
-            style={styles.sendMailButton}
-            onPress={() => store.showSnackbar("Sending Mail..")}
-          >
-            <GradientButton text='send mail' />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.sendMailButton}
-            onPress={async () => {
-              await AsyncStorage.setItem("resetEmail", email);
-              store.handleSendMail(email, navigation);
-            }}
-          >
-            <GradientButton text='send mail' />
-          </TouchableOpacity>
-        )}
+    store.loading ? <Loading /> :
+      <View style={styles.container}>
+        <Text style={styles.headingText}>forgot password?</Text>
+        <Text style={styles.subHeading}>
+          That's no fun. Enter your email and we'll send you instructions to reset your password.
+        </Text>
+        <View style={styles.formContainer}>
+          <Input
+            imageUrl={require("../assets/email.png")}
+            value={email}
+            setValue={setEmail}
+            keyboardType='email-address'
+            placeholder='Email Address'
+            secureTextEntry={false}
+          />
+          {store.loading ? (
+            <TouchableOpacity
+              style={styles.sendMailButton}
+              onPress={() => store.showSnackbar("Sending Mail..")}
+            >
+              <GradientButton text='send mail' />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.sendMailButton}
+              onPress={async () => {
+                await AsyncStorage.setItem("resetEmail", email);
+                store.handleSendMail(email, navigation);
+              }}
+            >
+              <GradientButton text='send mail' />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
   )
 }
 

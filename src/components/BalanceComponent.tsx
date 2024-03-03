@@ -16,25 +16,25 @@ export default function BalanceComponent({ group }: propsType) {
   const calculateTotalBalance = (userId: string) => {
     let totalBalance = 0;
     targetGroup?.balances.forEach(balance => {
-      const totalMembers = balance.debtorIds.length + 1;
-
-      if (balance.creditorId._id === userId) {
-        totalBalance += balance.amount / (totalMembers);
+      if (balance.creditor._id === userId) {
+        totalBalance += balance.amount;
       }
-      if (balance.debtorIds.some(debtorId => debtorId._id === userId)) {
-        totalBalance -= balance.amount / totalMembers;
+      else if (balance.debtor._id === userId) {
+        totalBalance -= balance.amount;
       }
     });
+
     return totalBalance.toFixed(2);
   }
 
   return (
     <ScrollView>
-      {group.members.map((member, index) => (
+      {targetGroup?.members.map((member, index) => (
         <View
           key={index}
         >
           <BalanceUser
+            userName={store.userObject?.userName}
             member={member}
             amount={Number(calculateTotalBalance(member._id))}
             targetGroup={targetGroup}

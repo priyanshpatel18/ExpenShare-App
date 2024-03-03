@@ -40,11 +40,9 @@ export interface GroupUser {
 
 export interface GroupBalance {
   groupId: string;
-  debtorIds: GroupUser[];
-  creditorId: GroupUser;
+  debtor: GroupUser;
+  creditor: GroupUser;
   amount: number;
-  status: boolean;
-  date: string;
 }
 
 export interface GroupTransaction {
@@ -178,8 +176,7 @@ interface StoreState {
   // Handle Remove Member
   handleRemoveMember: (
     memberEmail: string,
-    groupId: string,
-    navigation: NavigationProp<any>,
+    targetGroup: GroupDocument | undefined,
   ) => void;
 }
 
@@ -231,7 +228,9 @@ export const Store = create<StoreState>(set => ({
     axios
       .post("/transaction/getAll", { token })
       .then(res => {
-        set({ transactions: res.data.transactions });
+        if (res.data.transactions) {
+          set({ transactions: res.data.transactions });
+        }
       })
       .catch(err => {
         console.log(err);
@@ -294,7 +293,7 @@ export const Store = create<StoreState>(set => ({
         Store.getState().showSnackbar(res.data.message);
       })
       .catch(err => {
-        Store.getState().showSnackbar(err.response.data.message);
+        Store.getState().showSnackbar(err.response?.data.message);
       })
       .finally(() => {
         set({ loading: false });
@@ -305,6 +304,7 @@ export const Store = create<StoreState>(set => ({
     if (!email.trim()) {
       Store.getState().showSnackbar("Enter the Email");
     }
+    console.log(email);
 
     set({ loading: true });
     Store.getState().showSnackbar("Sending Mail...");
@@ -312,6 +312,7 @@ export const Store = create<StoreState>(set => ({
     axios
       .post(`/user/sendMail`, { email })
       .then(async res => {
+        console.log(res.data.message);
         Store.getState().showSnackbar(res.data.message);
         await AsyncStorage.setItem("otpId", res.data.otpId);
         navigation.navigate("VerifyOtp");
@@ -410,16 +411,20 @@ export const Store = create<StoreState>(set => ({
           token: await AsyncStorage.getItem("token"),
         }),
       ]);
+
       const userData = userDataResponse.data.user;
       const requestData = requestResponse.data.notifications;
 
-      set({ notifications: requestData });
+      if (requestData) {
+        set({ notifications: requestData });
+      }
 
       set({ userObject: userData });
       set({ totalBalance: Number(userData.totalBalance) });
       set({ totalIncome: Number(userData.totalIncome) });
       set({ totalExpense: Number(userData.totalExpense) });
     } catch (error) {
+      console.log("Error Fetching");
       if (axios.isAxiosError(error)) {
         navigation.navigate("Welcome");
         Store.getState().showSnackbar(error.response?.data.message);
@@ -591,7 +596,9 @@ export const Store = create<StoreState>(set => ({
     const token = await AsyncStorage.getItem("token");
 
     axios.post("/group/getAll", { token }).then(res => {
-      set({ groups: res.data.groups });
+      if (res.data.groups) {
+        set({ groups: res.data.groups });
+      }
     });
   },
 
@@ -630,25 +637,39 @@ export const Store = create<StoreState>(set => ({
       });
   },
 
-  handleRemoveMember: async (memberEmail, groupId, navigation) => {
+  handleRemoveMember: async (memberEmail, targetGroup) => {
     const token = await AsyncStorage.getItem("token");
 
-    set({ loading: true });
+    if (targetGroup) {
+      const existingBalance = targetGroup.balances.find(
+        balance =>
+          balance.debtor.email === memberEmail ||
+          balance.creditor.email === memberEmail,
+      );
+      if (existingBalance) {
+        Store.getState().showSnackbar("User is not settled up");
+        return;
+      }
 
-    axios
-      .post("/group/removeMember", { token, memberEmail, groupId })
-      .then(() => {
-        socket.emit("removeMember", { groupId });
-      })
-      .catch(err => {
-        if (axios.isAxiosError(err)) {
-          Store.getState().showSnackbar(err.response?.data.message);
-        } else {
-          console.error(err);
-        }
-      })
-      .finally(() => {
-        set({ loading: false });
-      });
+      const groupId = targetGroup._id;
+
+      set({ loading: true });
+
+      axios
+        .post("/group/removeMember", { token, memberEmail, groupId })
+        .then(() => {
+          socket.emit("removeMember", { groupId });
+        })
+        .catch(err => {
+          if (axios.isAxiosError(err)) {
+            Store.getState().showSnackbar(err.response?.data.message);
+          } else {
+            console.error(err);
+          }
+        })
+        .finally(() => {
+          set({ loading: false });
+        });
+    }
   },
 }));
