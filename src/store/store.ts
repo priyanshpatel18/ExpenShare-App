@@ -39,6 +39,7 @@ export interface GroupUser {
 }
 
 export interface GroupBalance {
+  _id: string;
   groupId: string;
   debtor: GroupUser;
   creditor: GroupUser;
@@ -178,6 +179,9 @@ interface StoreState {
     memberEmail: string,
     targetGroup: GroupDocument | undefined,
   ) => void;
+
+  // Delete Balance
+  handleDeleteBalance: (balanceId: string) => void;
 }
 
 export const Store = create<StoreState>(set => ({
@@ -671,5 +675,28 @@ export const Store = create<StoreState>(set => ({
           set({ loading: false });
         });
     }
+  },
+
+  handleDeleteBalance: async balanceId => {
+    const token = await AsyncStorage.getItem("token");
+
+    set({ loading: true });
+
+    axios
+      .post("/group/deleteBalance", { token, balanceId })
+      .then(() => {
+        socket.emit("deleteBalance", balanceId);
+        Store.getState().showSnackbar("Balance deleted");
+      })
+      .catch(err => {
+        if (axios.isAxiosError(err)) {
+          Store.getState().showSnackbar(err.response?.data.message);
+        } else {
+          console.error(err);
+        }
+      })
+      .finally(() => {
+        set({ loading: false });
+      });
   },
 }));

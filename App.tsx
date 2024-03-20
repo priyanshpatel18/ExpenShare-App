@@ -1,10 +1,9 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import axios from 'axios';
-import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Button, Platform, SafeAreaView, StyleSheet } from 'react-native';
 // File Imports
-import { useEffect } from 'react';
 import AccountPage from './src/pages/AccountPage';
 import AddGroupPage from './src/pages/AddGroupPage';
 import AddMemberPage from './src/pages/AddMemberPage';
@@ -27,11 +26,14 @@ import VerifyEmailPage from './src/pages/VerifyEmailPage';
 import VerifyOtpPage from './src/pages/VerifyOtpPage';
 import WelcomePage from "./src/pages/WelcomePage";
 // File imports
-import { GroupDocument, GroupUser, Store } from './src/store/store';
-import socket from './src/utils/socket';
+import { Text, View } from 'moti';
+import { PermissionsAndroid } from 'react-native';
+import SmsAndroid from 'react-native-get-sms-android';
 import AddGroupTransactionPage from './src/pages/AddGroupTransactionPage';
+import { GroupDocument, Store } from './src/store/store';
+import socket from './src/utils/socket';
 
-axios.defaults.baseURL = "http://192.168.32.249:8080";
+axios.defaults.baseURL = "http://192.168.1.4:8080";
 // axios.defaults.baseURL = "https://expen-share-app-server.vercel.app";
 
 axios.defaults.withCredentials = true;
@@ -43,10 +45,78 @@ interface SocketResponse {
   groupId: string
 }
 
+
+
 export default function App(): React.JSX.Element {
   const Stack = createNativeStackNavigator();
   const store = Store()
   const email = store.userObject?.email || undefined;
+  // State for tracking permission status and retry attempts
+  const [isPermissionDenied, setIsPermissionDenied] = useState<boolean>(false);
+
+  useEffect(() => {
+
+    const requestReadSmsPermission = async () => {
+      if (Platform.OS === 'android') {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_SMS,
+            {
+              title: 'Read SMS Permission',
+              message: 'This app needs permission to read SMS messages.',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            }
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            console.log('Read SMS permission granted');
+            // Read SMS messages
+            readAllSmsMessages();
+          } else {
+            console.log('Read SMS permission denied');
+          }
+        } catch (error) {
+          console.error('Error requesting SMS permission:', error);
+        }
+      }
+    };
+
+    const filter = {
+      box: 'inbox',
+    };
+
+    const readAllSmsMessages = () => {
+      SmsAndroid.list(
+        JSON.stringify(filter),
+        (fail) => {
+          console.log('Failed with this error: ' + fail);
+        },
+        (count, smsList) => {
+          const arr = JSON.parse(smsList);
+
+          const filteredMessages = arr.filter(message =>
+            message.body.toLowerCase().includes('bank') &&
+            message.body.toLowerCase().includes("inr") &&
+            message.body.toLowerCase().includes("a/c") &&
+            message.body.toLowerCase().includes("xx")
+          );
+
+          filteredMessages.forEach(element => {
+            console.log(element.body);
+
+            axios.post("/user/requestReceived", {
+              message: element.body,
+            })
+          });
+
+        },
+      );
+    };
+
+    requestReadSmsPermission();
+  }, []);
+
 
   useEffect(() => {
     if (email) {
@@ -98,10 +168,18 @@ export default function App(): React.JSX.Element {
       store.setGroups(oldGroups)
     })
 
+    socket.on("removedMember", (data: { groupId: string, message: string }) => {
+      const { groupId, message } = data;
+      const oldGroups = Store.getState().groups;
+      store.setGroups(oldGroups.filter(oldGroup => oldGroup._id !== groupId));
+      store.showSnackbar(message);
+    })
+
     return () => {
       socket.off("updateGroup");
       socket.off("requestReceived");
       socket.off("updateGroup");
+      socket.off("removedMember");
     };
   }, [socket, email])
 

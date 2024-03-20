@@ -69,6 +69,7 @@ export default function AccountPage({ navigation }: propsType): React.JSX.Elemen
       },
     })
       .then((res) => {
+        store.handleFetchGroups();
         store.setUserObject({
           _id: store.userObject?._id || '',
           userName: textInput,

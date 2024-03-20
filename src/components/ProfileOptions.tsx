@@ -79,12 +79,11 @@ export default function UserProfileOptions({ navigation }: propsType): React.JSX
         </View>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => {
-        if (store.transactions !== undefined) {
-          navigation.navigate("Report");
+        if (store.transactions && store.transactions?.length < 5) {
+          // store.showSnackbar("Insufficient Data");
+        } else {
         }
-        else {
-          store.showSnackbar("Insufficient Data");
-        }
+        navigation.navigate("Report");
       }}>
         <View style={styles.button}>
           <View style={[styles.iconContainer, { backgroundColor: "#99f691" }]}>

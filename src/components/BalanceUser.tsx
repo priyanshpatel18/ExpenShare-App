@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { GroupDocument, GroupUser } from '../store/store';
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { GroupDocument, GroupUser, Store } from '../store/store';
 
 type propsType = {
   userName: string | undefined;
@@ -12,11 +12,11 @@ type propsType = {
 export default function BalanceUser({ userName, member, amount, targetGroup }: propsType) {
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const isUser = userName === member.userName
+  const store = Store();
 
   return (
     <View style={styles.userBalanceContainer}>
       <Pressable
-
         onPress={() => {
           setShowDropDown(!showDropDown)
         }}
@@ -59,43 +59,59 @@ export default function BalanceUser({ userName, member, amount, targetGroup }: p
           <View style={styles.balanceContainer}>
             {targetGroup?.balances.map((balance, index) => (
               <View key={index}>
-                {balance.debtor._id === member._id && (
-                  <View style={styles.dropDownUser}>
-                    <Image
-                      source={
-                        balance.creditor.profilePicture
-                          ? { uri: balance.creditor.profilePicture }
-                          : require("../assets/defaultUser.png")
+                <View >
+                  {balance.debtor._id === member._id && (
+                    <View style={styles.dropDownUser}>
+                      <Image
+                        source={
+                          balance.creditor.profilePicture
+                            ? { uri: balance.creditor.profilePicture }
+                            : require("../assets/defaultUser.png")
+                        }
+                        style={styles.dropDownProfile}
+                      />
+                      <Text style={styles.dropDownText}>
+                        {`${balance.debtor.userName} owes ${balance.creditor.userName} `}
+                        <Text style={{ fontWeight: "bold", color: "red" }}>₹{balance.amount}</Text>
+                      </Text>
+                    </View>
+                  )}
+                  {balance.creditor._id === member._id && (
+                    <View style={styles.dropDownUser}>
+                      <Image
+                        source={
+                          balance.debtor.profilePicture
+                            ? { uri: balance.debtor.profilePicture }
+                            : require("../assets/defaultUser.png")
+                        }
+                        style={styles.dropDownProfile}
+                      />
+                      <Text style={styles.dropDownText}>
+                        {`${balance.creditor.userName} gets back `}
+                        <Text style={{ fontWeight: "bold", color: "#00a200" }}>₹{balance.amount}</Text>
+                        {` from ${balance.debtor.userName}`}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+                {
+                  isUser &&
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (balance.creditor.userName === member.userName) {
+                        store.handleDeleteBalance(balance._id)
+                      } else {
+                        console.log("Send Request", balance.creditor.userName);
                       }
-                      style={styles.dropDownProfile}
-                    />
-                    <Text style={styles.dropDownText}>
-                      {`${balance.debtor.userName} owes ${balance.creditor.userName} `}
-                      <Text style={{ fontWeight: "bold", color: "red" }}>₹{balance.amount}</Text>
-                    </Text>
-                  </View>
-                )}
-                {balance.creditor._id === member._id && (
-                  <View style={styles.dropDownUser}>
-                    <Image
-                      source={
-                        balance.debtor.profilePicture
-                          ? { uri: balance.debtor.profilePicture }
-                          : require("../assets/defaultUser.png")
-                      }
-                      style={styles.dropDownProfile}
-                    />
-                    <Text style={styles.dropDownText}>
-                      {`${balance.creditor.userName} gets back `}
-                      <Text style={{ fontWeight: "bold", color: "#00a200" }}>₹{balance.amount}</Text>
-                      {` from ${balance.debtor.userName}`}
-                    </Text>
-                  </View>
-                )}
+                    }}
+                    style={styles.settleUp}
+                  >
+                    <Text style={styles.settleUpText}>Settle Up</Text>
+                  </TouchableOpacity>
+                }
               </View>
             ))}
           </View>
-
         )
       }
 
@@ -152,4 +168,16 @@ const styles = StyleSheet.create({
     color: "#777",
     maxWidth: "70%",
   },
+  settleUp: {
+    padding: 10,
+    backgroundColor: "#ccc",
+    marginLeft: 30,
+    borderRadius: 10,
+    alignSelf: "flex-start",
+  },
+  settleUpText: {
+    color: "#222",
+    fontSize: 20,
+    fontFamily: "Montserrat-Medium",
+  }
 })

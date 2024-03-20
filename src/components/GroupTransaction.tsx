@@ -17,7 +17,8 @@ export default function GroupTransaction({
   categoryIcon,
   transactionTitle,
   transactionAmount,
-  transactionDate }
+  transactionDate
+}
   : propsType) {
   const store = Store();
 
@@ -44,20 +45,25 @@ export default function GroupTransaction({
           <Text style={styles.amount}>{paidBy.userName} paid ₹{transactionAmount}</Text>
         </View>
       </View>
-      <View>
-        <Text style={[
-          styles.lentText,
-          styles.rightPartText,
-          paidBy.userName === store.userObject?.userName ? { color: "#00a200" } : { color: "#f00" }
-        ]}>
-          You {paidBy.userName === store.userObject?.userName ? " lent" : " borrowed"}
-        </Text>
-        <Text style={[
-          styles.lentText,
-          styles.rightPartText,
-          paidBy.userName === store.userObject?.userName ? { color: "#00a200" } : { color: "#f00" }
-        ]}>₹{(transactionAmount / splitAmong.length).toFixed(2)}</Text>
-      </View>
+      {splitAmong.some(user => user.email === store.userObject?.email) ?
+        <View>
+          <Text style={[
+            styles.lentText,
+            styles.rightPartText,
+            paidBy.userName === store.userObject?.userName ? { color: "#00a200" } : { color: "#f00" }
+          ]}>
+            You {paidBy.userName === store.userObject?.userName ? " lent" : " borrowed"}
+          </Text>
+          <Text style={[
+            styles.lentText,
+            styles.rightPartText,
+
+            paidBy.userName === store.userObject?.userName ? { color: "#00a200" } : { color: "#f00" }
+          ]}>₹{(transactionAmount / splitAmong.length).toFixed(2)}</Text>
+        </View>
+        :
+        <Text style={{color: "#aaa", fontSize: 30, fontWeight: "500"}}> - </Text>
+      }
     </View>
   )
 }

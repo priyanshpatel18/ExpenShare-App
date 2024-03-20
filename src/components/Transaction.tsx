@@ -20,7 +20,7 @@ export default function Transaction({ title, type, amount, imageUrl }: propsType
       styles.transaction,
       type === "expense" ? { backgroundColor: "#FDD" } :
         type === "income" ? { backgroundColor: "#DFD" } :
-          { backgroundColor: "#CFCFCF" }
+          { backgroundColor: "#dfdfdf" }
     ]}>
       <View style={styles.mainTransaction}>
         <View style={styles.categoryIconContainer}>

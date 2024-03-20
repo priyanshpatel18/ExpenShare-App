@@ -37,7 +37,7 @@ export default function MainChart({ percentages, colors }: propsType): React.JSX
 
 
   return (
-    <View style={styles.container}>
+    <View>
       <Svg width={radius * 2} height={radius * 2} viewBox={`0 0 ${halfCircle * 2} ${halfCircle * 2}`} style={{ alignSelf: "center" }}>
         <G rotation="-90" origin={`${halfCircle}, ${halfCircle}`}>
           {percentages.map((_, index) => (
@@ -64,7 +64,5 @@ export default function MainChart({ percentages, colors }: propsType): React.JSX
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginVertical: 20
-  }
+  
 })
